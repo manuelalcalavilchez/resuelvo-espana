@@ -57,7 +57,12 @@ app.use(helmet({
       "frame-ancestors": ["'none'"]
     }
   },
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  // Por defecto helmet pone "no-referrer", lo que impide la comprobación CSRF
+  // basada en Referer (algunos formularios HTML no envían Origin). Usamos
+  // "same-origin": se envía Referer solo en peticiones al propio dominio,
+  // nunca hacia fuera → privacidad intacta + CSRF funcional.
+  referrerPolicy: { policy: 'same-origin' }
 }));
 
 // Middleware
@@ -96,8 +101,16 @@ app.use((req, res, next) => {
   const rawOrigin = req.get('Origin') || req.get('Referer') || '';
   // Origin "null" lo envían algunos navegadores en contextos sandbox o file:// — lo tratamos como ausente
   const origin = rawOrigin && rawOrigin !== 'null' ? rawOrigin : '';
+
+  // Fallback moderno: Sec-Fetch-Site (enviado por todos los navegadores modernos desde 2020)
+  // Si el navegador declara explícitamente que la petición es same-origin, confiamos.
+  const secFetchSite = (req.get('Sec-Fetch-Site') || '').toLowerCase();
+  if (!origin && (secFetchSite === 'same-origin' || secFetchSite === 'none')) {
+    return next();
+  }
+
   if (!origin) {
-    logger.warn({ path: req.path, ua: req.get('User-Agent') }, 'CSRF: sin Origin/Referer');
+    logger.warn({ path: req.path, ua: req.get('User-Agent'), secFetchSite }, 'CSRF: sin Origin/Referer');
     return res.status(403).send('CSRF: origen ausente (activa las cookies y JavaScript, y envía el formulario desde la misma página).');
   }
 
