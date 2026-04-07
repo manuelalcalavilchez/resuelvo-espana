@@ -78,6 +78,7 @@ const translations = {
     plans_vip: 'VIP',
     plans_diamond: 'Diamante',
     plans_compare: 'Comparar planes',
+    plans_contact_info: 'Todos los precios se confirman por WhatsApp.',
 
     // Registro (registro.ejs)
     register_title: 'Únete a Queens',
@@ -192,6 +193,7 @@ const translations = {
     plans_vip: 'VIP',
     plans_diamond: 'Diamond',
     plans_compare: 'Compare plans',
+    plans_contact_info: 'All prices are confirmed via WhatsApp.',
 
     register_title: 'Join Queens',
     register_subtitle: 'Create your profile and start advertising',
