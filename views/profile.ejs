@@ -15,7 +15,6 @@
     </a>
     <div class="navbar-links">
       <a href="/ciudad/<%= perfil.ciudad %>">← <%= perfil.ciudad %></a>
-      <a href="/acceso/login"><%= t.menu_login %></a>
     </div>
   </nav>
 
@@ -90,9 +89,10 @@
             <span class="tag">#️⃣ <%= perfil.id %></span>
           </div>
 
-          <% if (perfil.descripcion) { %>
-          <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(212,175,55,0.15);">
-            <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.7;"><%= perfil.descripcion %></p>
+          <% if (perfil.descripcion && perfil.descripcion.trim().length > 0) { %>
+          <div style="margin-top:22px;padding:18px 20px;background:rgba(212,175,55,0.04);border:1px solid rgba(212,175,55,0.18);border-left:3px solid #d4af37;border-radius:10px;">
+            <p style="font-size:0.7rem;font-weight:700;letter-spacing:1.5px;color:#d4af37;margin-bottom:10px;text-transform:uppercase;">Sobre mí</p>
+            <p style="font-size:0.92rem;color:#e8eef5;line-height:1.75;white-space:pre-line;margin:0;"><%= perfil.descripcion %></p>
           </div>
           <% } %>
 
@@ -121,7 +121,7 @@
             </a>
             <% } %>
           </div>
-          <button type="button" id="btn-referral" class="contact-btn" style="background:#111;border:1px dashed #d5a03d;color:#d5a03d;margin-top:4px;">Invita a una amiga (copiar enlace)</button>
+          <button type="button" id="btn-referral" class="contact-btn" style="background:#111;border:1px dashed #d5a03d;color:#d5a03d;margin-top:4px;">Invita a nuevos anunciantes y obtén tu recompensa</button>
         </div>
 
         <!-- Info table -->

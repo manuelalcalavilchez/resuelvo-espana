@@ -52,7 +52,7 @@
            target="_blank" rel="noopener" class="insc-btn insc-chica">
           <span class="insc-icon">♀</span>
           <span class="insc-label">
-            <strong>Inscribir Chica</strong>
+            <strong>Inscribir Independiente</strong>
             <small>Confirmación por WhatsApp</small>
           </span>
         </a>
@@ -66,8 +66,6 @@
         </a>
       </div>
       <p class="inscripcion-note">
-        Te responderá nuestro equipo al <strong>+<%= whatsapp %></strong> con las instrucciones y el enlace de pago.
-        <br>
         <a href="/planes" style="color:#d4af37;text-decoration:underline;">Ver planes y precios →</a>
       </p>
     </div>
@@ -83,9 +81,6 @@
 
     <!-- Ciudades con al menos un perfil activo -->
     <div style="columns:2 200px;gap:12px;margin-bottom:60px;" id="provincias-grid">
-      <% if (ciudadesList.length === 0) { %>
-      <p style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:24px;">Aún no hay perfiles activos por ciudad. Prueba más tarde o regístrate para aparecer aquí.</p>
-      <% } %>
       <% ciudadesList.forEach(prov => { %>
       <a href="/ciudad/<%= encodeURIComponent(prov) %>" class="province-link">
         <span class="prov-name"><%= prov %></span>
@@ -246,7 +241,7 @@
       letter-spacing: 0.5px;
       margin-top: 2px;
     }
-    .insc-agencia .insc-label small { color: #c8d4e0; opacity: 0.7; }
+    /* Ambos botones usan el mismo verde para "Confirmación por WhatsApp" */
     .inscripcion-note {
       font-size: 0.72rem;
       color: rgba(200,210,220,0.55);

@@ -17,7 +17,6 @@
     <div class="navbar-links">
       <a href="/inicio"><%= t.city_back %></a>
       <a href="/registro"><%= t.advertise %></a>
-      <a href="/acceso/login"><%= t.menu_login %></a>
     </div>
   </nav>
 
@@ -52,7 +51,13 @@
         </select>
         <button type="submit" class="filter-btn">Buscar</button>
         <a href="/ciudad/<%= ciudad %>" style="font-size:0.75rem;color:var(--text-muted);padding:10px;">Limpiar filtros</a>
-        <button type="button" id="btn-cercanas" class="filter-btn" style="background:#0a8d54;">Chicas Más cercanas</button>
+        <%
+          let _cercLabel = 'Más cercanas';
+          if (filters.categoria === 'chica') _cercLabel = 'Chicas más cercanas';
+          else if (filters.categoria === 'chico') _cercLabel = 'Chicos más cercanos';
+          else if (filters.categoria === 'trans') _cercLabel = 'Trans más cercanas';
+        %>
+        <button type="button" id="btn-cercanas" class="filter-btn" style="background:#0a8d54;"><%= _cercLabel %></button>
         <input type="hidden" name="lat" value="<%= filters.lat || '' %>">
         <input type="hidden" name="lng" value="<%= filters.lng || '' %>">
         <input type="hidden" name="max_km" value="<%= filters.max_km || '' %>">

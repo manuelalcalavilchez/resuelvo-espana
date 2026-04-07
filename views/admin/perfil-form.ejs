@@ -159,7 +159,7 @@
                 </div>
 
                 <div class="admin-form-group">
-                  <% const _limDesc = PLAN_LIMITS[perfil?.plan || 'basica'].max_desc; %>
+                  <% const _planKey = perfil?.plan || 'basica'; const _limDesc = (PLAN_LIMITS[_planKey] || PLAN_LIMITS.basica).max_desc; %>
                   <label class="admin-form-label">Descripción <small style="color:#888;">(máx. <%= _limDesc %> caracteres según plan)</small></label>
                   <textarea name="descripcion" class="admin-form-textarea" maxlength="<%= _limDesc %>"
                     oninput="document.getElementById('desc-count').textContent = this.value.length"
