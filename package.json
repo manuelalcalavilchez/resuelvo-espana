@@ -4,8 +4,8 @@
   "description": "Queens - Premium Marketplace MVP",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "nodemon --exec \"node --env-file-if-exists=.env server.js\""
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

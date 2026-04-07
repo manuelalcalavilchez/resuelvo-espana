@@ -67,23 +67,68 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Favicon inline (evita 404 sin necesidad de fichero)
+const FAVICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">👑</text></svg>`;
+app.get('/favicon.ico', (req, res) => {
+  res.set('Content-Type', 'image/svg+xml');
+  res.set('Cache-Control', 'public, max-age=604800');
+  res.send(FAVICON_SVG);
+});
+app.get('/favicon.svg', (req, res) => {
+  res.set('Content-Type', 'image/svg+xml');
+  res.set('Cache-Control', 'public, max-age=604800');
+  res.send(FAVICON_SVG);
+});
+
 // ─── CSRF vía Origin/Referer + SameSite=Strict ────────────
 // Alternativa simple a tokens CSRF: validamos que toda mutación venga del mismo host.
+// Detrás de proxy (Traefik/Easypanel/Cloudflare) usamos req.hostname (respeta X-Forwarded-Host).
+// ALLOWED_ORIGINS en .env permite añadir hosts extra separados por coma (ej: "queenviproyal.com,www.queenviproyal.com").
+const ALLOWED_HOSTS = new Set(
+  (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean)
+);
 app.use((req, res, next) => {
   if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
-  const origin = req.get('Origin') || req.get('Referer') || '';
-  if (!origin) return res.status(403).send('CSRF: origen ausente');
+
+  const rawOrigin = req.get('Origin') || req.get('Referer') || '';
+  // Origin "null" lo envían algunos navegadores en contextos sandbox o file:// — lo tratamos como ausente
+  const origin = rawOrigin && rawOrigin !== 'null' ? rawOrigin : '';
+  if (!origin) {
+    logger.warn({ path: req.path, ua: req.get('User-Agent') }, 'CSRF: sin Origin/Referer');
+    return res.status(403).send('CSRF: origen ausente (activa las cookies y JavaScript, y envía el formulario desde la misma página).');
+  }
+
+  let originHost;
   try {
-    const originHost = new URL(origin).host;
-    const expected = req.get('Host');
-    if (originHost !== expected) {
-      logger.warn({ originHost, expected, path: req.path }, 'CSRF bloqueado: host mismatch');
-      return res.status(403).send('CSRF: origen no autorizado');
-    }
+    originHost = new URL(origin).host.toLowerCase();
   } catch (_) {
+    logger.warn({ rawOrigin, path: req.path }, 'CSRF: URL inválida');
     return res.status(403).send('CSRF: origen inválido');
   }
-  next();
+
+  // Candidatos aceptables: hostname del request (con proxy), host crudo, y cualquier alias en ALLOWED_ORIGINS
+  const candidates = new Set();
+  candidates.add((req.hostname || '').toLowerCase());          // respeta X-Forwarded-Host si trust proxy
+  candidates.add((req.get('Host') || '').toLowerCase());       // header crudo
+  // También aceptamos el host sin puerto (por si el proxy normaliza :443/:80)
+  const stripPort = h => (h || '').split(':')[0];
+  candidates.add(stripPort(req.hostname));
+  candidates.add(stripPort(req.get('Host') || ''));
+  ALLOWED_HOSTS.forEach(h => candidates.add(h));
+
+  const originHostNoPort = stripPort(originHost);
+  if (candidates.has(originHost) || candidates.has(originHostNoPort)) {
+    return next();
+  }
+
+  logger.warn(
+    { originHost, candidates: [...candidates], path: req.path },
+    'CSRF bloqueado: host mismatch'
+  );
+  return res.status(403).send('CSRF: origen no autorizado');
 });
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Queens2024!';
