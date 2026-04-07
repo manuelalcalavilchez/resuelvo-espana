@@ -7,7 +7,7 @@ Guía rápida para desplegar este proyecto en [Easypanel](https://easypanel.io/)
 ## 1. Crear el servicio
 
 1. En tu proyecto de Easypanel → **+ Service** → **App**.
-2. **Source:** GitHub → repositorio `dnogares/queebweb`, branch `master`.
+2. **Source:** GitHub → repositorio `dnogares/queenviproyal`, branch `master`.
 3. **Build method:** `Dockerfile` (auto-detectado).
 4. **Build path:** `/` (raíz del repo).
 5. **Port:** `3000`.
@@ -48,7 +48,7 @@ Easypanel los crea automáticamente en `/etc/easypanel/projects/<proj>/<service>
 ## 4. Dominio y HTTPS
 
 1. Pestaña **Domains** → **+ Add Domain**.
-2. Escribe tu dominio (ej. `queebweb.com`).
+2. Escribe tu dominio (ej. `queenviproyal.com`).
 3. Activa **HTTPS** (Let's Encrypt automático).
 4. Apunta tu DNS (`A` record) a la IP de tu servidor Easypanel.
 
@@ -112,7 +112,7 @@ Cada `git push origin master` desde tu equipo:
 
 ## 10. Dominios múltiples / staging
 
-Puedes crear un segundo servicio (ej. `queebweb-staging`) que apunte a una branch distinta (`develop`) con su propio volumen, dominio y `ADMIN_PASSWORD`.
+Puedes crear un segundo servicio (ej. `queenviproyal-staging`) que apunte a una branch distinta (`develop`) con su propio volumen, dominio y `ADMIN_PASSWORD`.
 
 ---
 

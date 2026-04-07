@@ -54,4 +54,4 @@ Dado el uso de tecnologías independientes gracias a la contenerización nativa,
     *   `ADMIN_PASSWORD` (Clave directa para acceder al directorio `/admin`).
     *   `WHATSAPP_NUMBER` (Referencia telefónica comercial sin espacios).
     *   `SESSION_SECRET` (Llave criptográfica generadora de firmas temporales).
-4.  **Generación de la Imagen y Despliegue:** Construya la imagen nativamente operando en la raíz del entorno: `docker build -t queebweb .` seguido de la inicialización de ejecución adjuntando los volúmenes anteriormente descriptos y finalizando por el puerto expuesto especificado. Esto reanudará toda la carga persistente original de forma íntegra.
+4.  **Generación de la Imagen y Despliegue:** Construya la imagen nativamente operando en la raíz del entorno: `docker build -t queenviproyal .` seguido de la inicialización de ejecución adjuntando los volúmenes anteriormente descriptos y finalizando por el puerto expuesto especificado. Esto reanudará toda la carga persistente original de forma íntegra.
