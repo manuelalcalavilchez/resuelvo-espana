@@ -14,6 +14,8 @@ data/agencias.json
 data/config.json
 data/sessions
 data/backups
+data/takedowns.json
+data/gdpr_requests.json
 data/*.db
 public/uploads
 

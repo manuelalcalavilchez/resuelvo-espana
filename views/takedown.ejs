@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Retirada de contenido · Queens</title>
+  <link rel="stylesheet" href="/css/splash.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body class="splash-body">
+
+  <div class="velvet-bg"></div>
+  <div class="velvet-overlay"></div>
+
+  <main class="splash-main" style="max-width:760px;">
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:3rem;margin-bottom:8px;">⚖️</div>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(1.3rem,4vw,1.9rem);letter-spacing:2px;">
+        SOLICITUD DE RETIRADA DE CONTENIDO
+      </h1>
+      <p style="color:#c8d4e0;font-size:0.85rem;margin-top:6px;">
+        Canal oficial de notificación (LSSI-CE art. 17 · DMCA · RGPD)
+      </p>
+    </div>
+
+    <div class="gold-divider"></div>
+
+    <div class="legal-box">
+
+      <% if (sent) { %>
+
+        <div class="success-box">
+          <div style="font-size:3rem;margin-bottom:10px;">✅</div>
+          <h2 style="color:#f9e27e;margin-bottom:12px;">Solicitud recibida</h2>
+          <p style="color:#e8eef5;line-height:1.7;">
+            Tu solicitud ha sido registrada correctamente. Nuestro equipo legal la revisará
+            en un plazo máximo de <strong>48 horas laborables</strong>.
+          </p>
+          <p style="color:rgba(200,210,220,0.75);font-size:0.85rem;margin-top:12px;">
+            Si la solicitud está relacionada con un presunto delito (trata, menor, coacción),
+            ha sido automáticamente escalada como <strong>prioridad crítica</strong>.
+          </p>
+          <p style="margin-top:20px;">
+            <a href="/" class="btn-gold">← Volver al inicio</a>
+          </p>
+        </div>
+
+      <% } else { %>
+
+        <p class="legal-lead">
+          Si consideras que algún contenido publicado en Queens vulnera tus derechos
+          (imagen, honor, intimidad, propiedad intelectual) o contraviene la ley
+          (sospecha de trata de seres humanos, menores de edad, coacción),
+          utiliza este formulario para notificárnoslo formalmente.
+        </p>
+
+        <div class="warning-box">
+          ⚠️ <strong>Prioridad absoluta:</strong> Si detectas contenido relacionado con
+          <strong>menores de edad</strong> o <strong>trata de seres humanos</strong>,
+          además de usar este formulario, contacta inmediatamente con:
+          <br>
+          <a href="tel:062">062 Guardia Civil</a> ·
+          <a href="tel:091">091 Policía Nacional</a> ·
+          <a href="tel:900105090">900 10 50 90 (víctimas de trata)</a>
+        </div>
+
+        <% if (error) { %>
+          <div class="error-box">❌ <%= error %></div>
+        <% } %>
+
+        <form method="POST" action="/legal/takedown" class="legal-form">
+
+          <label>
+            Tipo de solicitud <span class="req">*</span>
+            <select name="tipo" required>
+              <option value="">— Selecciona —</option>
+              <option value="imagen">Derechos de imagen / honor / intimidad</option>
+              <option value="propiedad_intelectual">Propiedad intelectual (DMCA)</option>
+              <option value="privacidad">Privacidad / datos personales (RGPD)</option>
+              <option value="trata">Sospecha de trata de seres humanos</option>
+              <option value="menor">Sospecha de contenido con menor de edad</option>
+              <option value="difamacion">Difamación / información falsa</option>
+              <option value="otro">Otro motivo legal</option>
+            </select>
+          </label>
+
+          <label>
+            ID o URL del perfil afectado
+            <input type="text" name="perfil_id" placeholder="Ej: queens.com/perfil/123 o solo el ID">
+          </label>
+
+          <label>
+            Motivo detallado <span class="req">*</span>
+            <textarea name="motivo" rows="7" maxlength="5000" required
+              placeholder="Explica con el máximo detalle los hechos, la fecha, el contenido concreto y los derechos que consideras vulnerados. Si dispones de documentos acreditativos (DNI, sentencia, registro de obra, etc.) indícalo para que te los solicitemos."></textarea>
+          </label>
+
+          <label>
+            Email de contacto <span class="req">*</span>
+            <input type="email" name="email_contacto" required placeholder="tu@email.com">
+          </label>
+
+          <label>
+            Nombre del reclamante (opcional)
+            <input type="text" name="nombre_reclamante" placeholder="Nombre y apellidos o razón social">
+          </label>
+
+          <div class="legal-notice">
+            Al enviar esta solicitud declaras, bajo tu responsabilidad, que la información
+            facilitada es veraz y que estás legitimado/a para presentarla. Las notificaciones
+            falsas o maliciosas podrán ser perseguidas conforme al art. 456 CP (denuncia falsa).
+            Conservaremos estos datos durante el tiempo estrictamente necesario para tramitar
+            tu solicitud y, en su caso, para cumplir con nuestras obligaciones legales.
+          </div>
+
+          <button type="submit" class="btn-gold btn-big">
+            📨 Enviar solicitud
+          </button>
+
+        </form>
+
+      <% } %>
+
+      <p class="legal-foot">
+        <a href="/legal/aviso">Aviso legal</a> ·
+        <a href="/legal/privacidad">Privacidad</a> ·
+        <a href="/legal/anti-trata">Política anti-trata</a> ·
+        <a href="/legal/dmca">DMCA</a>
+      </p>
+    </div>
+
+  </main>
+
+  <style>
+    .legal-box {
+      background: rgba(8, 14, 28, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 16px;
+      padding: 32px 28px;
+      margin-top: 24px;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.08);
+    }
+    .legal-lead {
+      color: #e8eef5;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+    .warning-box {
+      background: rgba(200, 30, 30, 0.08);
+      border: 1px solid rgba(220, 60, 60, 0.4);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: rgba(255, 220, 220, 0.9);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+    .warning-box a { color: #f9e27e; font-weight: 600; }
+    .error-box {
+      background: rgba(200, 30, 30, 0.15);
+      border: 1px solid rgba(220, 60, 60, 0.5);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #ffcccc;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
+    .success-box {
+      text-align: center;
+      padding: 20px 10px;
+    }
+    .legal-form label {
+      display: block;
+      color: #e8eef5;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 18px;
+    }
+    .legal-form .req { color: #ff6b6b; }
+    .legal-form input,
+    .legal-form select,
+    .legal-form textarea {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 11px 13px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 8px;
+      color: #f5f5f5;
+      font-size: 0.9rem;
+      font-family: inherit;
+      font-weight: 400;
+    }
+    .legal-form textarea { resize: vertical; min-height: 120px; }
+    .legal-form input:focus,
+    .legal-form select:focus,
+    .legal-form textarea:focus {
+      outline: none;
+      border-color: #d4af37;
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+    }
+    .legal-notice {
+      color: rgba(200, 210, 220, 0.55);
+      font-size: 0.72rem;
+      line-height: 1.6;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      border-left: 2px solid rgba(212, 175, 55, 0.4);
+      margin: 8px 0 20px;
+    }
+    .btn-gold {
+      display: inline-block;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #7a5c00, #d4af37);
+      color: #0a0a0a;
+      border: 1px solid #d4af37;
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .btn-gold:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-big { width: 100%; padding: 14px; font-size: 0.95rem; }
+    .legal-foot {
+      text-align: center;
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(212, 175, 55, 0.15);
+      font-size: 0.78rem;
+      color: rgba(200, 210, 220, 0.55);
+    }
+    .legal-foot a { color: #d4af37; margin: 0 6px; }
+  </style>
+</body>
+</html>

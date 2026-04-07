@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const pino = require('pino');
@@ -61,6 +62,7 @@ app.use(helmet({
 
 // Middleware
 app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url.startsWith('/uploads') || req.url.startsWith('/css') || req.url.startsWith('/js') || req.url.startsWith('/img') } }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -244,6 +246,56 @@ const PROVINCIAS = [
   'Pontevedra', 'Salamanca', 'Tenerife', 'Segovia', 'Sevilla', 'Soria', 'Tarragona',
   'Teruel', 'Toledo', 'Valencia', 'Valladolid', 'Bizkaia', 'Zamora', 'Zaragoza'
 ];
+
+// ─── AGE GATE 18+ ─────────────────────────────────────────
+// Middleware que bloquea toda la navegación si no hay cookie de confirmación.
+// La cookie se fija en POST /age-gate con una declaración expresa del usuario.
+const AGE_GATE_COOKIE = 'queens_age_18';
+const AGE_GATE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 días
+const AGE_GATE_EXEMPT = [
+  '/age-gate',
+  '/legal/',
+  '/lang/',
+  '/health',
+  '/css/', '/js/', '/img/', '/uploads/', '/favicon.ico'
+];
+const isExemptFromAgeGate = (url) => AGE_GATE_EXEMPT.some(p => url.startsWith(p));
+
+app.get('/age-gate', (req, res) => {
+  const next = req.query.next && String(req.query.next).startsWith('/') ? req.query.next : '/';
+  const lang = (req.session && req.session.lang) || 'es';
+  const t = translations[lang] || translations.es;
+  res.render('age-gate', { next, t, lang });
+});
+app.post('/age-gate', formLimiter, (req, res) => {
+  if (req.body.confirm !== 'yes') {
+    return res.status(400).send('Debes confirmar que eres mayor de 18 años para continuar.');
+  }
+  res.cookie(AGE_GATE_COOKIE, '1', {
+    maxAge: AGE_GATE_TTL,
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: IS_PROD
+  });
+  const next = req.body.next && String(req.body.next).startsWith('/') ? req.body.next : '/';
+  logger.info({ ip: req.ip }, 'Age gate aceptado');
+  res.redirect(next);
+});
+app.post('/age-gate/reject', (req, res) => {
+  res.clearCookie(AGE_GATE_COOKIE);
+  res.redirect('https://www.google.com');
+});
+
+// Middleware: bloquea navegación si no hay cookie 18+
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  if (isExemptFromAgeGate(req.path)) return next();
+  if (req.cookies && req.cookies[AGE_GATE_COOKIE] === '1') return next();
+  // Fallback: parser simple de cookies si cookie-parser no está
+  const raw = req.headers.cookie || '';
+  if (raw.includes(`${AGE_GATE_COOKIE}=1`)) return next();
+  return res.redirect('/age-gate?next=' + encodeURIComponent(req.originalUrl));
+});
 
 // Middleware: inject language into every request
 app.use((req, res, next) => {
@@ -443,6 +495,64 @@ app.get('/legal/privacidad', (req, res) => res.render('legal', { pageId: 'privac
 app.get('/legal/terminos', (req, res) => res.render('legal', { pageId: 'terminos' }));
 app.get('/legal/cookies', (req, res) => res.render('legal', { pageId: 'cookies' }));
 app.get('/legal/aviso', (req, res) => res.render('legal', { pageId: 'aviso' }));
+app.get('/legal/anti-trata', (req, res) => res.render('legal', { pageId: 'anti-trata' }));
+app.get('/legal/consentimiento', (req, res) => res.render('legal', { pageId: 'consentimiento' }));
+app.get('/legal/dmca', (req, res) => res.render('legal', { pageId: 'dmca' }));
+
+// Takedown / retirada de contenido (formulario público)
+app.get('/legal/takedown', (req, res) => res.render('takedown', { sent: false, error: null }));
+app.post('/legal/takedown', formLimiter, async (req, res) => {
+  const { tipo, perfil_id, motivo, email_contacto, nombre_reclamante } = req.body;
+  if (!tipo || !motivo || !email_contacto) {
+    return res.render('takedown', { sent: false, error: 'Faltan campos obligatorios.' });
+  }
+  // Guardar en data/takedowns.json para el admin
+  const takedownsFile = path.join(DATA_DIR, 'takedowns.json');
+  let list = [];
+  try { if (fs.existsSync(takedownsFile)) list = JSON.parse(fs.readFileSync(takedownsFile, 'utf8')); } catch (_) {}
+  list.push({
+    id: 'TD-' + Date.now(),
+    tipo, perfil_id: perfil_id || null,
+    motivo: String(motivo).slice(0, 5000),
+    email_contacto,
+    nombre_reclamante: nombre_reclamante || null,
+    ip: req.ip,
+    ua: req.get('User-Agent') || '',
+    created_at: new Date().toISOString(),
+    estado: 'pendiente'
+  });
+  const tmp = takedownsFile + '.tmp';
+  await fsp.writeFile(tmp, JSON.stringify(list, null, 2));
+  await fsp.rename(tmp, takedownsFile);
+  logger.warn({ tipo, perfil_id, ip: req.ip }, 'Solicitud de takedown recibida');
+  res.render('takedown', { sent: true, error: null });
+});
+
+// GDPR: Subject Access Request (SAR) — acceso/rectificación/borrado
+app.get('/legal/mis-datos', (req, res) => res.render('gdpr-request', { sent: false, error: null }));
+app.post('/legal/mis-datos', formLimiter, async (req, res) => {
+  const { tipo_solicitud, perfil_id, email_contacto, descripcion } = req.body;
+  if (!tipo_solicitud || !email_contacto) {
+    return res.render('gdpr-request', { sent: false, error: 'Faltan campos obligatorios.' });
+  }
+  const gdprFile = path.join(DATA_DIR, 'gdpr_requests.json');
+  let list = [];
+  try { if (fs.existsSync(gdprFile)) list = JSON.parse(fs.readFileSync(gdprFile, 'utf8')); } catch (_) {}
+  list.push({
+    id: 'GDPR-' + Date.now(),
+    tipo_solicitud, perfil_id: perfil_id || null,
+    email_contacto,
+    descripcion: String(descripcion || '').slice(0, 3000),
+    ip: req.ip,
+    created_at: new Date().toISOString(),
+    estado: 'pendiente'
+  });
+  const tmp = gdprFile + '.tmp';
+  await fsp.writeFile(tmp, JSON.stringify(list, null, 2));
+  await fsp.rename(tmp, gdprFile);
+  logger.info({ tipo_solicitud, ip: req.ip }, 'Solicitud GDPR recibida');
+  res.render('gdpr-request', { sent: true, error: null });
+});
 
 // Healthcheck
 app.get('/health', (req, res) => res.json({ ok: true, version: APP_VERSION, ts: Date.now() }));

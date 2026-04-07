@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Mis datos (RGPD) · Queens</title>
+  <link rel="stylesheet" href="/css/splash.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body class="splash-body">
+
+  <div class="velvet-bg"></div>
+  <div class="velvet-overlay"></div>
+
+  <main class="splash-main" style="max-width:760px;">
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:3rem;margin-bottom:8px;">🔐</div>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(1.3rem,4vw,1.9rem);letter-spacing:2px;">
+        EJERCICIO DE DERECHOS RGPD
+      </h1>
+      <p style="color:#c8d4e0;font-size:0.85rem;margin-top:6px;">
+        Reglamento (UE) 2016/679 · LOPDGDD 3/2018
+      </p>
+    </div>
+
+    <div class="gold-divider"></div>
+
+    <div class="legal-box">
+
+      <% if (sent) { %>
+
+        <div class="success-box">
+          <div style="font-size:3rem;margin-bottom:10px;">✅</div>
+          <h2 style="color:#f9e27e;margin-bottom:12px;">Solicitud registrada</h2>
+          <p style="color:#e8eef5;line-height:1.7;">
+            Hemos recibido correctamente tu solicitud. Responderemos en el plazo máximo
+            legal de <strong>un mes desde la recepción</strong> (art. 12.3 RGPD), ampliable
+            otros dos meses en casos complejos con notificación previa.
+          </p>
+          <p style="color:rgba(200,210,220,0.75);font-size:0.85rem;margin-top:12px;">
+            Si no recibes respuesta dentro de plazo, tienes derecho a presentar reclamación
+            ante la <a href="https://www.aepd.es" target="_blank" style="color:#d4af37;">Agencia Española de Protección de Datos (AEPD)</a>.
+          </p>
+          <p style="margin-top:20px;">
+            <a href="/" class="btn-gold">← Volver al inicio</a>
+          </p>
+        </div>
+
+      <% } else { %>
+
+        <p class="legal-lead">
+          Como titular de tus datos personales puedes ejercer gratuitamente tus derechos
+          reconocidos por el RGPD. Utiliza este formulario para solicitar cualquiera de ellos.
+          Para verificar tu identidad podremos requerir documentación adicional.
+        </p>
+
+        <div class="rights-grid">
+          <div><strong>Acceso</strong><br><small>Art. 15 RGPD</small></div>
+          <div><strong>Rectificación</strong><br><small>Art. 16 RGPD</small></div>
+          <div><strong>Supresión</strong><br><small>Art. 17 RGPD</small></div>
+          <div><strong>Limitación</strong><br><small>Art. 18 RGPD</small></div>
+          <div><strong>Portabilidad</strong><br><small>Art. 20 RGPD</small></div>
+          <div><strong>Oposición</strong><br><small>Art. 21 RGPD</small></div>
+        </div>
+
+        <% if (error) { %>
+          <div class="error-box">❌ <%= error %></div>
+        <% } %>
+
+        <form method="POST" action="/legal/mis-datos" class="legal-form">
+
+          <label>
+            Derecho que deseas ejercer <span class="req">*</span>
+            <select name="tipo_solicitud" required>
+              <option value="">— Selecciona —</option>
+              <option value="acceso">Acceso — saber qué datos tenéis sobre mí</option>
+              <option value="rectificacion">Rectificación — corregir datos inexactos</option>
+              <option value="supresion">Supresión / Derecho al olvido</option>
+              <option value="limitacion">Limitación del tratamiento</option>
+              <option value="portabilidad">Portabilidad (exportar mis datos)</option>
+              <option value="oposicion">Oposición al tratamiento</option>
+              <option value="revocacion">Revocación del consentimiento</option>
+            </select>
+          </label>
+
+          <label>
+            ID de perfil o usuario (si lo conoces)
+            <input type="text" name="perfil_id" placeholder="Ej: usuario, nick o ID del perfil">
+          </label>
+
+          <label>
+            Email de contacto <span class="req">*</span>
+            <input type="email" name="email_contacto" required placeholder="tu@email.com">
+            <small style="display:block;color:rgba(200,210,220,0.55);font-size:0.72rem;font-weight:400;margin-top:4px;">
+              Debe coincidir con el email usado en el registro para poder verificar tu identidad.
+            </small>
+          </label>
+
+          <label>
+            Descripción de la solicitud
+            <textarea name="descripcion" rows="6" maxlength="3000"
+              placeholder="Describe qué necesitas exactamente. Por ejemplo: 'Solicito copia completa de todos mis datos personales' o 'Quiero que eliminéis mi perfil y todas mis fotos'."></textarea>
+          </label>
+
+          <div class="legal-notice">
+            <strong>Información sobre protección de datos:</strong> Los datos aportados en
+            este formulario serán tratados por Queens con la única finalidad de atender tu
+            solicitud de ejercicio de derechos. Base legal: obligación legal (art. 6.1.c RGPD).
+            Conservación: 3 años tras la resolución, según plazo de prescripción administrativa.
+            Puedes consultar la <a href="/legal/privacidad" style="color:#d4af37;">Política de Privacidad</a>
+            completa para más información.
+          </div>
+
+          <button type="submit" class="btn-gold btn-big">
+            📨 Enviar solicitud
+          </button>
+
+        </form>
+
+      <% } %>
+
+      <p class="legal-foot">
+        <a href="/legal/privacidad">Política de Privacidad</a> ·
+        <a href="/legal/cookies">Cookies</a> ·
+        <a href="/legal/aviso">Aviso legal</a>
+      </p>
+    </div>
+
+  </main>
+
+  <style>
+    .legal-box {
+      background: rgba(8, 14, 28, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 16px;
+      padding: 32px 28px;
+      margin-top: 24px;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.08);
+    }
+    .legal-lead {
+      color: #e8eef5;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .rights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .rights-grid div {
+      background: rgba(212, 175, 55, 0.06);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+      color: #e8eef5;
+      font-size: 0.82rem;
+    }
+    .rights-grid small { color: rgba(212, 175, 55, 0.7); font-size: 0.68rem; }
+    .error-box {
+      background: rgba(200, 30, 30, 0.15);
+      border: 1px solid rgba(220, 60, 60, 0.5);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #ffcccc;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
+    .success-box { text-align: center; padding: 20px 10px; }
+    .legal-form label {
+      display: block;
+      color: #e8eef5;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .legal-form .req { color: #ff6b6b; }
+    .legal-form input,
+    .legal-form select,
+    .legal-form textarea {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 11px 13px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 8px;
+      color: #f5f5f5;
+      font-size: 0.9rem;
+      font-family: inherit;
+      font-weight: 400;
+    }
+    .legal-form textarea { resize: vertical; min-height: 110px; }
+    .legal-form input:focus,
+    .legal-form select:focus,
+    .legal-form textarea:focus {
+      outline: none;
+      border-color: #d4af37;
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+    }
+    .legal-notice {
+      color: rgba(200, 210, 220, 0.6);
+      font-size: 0.75rem;
+      line-height: 1.65;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      border-left: 2px solid rgba(212, 175, 55, 0.4);
+      margin: 8px 0 20px;
+    }
+    .btn-gold {
+      display: inline-block;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #7a5c00, #d4af37);
+      color: #0a0a0a;
+      border: 1px solid #d4af37;
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .btn-gold:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-big { width: 100%; padding: 14px; font-size: 0.95rem; }
+    .legal-foot {
+      text-align: center;
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(212, 175, 55, 0.15);
+      font-size: 0.78rem;
+      color: rgba(200, 210, 220, 0.55);
+    }
+    .legal-foot a { color: #d4af37; margin: 0 6px; }
+  </style>
+</body>
+</html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= perfil.nombre %> — Queens <%= perfil.ciudad %></title>
-  <meta name="description" content="<%= perfil.nombre %>, acompañantes en <%= perfil.ciudad %>. Perfil verificado en Queens.">
+  <meta name="description" content="<%= perfil.nombre %> — <%= t.city_title %> <%= perfil.ciudad %>.">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="bg-velvet">
@@ -15,7 +15,7 @@
     </a>
     <div class="navbar-links">
       <a href="/ciudad/<%= perfil.ciudad %>">← <%= perfil.ciudad %></a>
-      <a href="/acceso/login">Acceso</a>
+      <a href="/acceso/login"><%= t.menu_login %></a>
     </div>
   </nav>
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acompañantes en <%= ciudad %> | Queens</title>
-  <meta name="description" content="Acompañantes verificadas en <%= ciudad %>. Perfiles reales con fotos auténticas. Queens.">
+  <title><%= t.city_title %> <%= ciudad %> | Queens</title>
+  <meta name="description" content="<%= t.city_title %> <%= ciudad %>. Queens.">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="bg-velvet">
@@ -15,9 +15,9 @@
       <img src="/img/queens-logo.png" alt="Queens" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS</span>'">
     </a>
     <div class="navbar-links">
-      <a href="/inicio">← Provincias</a>
-      <a href="/registro">Anúnciate</a>
-      <a href="/acceso/login">Acceso</a>
+      <a href="/inicio"><%= t.city_back %></a>
+      <a href="/registro"><%= t.advertise %></a>
+      <a href="/acceso/login"><%= t.menu_login %></a>
     </div>
   </nav>
 
@@ -31,7 +31,7 @@
 
     <!-- City Header -->
     <div style="text-align:center;margin-bottom:40px;">
-      <p class="section-title">Acompañantes Verificadas en</p>
+      <p class="section-title"><%= t.city_title %></p>
       <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:8px;"><%= ciudad.toUpperCase() %></h1>
     </div>
 
@@ -39,10 +39,10 @@
     <form id="geoForm" method="GET" action="/ciudad/<%= ciudad %>">
       <div class="filter-bar">
         <select name="categoria" class="filter-select auto-submit-select">
-          <option value="">Todas las categorías</option>
-          <option value="chica" <%= filters.categoria==='chica'?'selected':'' %>>♀ Chica</option>
-          <option value="chico" <%= filters.categoria==='chico'?'selected':'' %>>♂ Chico</option>
-          <option value="trans" <%= filters.categoria==='trans'?'selected':'' %>>⚧ Trans</option>
+          <option value=""><%= t.city_filter_all %></option>
+          <option value="chica" <%= filters.categoria==='chica'?'selected':'' %>><%= t.cat_chica %></option>
+          <option value="chico" <%= filters.categoria==='chico'?'selected':'' %>><%= t.cat_chico %></option>
+          <option value="trans" <%= filters.categoria==='trans'?'selected':'' %>><%= t.cat_trans %></option>
         </select>
         <select name="disponibilidad" class="filter-select auto-submit-select">
           <option value="">Todas las disponibilidades</option>

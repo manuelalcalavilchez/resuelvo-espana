@@ -31,108 +31,475 @@
         <h1 class="gold-shimmer font-cinzel">Política de Privacidad</h1>
         <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
 
+        <div class="legal-box">
+          <p>Esta política describe cómo Queens (en adelante, "la Plataforma") trata los datos personales
+          de usuarios visitantes, personas anunciadas y titulares de cuentas, en cumplimiento del
+          <strong>Reglamento (UE) 2016/679 (RGPD)</strong> y la <strong>LOPDGDD 3/2018</strong>.</p>
+        </div>
+
         <h2>1. Responsable del tratamiento</h2>
-        <p>Queens (en adelante, "la Plataforma") es un directorio online de perfiles profesionales independientes. Los datos de contacto del responsable están disponibles bajo solicitud a través del WhatsApp publicado en el sitio.</p>
+        <p>Los datos identificativos completos del responsable (razón social, NIF, domicilio y contacto) se proporcionan por escrito a cualquier interesado que los solicite mediante el <a href="/legal/mis-datos">formulario de solicitud de acceso</a> o el WhatsApp publicado en el sitio.</p>
+        <p><strong>Delegado de Protección de Datos (DPD):</strong> se designará cuando el volumen de tratamiento lo exija. Contacto actual: vía formulario <a href="/legal/mis-datos">/legal/mis-datos</a>.</p>
 
         <h2>2. Datos que tratamos</h2>
         <ul>
-          <li><strong>De usuarios visitantes:</strong> dirección IP, datos de navegación, preferencia de idioma, cookies técnicas de sesión.</li>
-          <li><strong>De personas anunciadas:</strong> nombre artístico, ciudad, categoría, teléfono, edad declarada, idiomas, descripción y fotografías. Estos datos se publican <strong>únicamente con consentimiento expreso</strong> de la persona titular, mayor de 18 años, y previa verificación de identidad por nuestro equipo.</li>
-          <li><strong>De cuentas registradas:</strong> email y contraseña cifrada (bcrypt).</li>
+          <li><strong>De usuarios visitantes:</strong> dirección IP, registros de navegación, preferencia de idioma, cookies técnicas de sesión (queens.sid), cookie de verificación de edad (queens_age_18). <em>No usamos cookies publicitarias ni de seguimiento.</em></li>
+          <li><strong>De personas anunciadas (modelos independientes y agencias):</strong> nombre artístico, ciudad, categoría, teléfono, edad declarada, idiomas, descripción, fotografías y, opcionalmente, vídeo de presentación. Estos datos se publican <strong>únicamente con consentimiento expreso e informado</strong>, previa verificación de identidad y mayoría de edad por parte de nuestro equipo (DNI/pasaporte comprobado por videollamada o presencialmente).</li>
+          <li><strong>De cuentas registradas:</strong> dirección de email y contraseña cifrada con bcrypt (nunca en claro).</li>
+          <li><strong>De solicitudes legales:</strong> nombre, email y contenido de las reclamaciones de retirada (takedown) y de las solicitudes de derechos RGPD.</li>
         </ul>
 
-        <h2>3. Finalidad</h2>
-        <p>Los datos se tratan exclusivamente para la prestación del servicio de directorio, la gestión de cuentas y el cumplimiento de obligaciones legales.</p>
+        <h2>3. Finalidades del tratamiento</h2>
+        <ul>
+          <li>Prestación del servicio de directorio publicitario.</li>
+          <li>Verificación de identidad y edad de las personas anunciadas.</li>
+          <li>Gestión de cuentas de usuario y sesiones.</li>
+          <li>Prevención del fraude, la suplantación de identidad y la publicación de contenido ilícito.</li>
+          <li>Atención a solicitudes de derechos RGPD y reclamaciones de retirada.</li>
+          <li>Cumplimiento de requerimientos legales y judiciales.</li>
+        </ul>
 
         <h2>4. Base legal</h2>
-        <p>Consentimiento explícito del interesado (art. 6.1.a RGPD) y ejecución del contrato de servicio (art. 6.1.b RGPD).</p>
+        <ul>
+          <li><strong>Consentimiento explícito</strong> del interesado para la publicación de datos personales (art. 6.1.a RGPD y art. 9.2.a RGPD para datos de categorías especiales si aplica).</li>
+          <li><strong>Ejecución del contrato</strong> de servicio publicitario (art. 6.1.b RGPD).</li>
+          <li><strong>Obligación legal</strong> para la conservación de registros fiscales y contables (art. 6.1.c RGPD).</li>
+          <li><strong>Interés legítimo</strong> para la seguridad del sitio y la prevención del fraude (art. 6.1.f RGPD).</li>
+        </ul>
 
-        <h2>5. Conservación</h2>
-        <p>Los datos se conservan mientras el perfil esté activo. Tras su baja, se eliminan en un plazo máximo de 30 días, salvo obligación legal de conservación.</p>
+        <h2>5. Plazo de conservación</h2>
+        <ul>
+          <li><strong>Perfiles activos:</strong> mientras dure la contratación del servicio.</li>
+          <li><strong>Perfiles dados de baja:</strong> eliminación completa en un plazo máximo de <strong>30 días naturales</strong>, salvo obligación legal de conservación.</li>
+          <li><strong>Registros contables y fiscales:</strong> 6 años (art. 30 Código de Comercio).</li>
+          <li><strong>Logs de seguridad:</strong> máximo 90 días.</li>
+          <li><strong>Cookies técnicas:</strong> 24 horas (sesión) / 30 días (age gate).</li>
+        </ul>
 
         <h2>6. Derechos del interesado</h2>
-        <p>Puedes ejercer tus derechos de acceso, rectificación, supresión (derecho al olvido), limitación, portabilidad y oposición contactando al WhatsApp del administrador. La baja de un perfil se tramita en un plazo máximo de 72 horas.</p>
+        <p>Tienes derecho a:</p>
+        <ul>
+          <li><strong>Acceso</strong> — saber qué datos tenemos de ti.</li>
+          <li><strong>Rectificación</strong> — corregir datos inexactos.</li>
+          <li><strong>Supresión</strong> ("derecho al olvido") — eliminar tus datos.</li>
+          <li><strong>Limitación</strong> — restringir el tratamiento.</li>
+          <li><strong>Portabilidad</strong> — recibir tus datos en formato estructurado.</li>
+          <li><strong>Oposición</strong> — oponerte al tratamiento.</li>
+          <li><strong>Revocación del consentimiento</strong> en cualquier momento.</li>
+          <li><strong>No ser objeto de decisiones automatizadas</strong>.</li>
+        </ul>
+        <p>Puedes ejercer estos derechos gratuitamente a través del formulario <a href="/legal/mis-datos">/legal/mis-datos</a>. Respondemos en un plazo máximo de <strong>30 días naturales</strong>. La baja de un perfil se procesa en un plazo máximo de <strong>72 horas</strong>.</p>
 
-        <h2>7. Destinatarios</h2>
-        <p>No cedemos datos a terceros salvo obligación legal. El hosting se realiza en servidores ubicados en la Unión Europea.</p>
+        <h2>7. Destinatarios y transferencias internacionales</h2>
+        <p>No cedemos datos a terceros salvo:</p>
+        <ul>
+          <li>Obligación legal o requerimiento judicial.</li>
+          <li>Proveedores de hosting ubicados en la Unión Europea con cláusulas contractuales que garantizan el RGPD.</li>
+          <li>Fuerzas y Cuerpos de Seguridad del Estado en caso de investigación por delitos graves (trata de personas, explotación, etc.).</li>
+        </ul>
+        <p>No realizamos transferencias internacionales fuera del Espacio Económico Europeo.</p>
 
-        <h2>8. Menores</h2>
-        <p>La Plataforma está reservada a mayores de 18 años, tanto visitantes como personas anunciadas. Cualquier detección de contenido relacionado con menores será denunciada a las autoridades competentes de inmediato.</p>
+        <h2>8. Medidas de seguridad</h2>
+        <ul>
+          <li>Contraseñas cifradas con bcrypt (nunca en texto plano).</li>
+          <li>Sesiones con cookies HttpOnly, Secure y SameSite=Strict.</li>
+          <li>Cabeceras HTTP de seguridad (Helmet, CSP).</li>
+          <li>Protección CSRF por validación de origen.</li>
+          <li>Rate limiting en endpoints sensibles.</li>
+          <li>Backups diarios cifrados de la base de datos.</li>
+          <li>Logs de seguridad con rotación.</li>
+        </ul>
 
-        <h2>9. Reclamaciones</h2>
-        <p>Puedes presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).</p>
+        <h2>9. Menores de edad</h2>
+        <p>La Plataforma está <strong>estrictamente reservada a mayores de 18 años</strong>, tanto visitantes como personas anunciadas. La edad se verifica en el momento del registro y al acceder al sitio (age gate). Cualquier detección de contenido relacionado con menores es eliminada de inmediato y comunicada a las autoridades (Guardia Civil, Policía Nacional) conforme a la Ley Orgánica 10/1995 del Código Penal y la LO 8/2021 de protección integral a la infancia.</p>
+
+        <h2>10. Reclamaciones ante la autoridad de control</h2>
+        <p>Si consideras que hemos vulnerado tus derechos, puedes presentar reclamación ante la <strong>Agencia Española de Protección de Datos</strong>:</p>
+        <ul>
+          <li>Web: <a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a></li>
+          <li>Dirección: C/ Jorge Juan, 6 — 28001 Madrid</li>
+          <li>Teléfono: 901 100 099</li>
+        </ul>
 
       <% } else if (pageId === 'terminos') { %>
-        <h1 class="gold-shimmer font-cinzel">Términos y Condiciones</h1>
+        <h1 class="gold-shimmer font-cinzel">Términos y Condiciones de Uso</h1>
         <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
 
-        <h2>1. Objeto</h2>
-        <p>Queens es un directorio online que pone en contacto a personas adultas que ofrecen servicios de acompañamiento legales con usuarios mayores de 18 años interesados. La Plataforma actúa únicamente como intermediaria publicitaria y <strong>no presta servicios personales ni participa en los acuerdos entre las partes</strong>.</p>
+        <div class="legal-box">
+          <p>La utilización de Queens implica la aceptación plena y sin reservas de los presentes términos.
+          Si no estás de acuerdo con alguna de las siguientes cláusulas, debes abandonar el sitio.</p>
+        </div>
 
-        <h2>2. Acceso</h2>
-        <p>El acceso a la Plataforma está reservado exclusivamente a <strong>mayores de 18 años</strong>. Al entrar al sitio, el usuario declara bajo su responsabilidad ser adulto.</p>
+        <h2>1. Objeto y naturaleza del servicio</h2>
+        <p>Queens (en adelante "la Plataforma") es un servicio de la sociedad de la información de tipo
+        <strong>directorio publicitario online</strong>, regulado por la Ley 34/2002 de Servicios de la
+        Sociedad de la Información y del Comercio Electrónico (LSSI-CE).</p>
+        <p>La Plataforma pone en contacto, con fines estrictamente publicitarios, a <strong>personas adultas
+        independientes</strong> que ofrecen servicios de acompañamiento legales con usuarios mayores de 18 años interesados
+        en conocerlas. Queens actúa exclusivamente como <strong>prestador de servicios de intermediación publicitaria</strong>
+        y <strong>no presta, organiza, facilita ni participa en los servicios personales ni en los acuerdos</strong>
+        que, en su caso, pudieran establecerse entre las partes de forma privada y voluntaria.</p>
 
-        <h2>3. Contenido de los anuncios</h2>
-        <p>Cada persona anunciada es responsable del contenido de su perfil y declara:</p>
+        <h2>2. Mayoría de edad (acceso restringido 18+)</h2>
+        <p>El acceso a la Plataforma está <strong>estrictamente reservado a personas mayores de 18 años</strong>,
+        o la edad legal de mayoría aplicable en la jurisdicción del usuario, la que sea superior.</p>
+        <p>Al aceptar el aviso de verificación de edad (age gate), el usuario declara bajo su responsabilidad
+        ser adulto. La falsedad de esta declaración será imputable exclusivamente al usuario. Queens se reserva
+        el derecho de solicitar verificación adicional de edad y de denegar el acceso en caso de duda razonable.</p>
+
+        <h2>3. Requisitos y obligaciones de las personas anunciadas</h2>
+        <p>Cada persona anunciada, al contratar un plan, declara bajo su responsabilidad:</p>
         <ul>
-          <li>Ser mayor de edad.</li>
-          <li>Actuar de forma libre y voluntaria.</li>
-          <li>Ser titular de todos los derechos sobre las fotografías aportadas.</li>
-          <li>Que los datos publicados son veraces.</li>
+          <li>Ser <strong>mayor de 18 años</strong> y aportar documentación oficial (DNI, NIE o pasaporte en vigor) que así lo acredite.</li>
+          <li>Actuar de forma <strong>libre, voluntaria e independiente</strong>, sin coacción, engaño ni sometimiento a terceros.</li>
+          <li>Ser <strong>titular de todos los derechos de imagen y propiedad intelectual</strong> sobre las fotografías y vídeos aportados.</li>
+          <li>Que los datos y el contenido publicados son <strong>veraces, actuales y no engañosos</strong>.</li>
+          <li>Cumplir la legislación fiscal y mercantil aplicable a su actividad como persona trabajadora independiente.</li>
+          <li>No publicar precios por servicios personales (la Plataforma es publicitaria, no un catálogo comercial de servicios).</li>
+          <li>Aceptar el <a href="/legal/consentimiento">documento de consentimiento para publicación</a>.</li>
         </ul>
-        <p>Queens verifica la identidad y la edad antes de activar cada perfil. Cualquier sospecha de coacción, trata de personas o contenido ilícito conlleva la suspensión inmediata del perfil y la comunicación a las autoridades.</p>
 
-        <h2>4. Prohibiciones</h2>
+        <h2>4. Verificación obligatoria previa</h2>
+        <p>Ningún perfil se activa hasta que el equipo de Queens ha verificado:</p>
+        <ol>
+          <li>La identidad y mayoría de edad de la persona titular (DNI comprobado por videollamada o presencialmente).</li>
+          <li>La correspondencia entre la persona física y las fotografías aportadas.</li>
+          <li>La voluntariedad del consentimiento (entrevista breve).</li>
+          <li>La ausencia de indicios de coacción, trata o explotación.</li>
+        </ol>
+        <p>Cualquier sospecha —aunque sea mínima— conlleva la <strong>denegación o suspensión inmediata</strong> del perfil
+        y, si procede, la comunicación a las autoridades conforme al
+        <a href="/legal/anti-trata">protocolo anti-trata</a>.</p>
+
+        <h2>5. Conductas y contenidos prohibidos</h2>
+        <p>Queda <strong>absolutamente prohibido</strong> publicar, facilitar o utilizar la Plataforma para:</p>
         <ul>
-          <li>Queda prohibido publicar contenido que promueva actividades ilegales, explotación, trata de seres humanos o menores.</li>
-          <li>Queda prohibido el uso automatizado (scraping, bots) del directorio.</li>
-          <li>Queda prohibido suplantar la identidad de otra persona.</li>
+          <li>Cualquier contenido relacionado con <strong>personas menores de 18 años</strong> (delito del Código Penal español, art. 189).</li>
+          <li>Cualquier indicio de <strong>trata de seres humanos</strong> o explotación (art. 177 bis CP).</li>
+          <li>Suplantación de identidad de otra persona.</li>
+          <li>Publicación de contenido sin consentimiento de la persona representada.</li>
+          <li>Promoción de actividades ilegales en España.</li>
+          <li>Uso automatizado del sitio (scraping, bots, herramientas de extracción masiva).</li>
+          <li>Intentos de eludir los controles de seguridad, autenticación o verificación de edad.</li>
+          <li>Publicidad engañosa, fraudulenta o que perjudique a terceros.</li>
         </ul>
+        <p>El incumplimiento conlleva la eliminación inmediata del perfil, la pérdida del importe abonado y, en su caso, acciones legales.</p>
 
-        <h2>5. Planes y pagos</h2>
-        <p>Los planes de publicación (Destacada, Catálogo) se contratan por WhatsApp directamente con el equipo. Las condiciones económicas se comunican en el momento de la contratación. No existe renovación automática.</p>
+        <h2>6. Planes, contratación y pagos</h2>
+        <p>Los planes de publicación (Destacada, Catálogo) se contratan mediante WhatsApp directamente con el equipo comercial.
+        Las condiciones económicas, la duración y el alcance se comunican de forma clara antes del pago. No existe renovación
+        automática: cada periodo debe renovarse manualmente por la persona anunciada.</p>
+        <p>El pago se realiza mediante los métodos indicados en el momento de la contratación. Las facturas se emiten conforme
+        a la normativa fiscal española y están disponibles bajo solicitud.</p>
+        <p><strong>Derecho de desistimiento:</strong> conforme al art. 103.a del RDL 1/2007, el derecho de desistimiento no aplica
+        a servicios ya prestados con consentimiento expreso (publicación activa del perfil). Si el perfil no ha sido aún activado,
+        el usuario dispone de 14 días naturales para desistir.</p>
 
-        <h2>6. Limitación de responsabilidad</h2>
-        <p>Queens no participa en los acuerdos entre personas anunciadas y usuarios ni garantiza la calidad, legalidad o resultado de los mismos. La Plataforma no es responsable de los daños derivados del uso indebido del sitio.</p>
+        <h2>7. Limitación de responsabilidad</h2>
+        <p>Queens actúa exclusivamente como intermediaria publicitaria. En consecuencia:</p>
+        <ul>
+          <li>No interviene, avala ni garantiza los acuerdos privados entre personas anunciadas y usuarios.</li>
+          <li>No es responsable de la calidad, legalidad, moralidad o resultado de dichos acuerdos.</li>
+          <li>No responde por incumplimientos, engaños o perjuicios derivados del uso que las partes hagan de los datos publicados.</li>
+          <li>No responde por caídas del servicio, pérdida de datos por causas de fuerza mayor ni interrupciones derivadas del proveedor de hosting.</li>
+        </ul>
+        <p>La responsabilidad de Queens, en su caso, se limita al importe abonado por el plan contratado en el período en curso.</p>
 
-        <h2>7. Derechos de propiedad intelectual</h2>
-        <p>La marca, el logotipo y el diseño del sitio son propiedad de Queens. Las fotografías publicadas pertenecen a sus respectivos titulares y se utilizan con autorización.</p>
+        <h2>8. Propiedad intelectual e industrial</h2>
+        <p>La marca "Queens", el logotipo, el diseño gráfico, la estructura del sitio, los textos originales y el código fuente son
+        titularidad exclusiva del responsable de la Plataforma y están protegidos por la legislación de propiedad intelectual e industrial.</p>
+        <p>Las fotografías y vídeos publicados son propiedad de sus respectivos titulares y se utilizan bajo licencia expresa otorgada
+        en el momento del registro. Véase <a href="/legal/dmca">política DMCA de notificaciones de infracción</a>.</p>
 
-        <h2>8. Ley aplicable y jurisdicción</h2>
-        <p>Estos términos se rigen por la legislación española. Para cualquier controversia serán competentes los tribunales del domicilio del responsable.</p>
+        <h2>9. Retirada de contenido (takedown)</h2>
+        <p>Cualquier persona que considere que un contenido publicado en Queens infringe sus derechos (imagen, propiedad intelectual,
+        privacidad, etc.) puede solicitar su retirada mediante el <a href="/legal/takedown">formulario de retirada</a>.
+        Las solicitudes fundamentadas se atienden en un plazo máximo de <strong>48 horas</strong>.</p>
+
+        <h2>10. Suspensión y terminación</h2>
+        <p>Queens se reserva el derecho de suspender o eliminar cualquier perfil o cuenta, con o sin preaviso, en caso de incumplimiento
+        de los presentes términos o de indicios razonables de actividad ilícita.</p>
+
+        <h2>11. Modificación de los términos</h2>
+        <p>Queens puede modificar los presentes términos en cualquier momento. Las modificaciones se publican en esta página con la fecha
+        de actualización correspondiente y entran en vigor desde su publicación. El uso continuado del sitio implica la aceptación de las modificaciones.</p>
+
+        <h2>12. Ley aplicable y jurisdicción</h2>
+        <p>Los presentes términos se rigen por la <strong>legislación española</strong>. Para cualquier controversia derivada de su interpretación
+        o ejecución, las partes se someten a los <strong>Juzgados y Tribunales del domicilio del responsable</strong>, con renuncia expresa a cualquier
+        otro fuero que pudiera corresponderles.</p>
+        <p>En caso de usuarios con condición de consumidor, será competente el juzgado del domicilio del consumidor, conforme al
+        art. 90.2 del RDL 1/2007.</p>
 
       <% } else if (pageId === 'cookies') { %>
         <h1 class="gold-shimmer font-cinzel">Política de Cookies</h1>
         <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
 
-        <h2>1. Qué son las cookies</h2>
-        <p>Las cookies son pequeños archivos de texto que los sitios web guardan en tu dispositivo. Nos ayudan a recordar tu idioma preferido y mantener tu sesión iniciada.</p>
+        <h2>1. ¿Qué son las cookies?</h2>
+        <p>Las cookies son pequeños archivos de texto que los sitios web almacenan en el dispositivo del usuario para recordar información sobre su visita (preferencias, sesión, etc.). Son un estándar técnico básico de la web.</p>
 
-        <h2>2. Cookies que usamos</h2>
+        <h2>2. Principio de minimización</h2>
+        <p>Queens aplica el <strong>principio de minimización</strong>: solo utilizamos cookies estrictamente necesarias para el funcionamiento del sitio.
+        <strong>No usamos</strong> cookies publicitarias, de seguimiento de terceros, de perfilado, de análisis estadístico ni de redes sociales.</p>
+
+        <h2>3. Cookies utilizadas</h2>
+        <table class="legal-table">
+          <thead>
+            <tr><th>Nombre</th><th>Finalidad</th><th>Tipo</th><th>Duración</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>queens.sid</code></td>
+              <td>Mantener la sesión iniciada del usuario.</td>
+              <td>Técnica (propia)</td>
+              <td>24 horas</td>
+            </tr>
+            <tr>
+              <td><code>queens_age_18</code></td>
+              <td>Recordar que el usuario ha confirmado ser mayor de edad para no mostrar el aviso en cada visita.</td>
+              <td>Técnica (propia)</td>
+              <td>30 días</td>
+            </tr>
+            <tr>
+              <td><code>queens_cookies_ok</code></td>
+              <td>Recordar que el usuario ha cerrado el banner informativo de cookies.</td>
+              <td>Técnica (propia)</td>
+              <td>180 días</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>4. Consentimiento</h2>
+        <p>Las cookies técnicas estrictamente necesarias <strong>no requieren consentimiento</strong> según el art. 22.2 LSSI-CE y la guía
+        de la AEPD sobre uso de cookies. Por este motivo, mostramos un banner meramente informativo en lugar de uno de consentimiento.</p>
+        <p>Si en el futuro incorporásemos cookies no esenciales (analítica, publicidad), implementaríamos un banner de consentimiento
+        previo y granular conforme al RGPD y la Guía de la AEPD.</p>
+
+        <h2>5. Cómo gestionar las cookies</h2>
+        <p>Puedes bloquear, borrar o rechazar las cookies desde la configuración de tu navegador:</p>
         <ul>
-          <li><strong>queens.sid</strong> — Cookie de sesión (técnica). Estrictamente necesaria. Caduca en 24 horas.</li>
-          <li><strong>connect.sid</strong> — Alias interno de la cookie de sesión.</li>
+          <li><strong>Chrome:</strong> Configuración → Privacidad y seguridad → Cookies y otros datos de sitios.</li>
+          <li><strong>Firefox:</strong> Preferencias → Privacidad y Seguridad → Cookies y datos del sitio.</li>
+          <li><strong>Safari:</strong> Preferencias → Privacidad → Gestionar datos de sitios web.</li>
+          <li><strong>Edge:</strong> Configuración → Privacidad, búsqueda y servicios → Cookies.</li>
         </ul>
-        <p>No utilizamos cookies publicitarias, de seguimiento de terceros ni de perfilado.</p>
+        <p><strong>Advertencia:</strong> si bloqueas las cookies técnicas de Queens, el sitio no funcionará correctamente.
+        No podrás iniciar sesión, mantener tu idioma ni completar el proceso de acceso al contenido.</p>
 
-        <h2>3. Cómo gestionarlas</h2>
-        <p>Puedes bloquear o eliminar las cookies desde la configuración de tu navegador. Ten en cuenta que si bloqueas las cookies técnicas, el sitio puede no funcionar correctamente (no podrás iniciar sesión ni mantener preferencias).</p>
+        <h2>6. Cookies de terceros</h2>
+        <p>Queens no embebe recursos de terceros que fijen cookies (no usamos Google Analytics, ni píxeles de Facebook, ni embeds de YouTube, etc.).
+        Las fuentes tipográficas y banderas de idioma se cargan sin cookies.</p>
 
       <% } else if (pageId === 'aviso') { %>
         <h1 class="gold-shimmer font-cinzel">Aviso Legal</h1>
         <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
 
-        <h2>1. Titularidad</h2>
-        <p>El presente sitio web es titularidad de Queens. Los datos identificativos del responsable están disponibles bajo solicitud a través del WhatsApp publicado en el sitio.</p>
+        <h2>1. Información general (art. 10 LSSI-CE)</h2>
+        <p>En cumplimiento del deber de información establecido en el artículo 10 de la Ley 34/2002, de 11 de julio,
+        de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSI-CE), se facilitan los siguientes datos:</p>
+        <ul>
+          <li><strong>Denominación:</strong> Queens (pendiente de completar con razón social completa).</li>
+          <li><strong>NIF / CIF:</strong> [completar con identificador fiscal del responsable].</li>
+          <li><strong>Domicilio:</strong> [completar con domicilio social].</li>
+          <li><strong>Contacto:</strong> WhatsApp publicado en el sitio / formulario <a href="/legal/mis-datos">/legal/mis-datos</a>.</li>
+          <li><strong>Inscripción registral:</strong> [Registro Mercantil correspondiente, cuando proceda].</li>
+        </ul>
+        <div class="legal-box legal-warn">
+          <p>⚠️ <strong>Importante para el operador:</strong> antes del lanzamiento en producción, estos datos deben completarse
+          con la razón social, NIF y domicilio reales del responsable del sitio. El artículo 10 LSSI exige que esta información
+          sea accesible de forma permanente, fácil, directa y gratuita.</p>
+        </div>
 
-        <h2>2. Condiciones de uso</h2>
-        <p>El acceso al sitio implica la aceptación de los <a href="/legal/terminos">Términos y Condiciones</a> y la <a href="/legal/privacidad">Política de Privacidad</a>.</p>
+        <h2>2. Naturaleza del servicio</h2>
+        <p>Queens es un <strong>servicio de la sociedad de la información</strong> de tipo directorio publicitario. No presta servicios
+        personales. Actúa como intermediario publicitario conforme al art. 16 LSSI.</p>
 
-        <h2>3. Acceso exclusivo a mayores de 18 años</h2>
-        <p>Este sitio contiene información para adultos. El acceso está <strong>estrictamente prohibido a menores de 18 años</strong>.</p>
+        <h2>3. Condiciones de uso</h2>
+        <p>El acceso al sitio implica la aceptación plena de los <a href="/legal/terminos">Términos y Condiciones</a>,
+        la <a href="/legal/privacidad">Política de Privacidad</a> y la <a href="/legal/cookies">Política de Cookies</a>.</p>
 
-        <h2>4. Responsabilidad</h2>
-        <p>Queens se reserva el derecho de actualizar, suspender o eliminar el contenido del sitio en cualquier momento sin previo aviso.</p>
+        <h2>4. Acceso exclusivo a mayores de 18 años</h2>
+        <p>Este sitio contiene información para adultos. El acceso está <strong>estrictamente prohibido a menores de 18 años</strong>.
+        Los visitantes deben verificar su edad mediante el aviso de entrada (age gate). Cualquier intento de acceso indebido por
+        parte de menores es responsabilidad exclusiva de sus representantes legales.</p>
+
+        <h2>5. Protocolo anti-trata y protección de víctimas</h2>
+        <p>Queens mantiene una <strong>tolerancia cero</strong> frente a la trata de seres humanos, la explotación sexual forzosa y la
+        publicación de contenido de personas menores. Véase el <a href="/legal/anti-trata">protocolo completo</a>.</p>
+        <p>Si sospechas de una situación de trata, coacción o explotación en relación con un perfil publicado, puedes:</p>
+        <ul>
+          <li>Llamar a la <strong>línea gratuita 016</strong> (atención a víctimas, 24/7, no deja rastro en facturación).</li>
+          <li>Contactar con la <strong>Guardia Civil (062)</strong> o la <strong>Policía Nacional (091)</strong>.</li>
+          <li>Usar nuestro <a href="/legal/takedown">formulario de retirada urgente</a> marcando la casilla "sospecha de trata".</li>
+        </ul>
+
+        <h2>6. Responsabilidad del prestador</h2>
+        <p>Conforme al art. 16 LSSI, Queens no es responsable del contenido publicado por terceros en la Plataforma siempre que:</p>
+        <ul>
+          <li>No tenga conocimiento efectivo de que la actividad o el contenido es ilícito.</li>
+          <li>Actúe con diligencia para retirarlo o bloquearlo en cuanto tenga conocimiento efectivo.</li>
+        </ul>
+        <p>El conocimiento efectivo se adquiere cuando una autoridad competente declara la ilicitud o cuando un perjudicado
+        lo comunica a través del <a href="/legal/takedown">canal de retirada</a>.</p>
+
+        <h2>7. Enlaces externos</h2>
+        <p>El sitio puede contener enlaces a recursos externos (WhatsApp, autoridades, sitios de verificación).
+        Queens no es responsable del contenido ni del funcionamiento de esos sitios.</p>
+
+        <h2>8. Modificaciones</h2>
+        <p>Queens se reserva el derecho de actualizar, suspender o eliminar el contenido del sitio, así como de modificar los términos
+        del presente aviso, en cualquier momento y sin previo aviso, cuando así lo exijan razones legales, técnicas o de servicio.</p>
+
+        <h2>9. Legislación aplicable</h2>
+        <p>El presente aviso se rige por la legislación española, en particular por la LSSI-CE, el RGPD, la LOPDGDD y demás normativa concurrente.</p>
+
+      <% } else if (pageId === 'anti-trata') { %>
+        <h1 class="gold-shimmer font-cinzel">Protocolo Anti-Trata</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <div class="legal-box legal-warn">
+          <p><strong>Tolerancia cero.</strong> Queens mantiene un compromiso absoluto e innegociable contra la trata de seres humanos,
+          la explotación sexual forzosa, la coacción y cualquier forma de sometimiento. No existen excepciones.</p>
+        </div>
+
+        <h2>1. Marco legal</h2>
+        <p>Queens se adhiere plenamente a:</p>
+        <ul>
+          <li><strong>Art. 177 bis del Código Penal español</strong> — trata de seres humanos.</li>
+          <li><strong>Convenio del Consejo de Europa</strong> sobre la lucha contra la trata de seres humanos (Varsovia, 2005).</li>
+          <li><strong>Directiva 2011/36/UE</strong> del Parlamento Europeo y del Consejo.</li>
+          <li><strong>Plan Estratégico Nacional contra la Trata de Seres Humanos</strong> del Gobierno de España.</li>
+          <li><strong>Protocolo de Palermo</strong> (ONU, 2000).</li>
+        </ul>
+
+        <h2>2. Indicadores que activan alertas</h2>
+        <p>Nuestro equipo está entrenado para detectar los siguientes indicadores durante la verificación previa de cada perfil:</p>
+        <ul>
+          <li>Documentación retenida por terceros.</li>
+          <li>Incapacidad de la persona para comunicarse libremente o sin la presencia de otra persona.</li>
+          <li>Historias incoherentes o claramente dictadas.</li>
+          <li>Signos físicos de maltrato, desnutrición o consumo forzado de sustancias.</li>
+          <li>Desconocimiento del idioma, de la dirección o de la ciudad donde se encuentra.</li>
+          <li>Dependencia económica total de terceros que cobran el plan en su nombre.</li>
+          <li>Edad dudosa o documentación sospechosa.</li>
+          <li>Transporte, alojamiento o control del teléfono por parte de terceros.</li>
+        </ul>
+
+        <h2>3. Procedimiento ante sospecha</h2>
+        <ol>
+          <li><strong>Suspensión inmediata</strong> del perfil (si ya estaba activo).</li>
+          <li><strong>Preservación de evidencias</strong> (conversaciones, fotografías, datos de contacto, IPs, logs).</li>
+          <li><strong>Comunicación inmediata</strong> a las Fuerzas y Cuerpos de Seguridad del Estado:
+            <ul>
+              <li><a href="tel:062">062 — Guardia Civil (EMUME / UCRIF)</a></li>
+              <li><a href="tel:091">091 — Policía Nacional (UCRIF — Unidad Central de Redes de Inmigración Ilegal y Falsedades Documentales)</a></li>
+            </ul>
+          </li>
+          <li><strong>Colaboración activa</strong> con la investigación policial y judicial, entregando toda la información disponible.</li>
+          <li>Contacto con <strong>entidades especializadas</strong> de atención a víctimas (APRAMP, Proyecto Esperanza, Cáritas, Cruz Roja).</li>
+        </ol>
+
+        <h2>4. Denuncia ciudadana</h2>
+        <p>Si observas indicios de trata en un perfil publicado, o si eres víctima, contacta <strong>ahora mismo</strong>:</p>
+        <ul>
+          <li><strong>016</strong> — Teléfono gratuito contra la violencia de género y trata (24/7, no deja rastro en facturación).</li>
+          <li><strong>900 10 50 90</strong> — Línea contra la trata del Ministerio de Igualdad.</li>
+          <li><strong>062 / 091</strong> — Guardia Civil / Policía Nacional.</li>
+          <li><a href="/legal/takedown">Formulario de retirada urgente</a> (marca "sospecha de trata").</li>
+        </ul>
+
+        <h2>5. Protección de las personas que denuncian</h2>
+        <p>Las denuncias recibidas se tratan con <strong>máxima confidencialidad</strong>. La identidad del denunciante nunca se comunica
+        al perfil denunciado. Queens no acepta represalias ni permite que un anunciante use sus datos para identificar al denunciante.</p>
+
+      <% } else if (pageId === 'consentimiento') { %>
+        <h1 class="gold-shimmer font-cinzel">Consentimiento para Publicación</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <div class="legal-box">
+          <p>Este documento debe ser aceptado expresamente por toda persona que desee publicar su perfil en Queens.
+          Es la base legal para el tratamiento de sus datos personales e imagen conforme al RGPD.</p>
+        </div>
+
+        <h2>1. Declaración de consentimiento</h2>
+        <p>Yo, la persona identificada mediante la documentación verificada por Queens, manifiesto que de forma
+        <strong>libre, voluntaria, específica, informada e inequívoca</strong>:</p>
+        <ol>
+          <li><strong>Declaro ser mayor de 18 años</strong> y presento documento oficial en vigor que así lo acredita.</li>
+          <li><strong>Soy la persona representada</strong> en las fotografías y, en su caso, vídeos aportados, y dispongo de todos los derechos sobre ellos.</li>
+          <li><strong>Autorizo a Queens</strong> a publicar los datos y el contenido aportados en su directorio online, con la finalidad publicitaria descrita en los Términos.</li>
+          <li><strong>Reconozco que mi actividad es independiente</strong> y que no existe relación laboral, de subordinación ni de sometimiento a Queens ni a terceros.</li>
+          <li><strong>Actúo sin coacción, engaño ni dependencia</strong>, en pleno uso de mis facultades y con conocimiento del sector publicitario.</li>
+          <li><strong>He leído y acepto</strong> los <a href="/legal/terminos">Términos y Condiciones</a>, la <a href="/legal/privacidad">Política de Privacidad</a> y el <a href="/legal/anti-trata">Protocolo anti-trata</a>.</li>
+        </ol>
+
+        <h2>2. Alcance del consentimiento</h2>
+        <p>Autorizo expresamente a Queens a:</p>
+        <ul>
+          <li>Publicar mi perfil en el sitio web y hacerlo accesible a visitantes mayores de 18 años.</li>
+          <li>Redimensionar y comprimir mis fotografías con fines técnicos (optimización web).</li>
+          <li>Mostrar el perfil en los idiomas configurados por el sitio.</li>
+          <li>Conservar los datos durante la vigencia del plan contratado.</li>
+        </ul>
+
+        <h2>3. Lo que NO autorizo</h2>
+        <ul>
+          <li>La cesión de mis datos a terceros con fines distintos al publicitario acordado.</li>
+          <li>La inclusión de mi perfil en campañas de marketing externas sin autorización expresa adicional.</li>
+          <li>El uso de mis fotografías en contextos distintos al directorio Queens.</li>
+          <li>La venta o transferencia de mis datos a otras plataformas.</li>
+        </ul>
+
+        <h2>4. Revocación del consentimiento</h2>
+        <p>Puedo revocar mi consentimiento en cualquier momento, sin necesidad de justificación, mediante:</p>
+        <ul>
+          <li>El <a href="/legal/mis-datos">formulario GDPR</a>.</li>
+          <li>Un mensaje al WhatsApp del administrador.</li>
+          <li>El acceso directo a mi panel de usuaria, si tengo cuenta registrada.</li>
+        </ul>
+        <p>La revocación se procesa en un plazo máximo de <strong>72 horas</strong>. Una vez revocado, mi perfil se elimina por completo
+        del sitio y los datos se borran en un plazo máximo de 30 días, salvo obligación legal de conservación (registros fiscales).</p>
+
+        <h2>5. Formalización del consentimiento</h2>
+        <p>Este consentimiento se formaliza en el momento del registro mediante:</p>
+        <ul>
+          <li>Aceptación expresa por escrito (WhatsApp, email o formulario).</li>
+          <li>Verificación de identidad por videollamada con DNI en mano o presencialmente.</li>
+          <li>Registro fechado del acto de consentimiento, que se conserva como evidencia durante toda la vigencia del perfil y 6 años tras su baja (plazo probatorio).</li>
+        </ul>
+
+      <% } else if (pageId === 'dmca') { %>
+        <h1 class="gold-shimmer font-cinzel">Política DMCA — Notificación de Infracción</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <h2>1. Compromiso con la propiedad intelectual</h2>
+        <p>Queens respeta los derechos de propiedad intelectual e industrial de terceros y espera que los usuarios de la Plataforma hagan lo mismo.
+        De conformidad con la <strong>Digital Millennium Copyright Act (DMCA)</strong> estadounidense y con la legislación española y europea aplicable
+        (Ley de Propiedad Intelectual TRLPI RD 1/1996 y Directiva 2001/29/CE), tramitamos de forma ágil las notificaciones de infracción.</p>
+
+        <h2>2. Cómo notificar una infracción</h2>
+        <p>Si eres titular de derechos de propiedad intelectual o su representante autorizado y consideras que un contenido publicado
+        en Queens infringe tus derechos, envía una notificación a través del <a href="/legal/takedown">formulario de retirada</a> incluyendo:</p>
+        <ol>
+          <li>Identificación precisa de la obra protegida (título, registro, fecha, etc.).</li>
+          <li>Identificación del contenido infractor en Queens (URL o ID del perfil).</li>
+          <li>Datos de contacto completos del reclamante (nombre, dirección, teléfono, email).</li>
+          <li>Declaración expresa de buena fe: "declaro bajo mi responsabilidad que la información proporcionada es exacta y que soy el titular
+            de los derechos reclamados o estoy autorizado a actuar en su nombre".</li>
+          <li>Firma electrónica o manuscrita (escaneada).</li>
+        </ol>
+
+        <h2>3. Plazo de respuesta</h2>
+        <p>Las notificaciones fundamentadas se atienden en un plazo máximo de <strong>48 horas</strong>. Si la reclamación está correctamente formulada,
+        el contenido infractor se retira de forma inmediata.</p>
+
+        <h2>4. Contranotificación</h2>
+        <p>Si un usuario considera que su contenido ha sido retirado injustamente, puede presentar una contranotificación fundamentada
+        por los mismos medios. Queens valorará los argumentos y podrá restablecer el contenido si procede.</p>
+
+        <h2>5. Infractores reincidentes</h2>
+        <p>Las cuentas que incumplan repetidamente la propiedad intelectual de terceros serán suspendidas de forma definitiva.</p>
+
       <% } %>
 
       <hr style="border:none;border-top:1px solid rgba(212,175,55,0.2);margin:40px 0 20px;">

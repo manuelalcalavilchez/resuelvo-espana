@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planes y Precios | Queens</title>
-  <meta name="description" content="Compara los planes Destacada y Catálogo de Queens. Beneficios y diferencias.">
+  <title><%= t.plans_title %> | Queens</title>
+  <meta name="description" content="<%= t.plans_subtitle %>">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="bg-velvet">
@@ -15,16 +15,16 @@
       <img src="/img/queens-logo.png" alt="Queens" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS</span>'">
     </a>
     <div class="navbar-links">
-      <a href="/inicio">← Inicio</a>
-      <a href="/acceso/login">Acceso</a>
+      <a href="/inicio"><%= t.city_back %></a>
+      <a href="/acceso/login"><%= t.menu_login %></a>
     </div>
   </nav>
 
   <div class="container" style="padding-top:110px;padding-bottom:80px;max-width:1000px;">
 
     <div style="text-align:center;margin-bottom:50px;">
-      <p class="section-title">Tarifas de anunciantes</p>
-      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:12px;">Elige tu plan</h1>
+      <p class="section-title"><%= t.plans_title %></p>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:12px;"><%= t.plans_subtitle %></h1>
       <p class="text-muted" style="max-width:620px;margin:0 auto;font-size:0.95rem;line-height:1.6;">
         Queens ofrece dos niveles de visibilidad. Cuanto mayor sea tu plan, mayor tu alcance,
         tus fotos, tu posición en el buscador y tus herramientas de contacto con clientes.

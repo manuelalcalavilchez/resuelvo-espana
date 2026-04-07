@@ -35,6 +35,87 @@ const translations = {
     set_available: 'Poner como Disponible',
     set_not_available: 'Poner como No Disponible',
     welcome: 'Bienvenido',
+
+    // ─── Páginas internas: ciudad / perfil / planes / registro ───
+    // Ciudad (city.ejs)
+    city_title: 'Acompañantes en',
+    city_filter_all: 'Todos',
+    city_filter_available: 'Disponibles ahora',
+    city_filter_verified: 'Solo verificadas',
+    city_no_results: 'No hay perfiles disponibles en esta categoría.',
+    city_back: '← Volver',
+    city_total: 'perfiles',
+
+    // Perfil (profile.ejs)
+    profile_about: 'Sobre mí',
+    profile_services: 'Servicios',
+    profile_rates: 'Tarifas',
+    profile_languages: 'Idiomas',
+    profile_location: 'Ubicación',
+    profile_age: 'Edad',
+    profile_height: 'Altura',
+    profile_weight: 'Peso',
+    profile_eyes: 'Ojos',
+    profile_hair: 'Cabello',
+    profile_contact_wa: 'Contactar por WhatsApp',
+    profile_share: 'Compartir',
+    profile_report: 'Reportar perfil',
+    profile_back: '← Volver',
+    profile_verified_badge: 'Verificada por Queens',
+    profile_invite_friend: 'Invita a una amiga',
+    profile_referral_link: 'Tu enlace de invitación',
+    profile_copy: 'Copiar',
+    profile_copied: '¡Copiado!',
+
+    // Planes (planes.ejs)
+    plans_title: 'Planes para anunciantes',
+    plans_subtitle: 'Elige el plan que mejor se adapte a ti',
+    plans_month: '/mes',
+    plans_choose: 'Elegir plan',
+    plans_features: 'Incluye',
+    plans_basic: 'Básico',
+    plans_premium: 'Premium',
+    plans_vip: 'VIP',
+    plans_diamond: 'Diamante',
+    plans_compare: 'Comparar planes',
+
+    // Registro (registro.ejs)
+    register_title: 'Únete a Queens',
+    register_subtitle: 'Crea tu perfil y empieza a anunciarte',
+    register_email: 'Correo electrónico',
+    register_password: 'Contraseña',
+    register_password2: 'Repite la contraseña',
+    register_phone: 'Teléfono / WhatsApp',
+    register_age: 'Edad',
+    register_city: 'Ciudad',
+    register_category: 'Categoría',
+    register_accept_terms: 'Acepto los Términos y la Política de Privacidad',
+    register_accept_18: 'Confirmo que soy mayor de 18 años',
+    register_submit: 'Crear cuenta',
+    register_have_account: '¿Ya tienes cuenta?',
+    register_login: 'Acceder',
+
+    // Acceso / Login
+    login_title: 'Acceso',
+    login_email: 'Correo electrónico',
+    login_password: 'Contraseña',
+    login_submit: 'Entrar',
+    login_no_account: '¿No tienes cuenta?',
+    login_register: 'Regístrate',
+
+    // Comunes
+    common_yes: 'Sí',
+    common_no: 'No',
+    common_save: 'Guardar',
+    common_cancel: 'Cancelar',
+    common_delete: 'Eliminar',
+    common_edit: 'Editar',
+    common_back: 'Volver',
+    common_next: 'Siguiente',
+    common_close: 'Cerrar',
+    common_loading: 'Cargando…',
+    common_error: 'Ha ocurrido un error.',
+    common_required: 'Campo obligatorio',
   },
   en: {
     lang: 'en', dir: 'ltr',
@@ -71,6 +152,81 @@ const translations = {
     set_available: 'Set as Available',
     set_not_available: 'Set as Not Available',
     welcome: 'Welcome',
+
+    // ─── Internal pages ───
+    city_title: 'Companions in',
+    city_filter_all: 'All',
+    city_filter_available: 'Available now',
+    city_filter_verified: 'Verified only',
+    city_no_results: 'No profiles available in this category.',
+    city_back: '← Back',
+    city_total: 'profiles',
+
+    profile_about: 'About me',
+    profile_services: 'Services',
+    profile_rates: 'Rates',
+    profile_languages: 'Languages',
+    profile_location: 'Location',
+    profile_age: 'Age',
+    profile_height: 'Height',
+    profile_weight: 'Weight',
+    profile_eyes: 'Eyes',
+    profile_hair: 'Hair',
+    profile_contact_wa: 'Contact via WhatsApp',
+    profile_share: 'Share',
+    profile_report: 'Report profile',
+    profile_back: '← Back',
+    profile_verified_badge: 'Verified by Queens',
+    profile_invite_friend: 'Invite a friend',
+    profile_referral_link: 'Your referral link',
+    profile_copy: 'Copy',
+    profile_copied: 'Copied!',
+
+    plans_title: 'Plans for advertisers',
+    plans_subtitle: 'Choose the plan that suits you best',
+    plans_month: '/month',
+    plans_choose: 'Choose plan',
+    plans_features: 'Includes',
+    plans_basic: 'Basic',
+    plans_premium: 'Premium',
+    plans_vip: 'VIP',
+    plans_diamond: 'Diamond',
+    plans_compare: 'Compare plans',
+
+    register_title: 'Join Queens',
+    register_subtitle: 'Create your profile and start advertising',
+    register_email: 'Email address',
+    register_password: 'Password',
+    register_password2: 'Repeat password',
+    register_phone: 'Phone / WhatsApp',
+    register_age: 'Age',
+    register_city: 'City',
+    register_category: 'Category',
+    register_accept_terms: 'I accept the Terms and Privacy Policy',
+    register_accept_18: 'I confirm I am over 18 years old',
+    register_submit: 'Create account',
+    register_have_account: 'Already have an account?',
+    register_login: 'Sign in',
+
+    login_title: 'Sign in',
+    login_email: 'Email address',
+    login_password: 'Password',
+    login_submit: 'Enter',
+    login_no_account: "Don't have an account?",
+    login_register: 'Register',
+
+    common_yes: 'Yes',
+    common_no: 'No',
+    common_save: 'Save',
+    common_cancel: 'Cancel',
+    common_delete: 'Delete',
+    common_edit: 'Edit',
+    common_back: 'Back',
+    common_next: 'Next',
+    common_close: 'Close',
+    common_loading: 'Loading…',
+    common_error: 'An error occurred.',
+    common_required: 'Required field',
   },
   ar: {
     lang: 'ar', dir: 'rtl',
@@ -281,5 +437,15 @@ const translations = {
     cities: 'Eskuragarri dauden probintziak',
   }
 };
+
+// Fallback: cualquier clave que falte en un idioma se completa con la versión española.
+// Así nuevas claves se pueden añadir solo en `es` (y opcionalmente `en`) sin romper i18n.
+const ES = translations.es;
+for (const code of Object.keys(translations)) {
+  if (code === 'es') continue;
+  translations[code] = Object.assign({}, ES, translations[code]);
+  // Conservar lang/dir originales del idioma destino, no los de ES
+  translations[code].lang = code;
+}
 
 module.exports = translations;

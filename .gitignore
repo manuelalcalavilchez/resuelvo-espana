@@ -13,6 +13,8 @@ data/agencias.json
 data/config.json
 data/sessions/
 data/backups/
+data/takedowns.json
+data/gdpr_requests.json
 
 # User uploads
 public/uploads/

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Verificación de edad · Queens</title>
+  <link rel="stylesheet" href="/css/splash.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body class="splash-body">
+
+  <div class="velvet-bg"></div>
+  <div class="velvet-overlay"></div>
+
+  <main class="splash-main" style="max-width:640px;">
+
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:3.5rem;margin-bottom:8px;">🔞</div>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(1.4rem,4vw,2rem);letter-spacing:3px;margin-bottom:6px;">
+        VERIFICACIÓN DE EDAD
+      </h1>
+      <p style="color:#c8d4e0;font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">
+        Contenido exclusivo para mayores de 18 años
+      </p>
+    </div>
+
+    <div class="gold-divider"></div>
+
+    <div class="age-gate-box">
+      <p class="age-gate-lead">
+        Estás a punto de acceder a un sitio web dirigido exclusivamente a
+        <strong>personas adultas mayores de 18 años</strong>. El contenido puede
+        incluir material destinado a público adulto.
+      </p>
+
+      <p class="age-gate-terms">
+        Al pulsar <strong>"Tengo 18 o más"</strong> declaras bajo tu responsabilidad que:
+      </p>
+
+      <ul class="age-gate-list">
+        <li>Eres mayor de 18 años (o la edad legal de mayoría en tu jurisdicción).</li>
+        <li>Accedes voluntariamente, en un espacio privado, y por tu propia elección.</li>
+        <li>No eres funcionario/a actuando en ejercicio de inspección sin previa identificación.</li>
+        <li>El contenido adulto no es ilegal en tu país ni región.</li>
+        <li>Has leído y aceptas los
+          <a href="/legal/terminos" target="_blank">Términos</a>,
+          la <a href="/legal/privacidad" target="_blank">Política de Privacidad</a>
+          y la <a href="/legal/cookies" target="_blank">Política de Cookies</a>.
+        </li>
+      </ul>
+
+      <p class="age-gate-warning">
+        ⚠️ Queens rechaza de forma absoluta cualquier contenido relacionado con personas
+        menores de edad, trata de seres humanos o coacción. Cualquier sospecha debe
+        comunicarse inmediatamente a las autoridades
+        (<a href="tel:062" style="color:#f9e27e;">062 Guardia Civil</a>,
+        <a href="tel:091" style="color:#f9e27e;">091 Policía Nacional</a>,
+        <a href="/legal/takedown" style="color:#f9e27e;">formulario de retirada</a>).
+      </p>
+
+      <form method="POST" action="/age-gate" class="age-gate-form">
+        <input type="hidden" name="next" value="<%= next %>">
+        <input type="hidden" name="confirm" value="yes">
+        <button type="submit" class="age-gate-btn age-gate-yes">
+          ✅ Tengo 18 o más — Entrar
+        </button>
+      </form>
+
+      <form method="POST" action="/age-gate/reject" class="age-gate-form">
+        <button type="submit" class="age-gate-btn age-gate-no">
+          ❌ Soy menor — Salir
+        </button>
+      </form>
+
+      <p class="age-gate-footnote">
+        Tu respuesta se guarda en una cookie técnica durante 30 días.
+        Puedes revocar tu consentimiento en cualquier momento borrando las cookies del navegador.
+      </p>
+    </div>
+
+  </main>
+
+  <style>
+    .age-gate-box {
+      background: rgba(8, 14, 28, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 16px;
+      padding: 28px 26px;
+      margin-top: 24px;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.08);
+    }
+    .age-gate-lead {
+      color: #e8eef5;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .age-gate-lead strong { color: #f9e27e; }
+    .age-gate-terms {
+      color: rgba(200, 210, 220, 0.75);
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+    .age-gate-list {
+      color: rgba(200, 210, 220, 0.72);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      padding-left: 22px;
+      margin-bottom: 18px;
+    }
+    .age-gate-list li { margin-bottom: 6px; }
+    .age-gate-list a { color: #d4af37; }
+    .age-gate-warning {
+      background: rgba(200, 30, 30, 0.08);
+      border: 1px solid rgba(220, 60, 60, 0.35);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: rgba(255, 220, 220, 0.85);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+    .age-gate-form {
+      margin-bottom: 10px;
+    }
+    .age-gate-btn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      border: 1px solid transparent;
+    }
+    .age-gate-yes {
+      background: linear-gradient(135deg, #7a5c00, #d4af37);
+      color: #0a0a0a;
+      border-color: #d4af37;
+    }
+    .age-gate-yes:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(212, 175, 55, 0.35);
+    }
+    .age-gate-no {
+      background: transparent;
+      color: rgba(200, 210, 220, 0.75);
+      border-color: rgba(200, 210, 220, 0.3);
+    }
+    .age-gate-no:hover {
+      background: rgba(200, 30, 30, 0.15);
+      border-color: rgba(220, 60, 60, 0.6);
+      color: #ffcccc;
+    }
+    .age-gate-footnote {
+      color: rgba(200, 210, 220, 0.4);
+      font-size: 0.68rem;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</body>
+</html>
