@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escorts en <%= ciudad %> | Queens Escort</title>
+  <meta name="description" content="Escorts verificadas en <%= ciudad %>. Perfiles reales con fotos auténticas. Queens Escort.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-velvet">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/inicio" class="navbar-logo" style="text-decoration:none">
+      <img src="/img/queens-logo.png" alt="Queens Escort" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS ESCORT</span>'">
+    </a>
+    <div class="navbar-links">
+      <a href="/inicio">← Provincias</a>
+      <a href="/registro">Anúnciate</a>
+      <a href="/acceso/login">Acceso</a>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top:100px;padding-bottom:60px;">
+    <div id="recompensa-banner" style="position:sticky;top:70px;z-index:20;margin-bottom:12px;background:#111;border:1px solid #d5a03d;padding:10px 14px;border-radius:10px;display:flex;align-items:center;gap:10px;">
+      <span class="badge">Modo recompensa</span>
+      <span>¿Quieres un mes gratis? Trae a 10 nuevas anunciantes y te regalamos 30 días en cualquier localidad.</span>
+      <a href="/registro" class="btn-gold" style="padding:6px 12px;">Saber Más</a>
+      <button type="button" id="banner-close" style="margin-left:auto;background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;">×</button>
+    </div>
+
+    <!-- City Header -->
+    <div style="text-align:center;margin-bottom:40px;">
+      <p class="section-title">Escorts Verificadas en</p>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:8px;"><%= ciudad.toUpperCase() %></h1>
+    </div>
+
+    <!-- Filter Bar -->
+    <form id="geoForm" method="GET" action="/ciudad/<%= ciudad %>">
+      <div class="filter-bar">
+        <select name="categoria" class="filter-select auto-submit-select">
+          <option value="">Todas las categorías</option>
+          <option value="chica" <%= filters.categoria==='chica'?'selected':'' %>>♀ Chica</option>
+          <option value="chico" <%= filters.categoria==='chico'?'selected':'' %>>♂ Chico</option>
+          <option value="trans" <%= filters.categoria==='trans'?'selected':'' %>>⚧ Trans</option>
+        </select>
+        <select name="disponibilidad" class="filter-select auto-submit-select">
+          <option value="">Todas las disponibilidades</option>
+          <option value="disponible" <%= filters.disponibilidad==='disponible'?'selected':'' %>>🟢 Disponible ahora</option>
+          <option value="proximamente" <%= filters.disponibilidad==='proximamente'?'selected':'' %>>🟡 Próximamente</option>
+          <option value="no_disponible" <%= filters.disponibilidad==='no_disponible'?'selected':'' %>>🔴 No disponible</option>
+        </select>
+        <button type="submit" class="filter-btn">Buscar</button>
+        <a href="/ciudad/<%= ciudad %>" style="font-size:0.75rem;color:var(--text-muted);padding:10px;">Limpiar filtros</a>
+        <button type="button" id="btn-cercanas" class="filter-btn" style="background:#0a8d54;">Chicas Más cercanas</button>
+        <input type="hidden" name="lat" value="<%= filters.lat || '' %>">
+        <input type="hidden" name="lng" value="<%= filters.lng || '' %>">
+        <input type="hidden" name="max_km" value="<%= filters.max_km || '' %>">
+      </div>
+    </form>
+
+    <!-- 🟡 DESTACADAS 🟡 -->
+    <% if (destacadas.length > 0) { %>
+    <div class="tier-header">
+      <span class="tier-badge destacada">👑 Destacadas</span>
+    </div>
+    <div class="profiles-grid highlighted">
+      <% destacadas.forEach(p => { %>
+        <a href="/perfil/<%= p.id %>" class="profile-card highlighted-card">
+          <span class="card-plan-badge destacada">👑 Corona</span>
+          <div class="availability-dot <%= p.disponibilidad %>"></div>
+          <% if (p.fotos.length > 0) { %>
+            <img class="card-image" src="<%= p.fotos[0] %>" alt="<%= p.nombre %>" loading="lazy">
+          <% } else { %>
+            <div class="card-image-placeholder"><%= p.nombre.charAt(0).toUpperCase() %></div>
+          <% } %>
+          <div class="card-overlay">
+            <div class="card-name"><%= p.nombre %></div>
+            <div class="card-meta"><%= p.edad ? p.edad + ' años · ' : '' %><%= p.idiomas || 'Español' %></div>
+            <% if (p.distancia !== undefined) { %><div class="badge" style="margin-top:6px;">A <%= p.distancia %> km</div><% } %>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <!-- 🟡 BÁSICAS 🟡 -->
+    <% if (basicas.length > 0) { %>
+    <div class="tier-header">
+      <span class="tier-badge basica">Catálogo</span>
+    </div>
+    <div class="profiles-grid basic-grid">
+      <% basicas.forEach(p => { %>
+        <a href="/perfil/<%= p.id %>" class="profile-card">
+          <div class="availability-dot <%= p.disponibilidad %>"></div>
+          <% if (p.fotos.length > 0) { %>
+            <img class="card-image" src="<%= p.fotos[0] %>" alt="<%= p.nombre %>" loading="lazy">
+          <% } else { %>
+            <div class="card-image-placeholder" style="font-size:1.5rem"><%= p.nombre.charAt(0).toUpperCase() %></div>
+          <% } %>
+          <div class="card-overlay">
+            <div class="card-name" style="font-size:0.9rem"><%= p.nombre %></div>
+            <div class="card-meta"><%= p.edad ? p.edad + ' años' : '' %></div>
+            <% if (p.distancia !== undefined) { %><div class="badge" style="margin-top:6px;">A <%= p.distancia %> km</div><% } %>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <!-- 🟡 AGENCIAS 🟡 -->
+    <% if (agencias.length > 0) { %>
+    <div class="tier-header">
+      <span class="tier-badge basica">🏢 Agencias y Chalets</span>
+    </div>
+    <% agencias.forEach(a => { %>
+      <div class="agency-card">
+        <h3 class="gold-text font-cinzel-sm" style="font-size:1.1rem;margin-bottom:6px;"><%= a.nombre %></h3>
+        <p class="text-muted mb-2"><%= a.descripcion || '' %></p>
+        <% if (a.contacto) { %>
+          <a href="https://wa.me/<%= a.contacto.replace(/\D/g,'') %>" target="_blank" class="btn btn-success btn-sm">
+            📱 Contactar por WhatsApp
+          </a>
+        <% } %>
+      </div>
+    <% }) %>
+    <% } %>
+
+    <!-- Empty state -->
+    <% if (destacadas.length + premium.length + basicas.length === 0) { %>
+    <div style="text-align:center;padding:80px 20px;">
+      <div style="font-size:3rem;margin-bottom:16px;">🔍</div>
+      <h3 class="gold-text font-cinzel-sm">No hay perfiles disponibles</h3>
+      <p class="text-muted mt-2">Prueba cambiando los filtros o selecciona otra ciudad.</p>
+      <a href="/inicio" class="btn-gold" style="display:inline-block;width:auto;padding:12px 28px;margin-top:24px;">Ver todas las provincias</a>
+    </div>
+    <% } %>
+
+  </div>
+
+
+  <!-- Ghost mode -->
+  <a href="/ghost" class="ghost-trigger">● MODO SEGURO</a>
+
+  <script src="/js/main.js"></script>
+  <script>
+    const btn = document.getElementById("btn-cercanas");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        if (!navigator.geolocation) return alert("Activa la ubicación");
+        navigator.geolocation.getCurrentPosition(pos => {
+          document.querySelector("input[name=\"lat\"]").value = pos.coords.latitude.toFixed(5);
+          document.querySelector("input[name=\"lng\"]").value = pos.coords.longitude.toFixed(5);
+          document.querySelector("input[name=\"max_km\"]").value = 50;
+          document.getElementById("geoForm").submit();
+        }, () => alert("No pudimos Obténer tu ubicación"));
+      });
+    }
+    const banner = document.getElementById("recompensa-banner");
+    const closeBtn = document.getElementById("banner-close");
+    if (banner && closeBtn) closeBtn.addEventListener("click", () => banner.style.display = "none");
+  </script>
+</body>
+</html>
+
+
+
+
+

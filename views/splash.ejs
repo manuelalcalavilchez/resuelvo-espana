@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= t.site_title %> | <%= t.subtitle1 %>
+  </title>
+  <meta name="description"
+    content="Queens Escort - La plataforma premium de acompañantes verificadas en España. Escort en España.">
+  <link rel="stylesheet" href="/css/splash.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+
+<body class="splash-body">
+
+  <!-- Velvet Background -->
+  <div class="velvet-bg"></div>
+  <div class="velvet-overlay"></div>
+
+  <!-- Corner Decorations -->
+  <div class="corner corner-tl"><span class="corner-q">Q</span></div>
+  <div class="corner corner-tr"><span class="corner-q">Q</span></div>
+  <div class="corner corner-bl"><span class="corner-q">Q</span></div>
+  <div class="corner corner-br"><span class="corner-q">Q</span></div>
+
+  <!-- Ribbon top-right -->
+  <div class="ribbon-tr"></div>
+
+  <!-- Main Content -->
+  <main class="splash-main">
+
+    <!-- Logo -->
+    <div class="splash-logo-wrap">
+      <img src="/img/queens-vip-royal-new.png" alt="Queens VIP Royal" class="splash-logo">
+    </div>
+
+    <!-- Models Hero -->
+    <div class="models-hero">
+      <img src="/img/models/hero-new.png" alt="" class="models-hero-img" loading="eager">
+      <div class="models-hero-fade"></div>
+    </div>
+
+    <!-- Divider -->
+    <div class="gold-divider"></div>
+
+    <!-- Language Flags -->
+    <div class="lang-grid">
+      <a href="/lang/es" class="lang-btn <%= lang==='es'?'active':'' %>" title="Español">
+        <img src="https://flagcdn.com/es.svg" alt="ES" class="flag-icon"><span>ES</span>
+      </a>
+      <a href="/lang/en" class="lang-btn <%= lang==='en'?'active':'' %>" title="English">
+        <img src="https://flagcdn.com/gb.svg" alt="EN" class="flag-icon"><span>EN</span>
+      </a>
+      <a href="/lang/ar" class="lang-btn <%= lang==='ar'?'active':'' %>" title="العربية">
+        <img src="https://flagcdn.com/sa.svg" alt="AR" class="flag-icon"><span>AR</span>
+      </a>
+      <a href="/lang/ro" class="lang-btn <%= lang==='ro'?'active':'' %>" title="Română">
+        <img src="https://flagcdn.com/ro.svg" alt="RU" class="flag-icon"><span>RO</span>
+      </a>
+      <a href="/lang/pt" class="lang-btn <%= lang==='pt'?'active':'' %>" title="Português">
+        <img src="https://flagcdn.com/pt.svg" alt="PT" class="flag-icon"><span>PT</span>
+      </a>
+      <a href="/lang/zh" class="lang-btn <%= lang==='zh'?'active':'' %>" title="中文">
+        <img src="https://flagcdn.com/cn.svg" alt="CH" class="flag-icon"><span>CH</span>
+      </a>
+      <a href="/lang/de" class="lang-btn <%= lang==='de'?'active':'' %>" title="Deutsch">
+        <img src="https://flagcdn.com/de.svg" alt="AL" class="flag-icon"><span>DE</span>
+      </a>
+      <a href="/lang/fr" class="lang-btn <%= lang==='fr'?'active':'' %>" title="Français">
+        <img src="https://flagcdn.com/fr.svg" alt="FR" class="flag-icon"><span>FR</span>
+      </a>
+      <a href="/lang/ca" class="lang-btn <%= lang==='ca'?'active':'' %>" title="Català">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Catalonia.svg" alt="CA"
+          class="flag-icon"><span>CA</span>
+      </a>
+      <a href="/lang/eu" class="lang-btn <%= lang==='eu'?'active':'' %>" title="Euskera">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Flag_of_the_Basque_Country.svg" alt="EUS"
+          class="flag-icon"><span>EU</span>
+      </a>
+    </div>
+
+    <!-- Age Warning -->
+    <p class="age-warning">
+      <%= t.age_warning %>
+    </p>
+
+    <!-- Enter Button -->
+    <a href="/inicio" class="enter-btn">
+      <div class="enter-q-circle">Q</div>
+      <span>
+        <%= t.enter %>
+      </span>
+    </a>
+
+  </main>
+
+  <!-- SEO Footer (hidden visually, visible to crawlers) -->
+  <footer class="seo-footer" aria-hidden="true">
+    <p>
+      <%= t.footer_seo %>
+    </p>
+  </footer>
+
+  <style>
+    /* Inline flag emoji fallback */
+    .lang-btn img {
+      width: 28px;
+      height: 20px;
+      object-fit: cover;
+      border-radius: 3px;
+    }
+  </style>
+</body>
+
+</html>

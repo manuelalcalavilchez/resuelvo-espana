@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body.splash-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+  color: #f0e6c8;
+}
+
+/* ─── BACKGROUND ─────────────────────────────────────────── */
+.velvet-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(135deg, #040d1e 0%, #071428 30%, #082818 60%, #050f1a 100%);
+  z-index: 0;
+}
+
+.velvet-overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(5, 30, 80, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(5, 60, 40, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 70%);
+  /* Velvet texture simulation */
+  background-image: url('/img/velvet-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.85;
+  z-index: 0;
+}
+
+/* ─── CORNERS ─────────────────────────────────────────────── */
+.corner {
+  position: fixed;
+  z-index: 30;
+  width: 80px;
+  height: 80px;
+}
+.corner-tl { top: 16px; left: 16px; }
+.corner-tr { top: 16px; right: 16px; }
+.corner-bl { bottom: 16px; left: 16px; }
+.corner-br { bottom: 16px; right: 16px; }
+
+.corner-q {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0a2040, #1a4060);
+  border: 2px solid #d4af37;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  color: #d4af37;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.corner-tr .corner-q, .corner-br .corner-q {
+  margin-left: auto;
+}
+
+/* Ribbon top-right */
+.ribbon-tr {
+  display: none;
+}
+
+/* ─── MAIN CONTENT ────────────────────────────────────────── */
+.splash-main {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 24px;
+  max-width: 700px;
+  width: 100%;
+  gap: 0;
+}
+
+/* ─── LOGO ────────────────────────────────────────────────── */
+.splash-logo-wrap {
+  margin-bottom: -50px;
+  position: relative;
+  z-index: 8;
+  animation: fadeInDown 0.8s ease;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.splash-logo {
+  width: 480px;
+  max-width: 75vw;
+  filter: drop-shadow(0 0 35px rgba(212, 175, 55, 0.6));
+  border-radius: 16px;
+}
+
+/* Text fallback logo */
+.text-logo { text-align: center; }
+.text-logo-crown { font-size: 2.5rem; filter: drop-shadow(0 0 15px rgba(212,175,55,0.6)); animation: float 3s ease-in-out infinite; }
+.text-logo-queens {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  background: linear-gradient(135deg, #b8860b 0%, #f9e27e 40%, #d4af37 70%, #b8860b 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 6px;
+}
+.text-logo-figure { color: #d4af37; font-size: 1.2rem; margin: -4px 0; letter-spacing: 4px; opacity: 0.7; }
+.text-logo-escort {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: #d4af37;
+  letter-spacing: 10px;
+  font-weight: 400;
+}
+
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── SUBTITLE ────────────────────────────────────────────── */
+.splash-subtitle {
+  margin-bottom: 16px;
+  animation: fadeInDown 0.8s ease 0.2s both;
+}
+
+.subtitle-1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: #d4af37;
+  margin-bottom: 4px;
+}
+
+.subtitle-2 {
+  font-size: clamp(0.65rem, 1.8vw, 0.8rem);
+  letter-spacing: 3px;
+  color: rgba(212, 175, 55, 0.5);
+  text-transform: uppercase;
+}
+
+/* ─── MODELS HERO ─────────────────────────────────────────── */
+.models-hero {
+  position: relative;
+  z-index: 15;
+  width: 100vw;
+  max-width: 700px;
+  margin: 0 auto 0;
+  overflow: visible;
+  animation: fadeInDown 1s ease 0.3s both;
+}
+
+.models-hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  filter: brightness(0.95) contrast(1.05) saturate(1.1);
+  border-radius: 16px;
+}
+
+.models-hero-fade {
+  display: none;
+}
+
+.models-hero::after {
+  display: none;
+}
+
+/* ─── GOLD DIVIDER ────────────────────────────────────────── */
+.gold-divider {
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  margin: 0 auto 12px;
+  position: relative;
+  z-index: 20;
+}
+
+/* ─── LANGUAGE FLAGS ──────────────────────────────────────── */
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  max-width: 380px;
+  width: 100%;
+  margin-top: -60px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 20;
+  animation: fadeInDown 0.8s ease 0.4s both;
+}
+
+.lang-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  background: rgba(10, 30, 60, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  text-decoration: none;
+  color: rgba(212, 175, 55, 0.7);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.lang-btn:hover, .lang-btn.active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: #d4af37;
+  color: #f9e27e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.lang-btn.active {
+  border-color: #d4af37;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
+.flag-icon {
+  width: 32px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  transition: all 0.25s ease;
+}
+
+.lang-btn:hover .flag-icon {
+  transform: scale(1.05);
+  border-color: #f9e27e;
+}
+
+/* ─── AGE WARNING ─────────────────────────────────────────── */
+.age-warning {
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(240, 230, 200, 0.4);
+  margin-bottom: 20px;
+  animation: fadeInDown 0.8s ease 0.5s both;
+}
+
+/* ─── ENTER BUTTON ────────────────────────────────────────── */
+.enter-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  animation: fadeInDown 0.8s ease 0.6s both;
+  transition: filter 0.3s;
+}
+
+.enter-btn:hover .enter-q-circle {
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+  transform: scale(1.05);
+}
+
+.enter-btn:hover span { color: #f9e27e; }
+
+.enter-q-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0a2040, #1a3560);
+  border: 2px solid #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.6rem;
+  color: #d4af37;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.35), inset 0 0 15px rgba(212, 175, 55, 0.1);
+  transition: all 0.3s ease;
+}
+
+.enter-btn > span {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.6);
+  transition: color 0.3s;
+}
+
+/* ─── SEO FOOTER ──────────────────────────────────────────── */
+.seo-footer {
+  position: fixed;
+  bottom: -100px;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  font-size: 0.1px;
+  pointer-events: none;
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .models-hero { max-width: 95vw; margin: 12px auto 6px; border-radius: 12px; }
+  .models-hero-img { border-radius: 12px; }
+  .models-hero-fade { border-radius: 12px; }
+  .models-hero::after { border-radius: 12px; }
+}
+
+@media (max-width: 480px) {
+  .lang-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 320px; }
+  .lang-btn { padding: 6px 2px; }
+  .flag-icon { width: 26px; height: 18px; }
+  .corner { display: none; }
+  .splash-logo { max-width: 280px; }
+  .models-hero { margin: 8px auto 4px; border-radius: 10px; }
+  .models-hero-img { border-radius: 10px; }
+  .models-hero-fade { border-radius: 10px; }
+  .models-hero::after { border-radius: 10px; }
+}
