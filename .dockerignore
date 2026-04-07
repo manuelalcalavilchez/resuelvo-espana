@@ -1,6 +1,38 @@
+# Node
 node_modules
-data/*.db
+npm-debug.log*
+
+# Env / secrets — NUNCA dentro de la imagen
 .env
-*.log
+.env.local
+.env.*.local
+
+# Datos y uploads runtime — se montan como volúmenes en Easypanel
+data/perfiles.json
+data/usuarios.json
+data/agencias.json
+data/*.db
+public/uploads
+
+# Git / IDE / OS
+.git
+.gitignore
+.github
+.claude
+.vscode
+.idea
 .DS_Store
 Thumbs.db
+*.lnk
+*.log
+
+# Documentación / build artifacts
+EASYPANEL.md
+MANUAL_TECNICO.md
+README.md
+dist
+build
+
+# Imágenes temporales de debug
+public/img/models/debug-*
+public/img/models/hero-banner-nomast.png
