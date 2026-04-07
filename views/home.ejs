@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= t.site_title %> | Queens Escort en España</title>
+  <meta name="description" content="Queens Escort - Escorts verificadas en todas las provincias de España. Perfiles reales y exclusivos.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-velvet">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="navbar-logo" style="text-decoration:none">
+      <img src="/img/queens-logo.png" alt="Queens Escort" style="height:40px;" onerror="this.outerHTML='<span class=\'gold-shimmer\'>QUEENS ESCORT</span>'">
+    </a>
+    <div class="navbar-links">
+      <a href="/registro"><%= t.advertise %></a>
+      <a href="/acceso/login">Acceso agencias/modelos</a>
+      <a href="/ghost" style="font-size:0.68rem;opacity:0.5;"><%= t.ghost_btn %></a>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top:100px;padding-bottom:60px;">
+
+    <!-- Page Header -->
+    <div style="text-align:center;margin-bottom:48px;">
+      <p class="section-title"><%= t.cities %></p>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(1.6rem,4vw,2.8rem);margin-bottom:8px;"><%= t.home_subtitle %></h1>
+      <p class="text-muted" style="font-size:0.8rem;letter-spacing:2px;">QUEENS ESCORT | ESCORT EN ESPAÑA</p>
+    </div>
+
+    <!-- Inscripción (Chica / Agencia) -->
+    <%
+      const refSuffix = refCode ? ` Vengo recomendada por la afiliada ${refCode}.` : '';
+      const msgChica = `Hola Queens Escort, quiero inscribirme como CHICA. Envíame los pasos y precios, por favor.${refSuffix}`;
+      const msgAgencia = `Hola Queens Escort, quiero inscribir mi AGENCIA / CHALET. Envíame los pasos y precios, por favor.${refSuffix}`;
+    %>
+    <div class="inscripcion-wrap">
+      <p class="inscripcion-title">¿Quieres anunciarte en Queens Escort?</p>
+      <% if (refCode) { %>
+        <p style="color:#0a8d54;font-size:0.8rem;margin-bottom:14px;">
+          ✨ Vienes recomendada por la afiliada <strong><%= refCode %></strong>
+        </p>
+      <% } %>
+      <div class="inscripcion-buttons">
+        <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent(msgChica) %>"
+           target="_blank" rel="noopener" class="insc-btn insc-chica">
+          <span class="insc-icon">♀</span>
+          <span class="insc-label">
+            <strong>Inscribir Chica</strong>
+            <small>Confirmación por WhatsApp</small>
+          </span>
+        </a>
+        <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent(msgAgencia) %>"
+           target="_blank" rel="noopener" class="insc-btn insc-agencia">
+          <span class="insc-icon">🏢</span>
+          <span class="insc-label">
+            <strong>Inscribir Agencia</strong>
+            <small>Confirmación por WhatsApp</small>
+          </span>
+        </a>
+      </div>
+      <p class="inscripcion-note">
+        Te responderá nuestro equipo al <strong>+<%= whatsapp %></strong> con las instrucciones y el enlace de pago.
+        <br>
+        <a href="/planes" style="color:#d4af37;text-decoration:underline;">Ver planes y precios →</a>
+      </p>
+    </div>
+
+    <!-- Category Quick Filter (ciudad de ejemplo: primera con perfiles activos) -->
+    <% if (ciudadesList.length > 0) { %>
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px;">
+      <a href="/ciudad/<%= encodeURIComponent(ciudadEjemplo) %>?categoria=chica" class="cat-btn chica" style="width:auto;padding:10px 24px;"><%= t.cat_chica %></a>
+      <a href="/ciudad/<%= encodeURIComponent(ciudadEjemplo) %>?categoria=chico" class="cat-btn chico" style="width:auto;padding:10px 24px;"><%= t.cat_chico %></a>
+      <a href="/ciudad/<%= encodeURIComponent(ciudadEjemplo) %>?categoria=trans" class="cat-btn trans" style="width:auto;padding:10px 24px;"><%= t.cat_trans %></a>
+    </div>
+    <% } %>
+
+    <!-- Ciudades con al menos un perfil activo -->
+    <div style="columns:2 200px;gap:12px;margin-bottom:60px;" id="provincias-grid">
+      <% if (ciudadesList.length === 0) { %>
+      <p style="text-align:center;color:var(--text-muted);grid-column:1/-1;padding:24px;">Aún no hay perfiles activos por ciudad. Prueba más tarde o regístrate para aparecer aquí.</p>
+      <% } %>
+      <% ciudadesList.forEach(prov => { %>
+      <a href="/ciudad/<%= encodeURIComponent(prov) %>" class="province-link">
+        <span class="prov-name"><%= prov %></span>
+        <span class="prov-count"><%= ciudadesMap[prov] %></span>
+      </a>
+      <% }) %>
+    </div>
+
+    <!-- SEO Text Block -->
+    <div class="seo-text-block">
+      <h2>Queens Escort | Escort en España</h2>
+      <p>
+        Bienvenido a <strong>Queens Escort</strong>, la plataforma premium de <strong>escort en España</strong>.
+        Todos nuestros perfiles son verificados personalmente por nuestro equipo.
+        <% if (ciudadesList.length > 0) { %>
+        Encuentra escorts en 
+        <% ciudadesList.forEach((prov, i) => { %>
+          <strong><%= prov %></strong><%= i < ciudadesList.length - 1 ? ', ' : '' %>
+        <% }) %> y en el resto de provincias de España.
+        <% } else { %>
+        Encuentra perfiles de exclusividad en todas las provincias de España.
+        <% } %>
+        Escort de lujo. <strong>Acompañantes verificadas en España</strong>.
+        Chicas escort, chicos escort y trans escort.
+      </p>
+      <div class="seo-links">
+        <% ciudadesList.forEach(prov => { %>
+          <a href="/ciudad/<%= encodeURIComponent(prov) %>">Escort en <%= prov %></a>
+        <% }) %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Ghost Mode -->
+  <a href="/ghost" class="ghost-trigger"><%= t.ghost_btn %></a>
+
+  <style>
+    .province-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      margin-bottom: 10px;
+      background: rgba(8, 14, 28, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 8px;
+      text-decoration: none;
+      color: #c8d4e0;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.25s ease;
+      break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+    }
+    .province-link:hover {
+      background: rgba(212, 175, 55, 0.08);
+      border-color: rgba(212, 175, 55, 0.5);
+      color: #f9e27e;
+      transform: translateX(4px);
+    }
+    .prov-name { flex: 1; }
+    .prov-count {
+      background: linear-gradient(135deg, #7a5c00, #d4af37);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 30px;
+      min-width: 24px;
+      text-align: center;
+    }
+    .prov-new {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(212, 175, 55, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 1px 6px;
+      border-radius: 30px;
+    }
+
+    .inscripcion-wrap {
+      text-align: center;
+      margin: 0 auto 44px;
+      max-width: 720px;
+      padding: 22px 18px;
+      background: linear-gradient(180deg, rgba(212,175,55,0.06), rgba(8,14,28,0.5));
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 14px;
+      box-shadow: 0 0 30px rgba(212,175,55,0.08);
+    }
+    .inscripcion-title {
+      font-family: 'Cinzel', serif;
+      color: #f9e27e;
+      letter-spacing: 2px;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .inscripcion-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .insc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 22px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      min-width: 240px;
+      border: 1px solid rgba(212,175,55,0.5);
+      background: linear-gradient(135deg, #1a1205, #0a0a0a);
+      color: #f9e27e;
+      transition: all 0.25s ease;
+    }
+    .insc-btn:hover {
+      background: linear-gradient(135deg, #2a1c08, #141414);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(212,175,55,0.22);
+    }
+    .insc-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      min-width: 32px;
+      text-align: center;
+    }
+    .insc-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .insc-label strong {
+      font-size: 1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .insc-label small {
+      font-size: 0.7rem;
+      color: #0a8d54;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    .insc-agencia .insc-label small { color: #c8d4e0; opacity: 0.7; }
+    .inscripcion-note {
+      font-size: 0.72rem;
+      color: rgba(200,210,220,0.55);
+      margin-top: 14px;
+      letter-spacing: 0.5px;
+    }
+    .inscripcion-note strong { color: #f9e27e; }
+    @media (max-width: 560px) {
+      .insc-btn { min-width: 85%; justify-content: center; }
+    }
+
+    .seo-text-block {
+      border-top: 1px solid rgba(212, 175, 55, 0.15);
+      padding-top: 40px;
+      margin-top: 20px;
+    }
+    .seo-text-block h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: rgba(212, 175, 55, 0.6);
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .seo-text-block p {
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: rgba(200, 210, 220, 0.4);
+      margin-bottom: 20px;
+    }
+    .seo-text-block strong { color: rgba(212, 175, 55, 0.5); }
+    .seo-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .seo-links a {
+      font-size: 0.7rem;
+      color: rgba(212, 175, 55, 0.3);
+      text-decoration: none;
+      padding: 3px 10px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+    .seo-links a:hover { color: rgba(212, 175, 55, 0.7); border-color: rgba(212, 175, 55, 0.3); }
+
+    @media (max-width: 600px) {
+      #provincias-grid { columns: 1; }
+    }
+  </style>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
+
+

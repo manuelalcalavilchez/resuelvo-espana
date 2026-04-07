@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración — Queens Escort Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <h1 class="gold-text">👑 QUEENS</h1>
+      <p>PANEL DE ADMINISTRACIÓN</p>
+    </div>
+    <nav class="admin-nav">
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/perfil/nuevo">➕ Nuevo Perfil</a>
+      <a href="/admin/recordatorios">🔔 Recordatorios</a>
+      <a href="/admin/agencias">🏢 Agencias</a>
+      <a href="/admin/config" class="active">⚙️ Configuración</a>
+      <a href="/" target="_blank">🌐 Ver Web</a>
+      <a href="/admin/logout" style="margin-top:auto;color:#ff3b6b;">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2>⚙️ Configuración</h2>
+    </div>
+
+    <% if (success) { %>
+      <div style="background:rgba(0,230,118,0.1);border:1px solid #00e676;color:#00e676;padding:12px 16px;border-radius:10px;margin-bottom:20px;">
+        ✅ Cambios guardados correctamente.
+      </div>
+    <% } %>
+
+    <div class="card" style="max-width:720px;padding:24px;">
+      <h3 class="gold-text font-cinzel-sm" style="margin-bottom:8px;">📱 WhatsApp de contacto / confirmación</h3>
+      <p class="text-muted" style="font-size:0.85rem;margin-bottom:20px;">
+        Este número recibe las solicitudes de inscripción (Chica / Agencia) y los mensajes de "¿olvidaste tu contraseña?".
+        Introduce el número con código de país, sin el signo +, espacios ni guiones. Ejemplo: <strong>34610216548</strong>.
+      </p>
+
+      <form method="POST" action="/admin/config">
+        <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:#c8d4e0;">
+          Número de WhatsApp
+        </label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:1.1rem;color:#f9e27e;">+</span>
+          <input
+            type="text"
+            name="whatsapp_number"
+            value="<%= config.whatsapp_number || '' %>"
+            placeholder="34610216548"
+            pattern="[0-9]{8,15}"
+            required
+            style="flex:1;padding:12px 14px;background:#0a0a0a;border:1px solid rgba(212,175,55,0.4);border-radius:8px;color:#f9e27e;font-size:1rem;letter-spacing:1px;"
+          >
+        </div>
+        <p class="text-muted" style="font-size:0.75rem;margin-top:8px;">
+          Actual: <strong>+<%= config.whatsapp_number || '—' %></strong>
+        </p>
+
+        <div style="display:flex;gap:12px;margin-top:24px;">
+          <button type="submit" class="btn btn-primary">💾 Guardar cambios</button>
+          <a href="https://wa.me/<%= config.whatsapp_number %>" target="_blank" class="btn btn-success">📱 Probar WhatsApp</a>
+        </div>
+      </form>
+    </div>
+
+  </main>
+</body>
+</html>

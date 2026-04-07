@@ -17,8 +17,60 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Queens2024!';
-const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '34600000000';
 const APP_VERSION = Date.now().toString(); // Genera un ID único cada vez que reinicias el servidor
+
+// ─── CONFIG (editable desde admin) ────────────────────────
+const CONFIG_FILE = path.join(__dirname, 'data', 'config.json');
+const DEFAULT_CONFIG = {
+  whatsapp_number: process.env.WHATSAPP_NUMBER || '34600000000'
+};
+const getConfig = () => {
+  try {
+    if (!fs.existsSync(CONFIG_FILE)) return { ...DEFAULT_CONFIG };
+    return { ...DEFAULT_CONFIG, ...JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) };
+  } catch (err) {
+    console.error('Error leyendo config.json:', err);
+    return { ...DEFAULT_CONFIG };
+  }
+};
+const saveConfig = async (cfg) => {
+  const tmp = CONFIG_FILE + '.tmp';
+  await fsp.writeFile(tmp, JSON.stringify(cfg, null, 2));
+  await fsp.rename(tmp, CONFIG_FILE);
+};
+const getWhatsappNumber = () => (getConfig().whatsapp_number || '').replace(/\D/g, '');
+
+// ─── PLAN LIMITS ──────────────────────────────────────────
+// Beneficios concretos por plan — usado en backend (enforce) y frontend (mostrar).
+const PLAN_LIMITS = {
+  destacada: {
+    label: '👑 Destacada',
+    price_hint: 'Premium',
+    max_fotos: 12,
+    allow_video: true,
+    max_desc: 800,
+    priority_sort: 1,     // aparece primero
+    home_showcase: true,  // aparece en el carrusel de la portada
+    stats_visible: true,  // estadísticas en el panel
+    card_size: 'grande',
+    badge: '👑 Corona',
+    color: '#d4af37'
+  },
+  basica: {
+    label: 'Catálogo',
+    price_hint: 'Básico',
+    max_fotos: 5,
+    allow_video: false,
+    max_desc: 250,
+    priority_sort: 2,
+    home_showcase: false,
+    stats_visible: false,
+    card_size: 'estándar',
+    badge: null,
+    color: '#888'
+  }
+};
+const getPlanLimits = (plan) => PLAN_LIMITS[plan] || PLAN_LIMITS.basica;
 
 // ─── DATA STORE ───────────────────────────────────────────
 const DATA_DIR = path.join(__dirname, 'data');
@@ -122,7 +174,8 @@ app.use((req, res, next) => {
     res.locals.user = null;
   }
 
-  res.locals.whatsapp = WHATSAPP_NUMBER; // Hacer accesible el número para el botón de "olvidé contraseña"
+  res.locals.whatsapp = getWhatsappNumber(); // Hacer accesible el número (editable desde admin/config)
+  res.locals.PLAN_LIMITS = PLAN_LIMITS;
   next();
 });
 
@@ -190,7 +243,21 @@ app.get('/inicio', (req, res) => {
   });
   const ciudadesList = Object.keys(ciudadesMap).sort((a, b) => a.localeCompare(b, 'es'));
   const ciudadEjemplo = ciudadesList[0] || 'Madrid';
-  res.render('home', { ciudadesMap, ciudadesList, ciudadEjemplo });
+
+  // Código de afiliada (ref) — validar que exista y esté activo
+  let refCode = null;
+  if (req.query.ref) {
+    const refClean = String(req.query.ref).trim().toUpperCase();
+    const refProfile = getPerfiles().find(p => p.id === refClean && p.estado === 'activo');
+    if (refProfile) refCode = refClean;
+  }
+
+  res.render('home', { ciudadesMap, ciudadesList, ciudadEjemplo, refCode });
+});
+
+// Legacy referral link → redirige al nuevo sistema con ?ref=
+app.get('/r/:id', (req, res) => {
+  res.redirect('/inicio?ref=' + encodeURIComponent(req.params.id));
 });
 
 app.get('/ciudad/:nombre', (req, res) => {
@@ -221,55 +288,100 @@ app.get('/ciudad/:nombre', (req, res) => {
   });
 });
 
-app.get('/perfil/:id', (req, res) => {
-  const perfil = getPerfiles().find(p => p.id === req.params.id && p.estado === 'activo');
+app.get('/perfil/:id', async (req, res) => {
+  const perfiles = getPerfiles();
+  const perfil = perfiles.find(p => p.id === req.params.id && p.estado === 'activo');
   if (!perfil) return res.redirect('/inicio');
-  const relacionados = getPerfiles()
+
+  // Contador de visitas (solo 1 por sesión para evitar inflar con recargas)
+  req.session.viewed = req.session.viewed || {};
+  if (!req.session.viewed[perfil.id]) {
+    perfil.views = (perfil.views || 0) + 1;
+    req.session.viewed[perfil.id] = true;
+    savePerfiles(perfiles).catch(() => {});
+  }
+
+  const relacionados = perfiles
     .filter(p => p.ciudad === perfil.ciudad && p.categoria === perfil.categoria && p.estado === 'activo' && p.id !== perfil.id)
     .slice(0, 4);
-  res.render('profile', { perfil, relacionados });
+  res.render('profile', { perfil, relacionados, limits: getPlanLimits(perfil.plan) });
 });
 
-app.get('/r/:id', (req, res) => {
-  req.session.referralId = req.params.id;
-  res.redirect('/registro');
+// Página informativa de comparación de planes
+app.get('/planes', (req, res) => {
+  res.render('planes');
 });
 
 app.get('/registro', (req, res) => res.render('registro', { provincias: PROVINCIAS }));
 
 app.post('/registro', async (req, res) => {
-  const { nombre, ciudad, telefono, categoria, lat, lng } = req.body;
+  const { nombre, ciudad, telefono, categoria, lat, lng, ref } = req.body;
   const id = generateId();
   const perfiles = getPerfiles();
+
+  // Validar código de afiliada
+  let refCode = null;
+  if (ref) {
+    const refClean = String(ref).trim().toUpperCase();
+    const refProfile = perfiles.find(p => p.id === refClean && p.estado === 'activo');
+    if (refProfile) refCode = refClean;
+  }
+
   perfiles.push({
     id, nombre, ciudad, telefono, categoria,
     tipo_anunciante: 'independiente', agencia_id: null, plan: 'basica',
     estado: 'solicitud_recibida', disponibilidad: 'disponible',
     descripcion: null, edad: null, idiomas: 'Español', fotos: [], lat: lat ? parseFloat(lat) : null, lng: lng ? parseFloat(lng) : null,
     orden_manual: 99, fecha_inicio: null, fecha_fin: null,
-    notas_internas: null, created_at: new Date().toISOString(), referidos_count: 0, recompensa: false
+    notas_internas: null, created_at: new Date().toISOString(),
+    referidos_count: 0, recompensa: false,
+    referida_por: refCode
   });
-  // referrals
-  if (req.session.referralId) {
-    const refIdx = perfiles.findIndex(p => p.id === req.session.referralId);
-    if (refIdx !== -1) {
-      perfiles[refIdx].referidos_count = (perfiles[refIdx].referidos_count || 0) + 1;
-      if (perfiles[refIdx].referidos_count >= 10 && !perfiles[refIdx].recompensa) {
-        perfiles[refIdx].recompensa = true;
-        perfiles[refIdx].plan = 'destacada';
-        const today = new Date();
-        const fin = new Date(); fin.setDate(fin.getDate() + 30);
-        perfiles[refIdx].fecha_inicio = today.toISOString().split('T')[0];
-        perfiles[refIdx].fecha_fin = fin.toISOString().split('T')[0];
-        perfiles[refIdx].estado = 'activo';
-      }
+  await savePerfiles(perfiles);
+
+  // IMPORTANTE: No acreditamos al referente aquí — sólo cuando el admin activa el perfil,
+  // para evitar que cualquiera rellene formularios falsos. Ver applyAffiliateCredit().
+
+  const refMsg = refCode ? ` Me recomendó la afiliada ${refCode}.` : '';
+  const msg = `Hola! Soy ${nombre}, mi ID es ${id}. Quiero anunciarme en Queens Escort. Ciudad: ${ciudad}. Categoría: ${categoria}.${refMsg}`;
+  res.redirect(`https://wa.me/${getWhatsappNumber()}?text=${encodeURIComponent(msg)}`);
+});
+
+// ─── AFFILIATE TIER SYSTEM ────────────────────────────────
+// Tiers: 1 → 7 días gratis, 3 → 15 días, 5 → 30 días Destacada
+const AFFILIATE_TIERS = [
+  { count: 1, days: 7,  plan: null },
+  { count: 3, days: 15, plan: null },
+  { count: 5, days: 30, plan: 'destacada' }
+];
+const addDaysToProfile = (perfil, days) => {
+  const today = new Date();
+  const base = perfil.fecha_fin && new Date(perfil.fecha_fin) > today
+    ? new Date(perfil.fecha_fin) : today;
+  base.setDate(base.getDate() + days);
+  perfil.fecha_fin = base.toISOString().split('T')[0];
+  if (!perfil.fecha_inicio) perfil.fecha_inicio = today.toISOString().split('T')[0];
+  if (perfil.estado !== 'activo') perfil.estado = 'activo';
+};
+const applyAffiliateCredit = async (referenteId) => {
+  const perfiles = getPerfiles();
+  const idx = perfiles.findIndex(p => p.id === referenteId);
+  if (idx === -1) return false;
+  const p = perfiles[idx];
+  p.referidos_count = (p.referidos_count || 0) + 1;
+  p.tiers_cobrados = p.tiers_cobrados || [];
+  // aplicar cualquier tier alcanzado aún no cobrado
+  for (const tier of AFFILIATE_TIERS) {
+    if (p.referidos_count >= tier.count && !p.tiers_cobrados.includes(tier.count)) {
+      addDaysToProfile(p, tier.days);
+      if (tier.plan) p.plan = tier.plan;
+      p.tiers_cobrados.push(tier.count);
+      if (tier.count >= 5) p.recompensa = true;
     }
-    req.session.referralId = null;
   }
   await savePerfiles(perfiles);
-  const msg = `Hola! Soy ${nombre}, mi ID es ${id}. Quiero registrarme en Queens Escort. Ciudad: ${ciudad}. Categoría: ${categoria}.`;
-  res.redirect(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`);
-});
+  return true;
+};
 
 app.get('/ghost', (req, res) => res.render('ghost'));
 
@@ -289,6 +401,18 @@ app.post('/admin/login', (req, res) => {
   res.render('admin/login', { error: 'Contraseña incorrecta.' });
 });
 app.get('/admin/logout', (req, res) => { req.session.destroy(); res.redirect('/admin/login'); });
+
+// Admin: Config (WhatsApp, etc.)
+app.get('/admin/config', requireAdmin, (req, res) => {
+  res.render('admin/config', { config: getConfig(), success: req.query.ok === '1' });
+});
+app.post('/admin/config', requireAdmin, async (req, res) => {
+  const cfg = getConfig();
+  const numero = (req.body.whatsapp_number || '').replace(/\D/g, '');
+  if (numero) cfg.whatsapp_number = numero;
+  await saveConfig(cfg);
+  res.redirect('/admin/config?ok=1');
+});
 
 // ACCESO USUARIOS
 app.get('/acceso/login', (req, res) => {
@@ -422,7 +546,7 @@ app.get('/admin/perfil/nuevo', requireAuth, (req, res) => {
   const agencias = req.session.user.rol === 'agencia'
     ? getAgencias().filter(a => a.id === req.session.user.agencia_id)
     : getAgencias();
-  res.render('admin/perfil-form', { perfil: null, provincias: PROVINCIAS, agencias, action: '/admin/perfil/nuevo' });
+  res.render('admin/perfil-form', { perfil: null, provincias: PROVINCIAS, agencias, action: '/admin/perfil/nuevo', isAdmin: req.session.isAdmin === true, query: req.query });
 });
 app.post('/admin/perfil/nuevo', requireAuth, (req, res) => {
   if (req.session.user.rol === 'modelo') return res.redirect('/panel');
@@ -435,14 +559,34 @@ app.post('/admin/perfil/nuevo', requireAuth, (req, res) => {
     id, nombre, ciudad, telefono, categoria,
     tipo_anunciante: tipo_anunciante || 'independiente', agencia_id: ownerAgencia,
     plan: plan || 'basica', estado: 'activo', disponibilidad: disponibilidad || 'disponible',
-    descripcion: descripcion || null, edad: edad ? parseInt(edad) : null,
-    idiomas: idiomas || 'Español', fotos: [], orden_manual: 99,
+    descripcion: descripcion ? String(descripcion).slice(0, getPlanLimits(plan || 'basica').max_desc) : null,
+    edad: edad ? parseInt(edad) : null,
+    idiomas: idiomas || 'Español', fotos: [], video: null, views: 0, orden_manual: 99,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
     notas_internas: notas_internas || null, created_at: new Date().toISOString(),
-    referidos_count: 0, recompensa: false
+    referidos_count: 0, recompensa: false, tiers_cobrados: []
   });
   savePerfiles(perfiles);
   res.redirect(`/admin/perfil/${id}/editar`); // Redirigir a editar para poder subir fotos inmediatamente
+});
+
+// Acreditar manualmente una referida a una afiliada (solo admin)
+app.post('/admin/perfil/:id/acreditar-referida', requireAdmin, async (req, res) => {
+  const nuevaReferidaId = req.params.id; // perfil que fue traído
+  const referenteId = (req.body.referente_id || '').trim().toUpperCase();
+  const perfiles = getPerfiles();
+  const nueva = perfiles.find(p => p.id === nuevaReferidaId);
+  const referente = perfiles.find(p => p.id === referenteId);
+  if (!nueva || !referente) {
+    return res.status(400).send('Perfil o referente no encontrado. <a href="javascript:history.back()">Volver</a>');
+  }
+  if (nueva.referida_por) {
+    return res.status(400).send(`Esta modelo ya tenía acreditada a ${nueva.referida_por}. <a href="javascript:history.back()">Volver</a>`);
+  }
+  nueva.referida_por = referenteId;
+  await savePerfiles(perfiles);
+  await applyAffiliateCredit(referenteId);
+  res.redirect(`/admin/perfil/${nuevaReferidaId}/editar`);
 });
 
 app.get('/admin/perfil/:id/editar', requireAuth, (req, res) => {
@@ -452,7 +596,7 @@ app.get('/admin/perfil/:id/editar', requireAuth, (req, res) => {
   const agencias = req.session.user.rol === 'agencia'
     ? getAgencias().filter(a => a.id === req.session.user.agencia_id)
     : getAgencias();
-  res.render('admin/perfil-form', { perfil, provincias: PROVINCIAS, agencias, action: `/admin/perfil/${perfil.id}/editar` });
+  res.render('admin/perfil-form', { perfil, provincias: PROVINCIAS, agencias, action: `/admin/perfil/${perfil.id}/editar`, isAdmin: req.session.isAdmin === true, query: req.query });
 });
 app.post('/admin/perfil/:id/editar', requireAuth, (req, res) => {
   const perfiles = getPerfiles();
@@ -465,7 +609,9 @@ app.post('/admin/perfil/:id/editar', requireAuth, (req, res) => {
     ...perfiles[idx], nombre, ciudad, telefono, categoria,
     tipo_anunciante: tipo_anunciante || 'independiente',
     agencia_id: req.session.user.rol === 'agencia' ? req.session.user.agencia_id : (agencia_id || null),
-    plan, estado, disponibilidad, descripcion: descripcion || null,
+    plan,
+    estado, disponibilidad,
+    descripcion: descripcion ? String(descripcion).slice(0, getPlanLimits(plan).max_desc) : null,
     edad: edad ? parseInt(edad) : null, idiomas: idiomas || 'Español',
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
     notas_internas: notas_internas || null, orden_manual: parseInt(orden_manual) || 99
@@ -504,10 +650,51 @@ app.post('/admin/perfil/:id/eliminar', requireAuth, (req, res) => {
   res.redirect('/panel');
 });
 
-app.post('/admin/perfil/:id/fotos', requireAuth, upload.array('fotos', 10), (req, res) => {
+app.post('/admin/perfil/:id/fotos', requireAuth, upload.array('fotos', 15), async (req, res) => {
   const perfiles = getPerfiles();
   const p = perfiles.find(p => p.id === req.params.id);
-  if (p && checkOwnership(p, req.session.user)) { p.fotos = [...(p.fotos || []), ...req.files.map(f => `/uploads/${req.params.id}/${f.filename}`)]; savePerfiles(perfiles); }
+  if (!p || !checkOwnership(p, req.session.user)) return res.redirect('/panel');
+
+  const limits = getPlanLimits(p.plan);
+  const current = (p.fotos || []).length;
+  const incoming = req.files || [];
+  const allowedSlots = Math.max(0, limits.max_fotos - current);
+
+  // Los que entran dentro del límite se aceptan; los sobrantes se borran del disco
+  const accepted = incoming.slice(0, allowedSlots);
+  const rejected = incoming.slice(allowedSlots);
+  for (const f of rejected) {
+    try { fs.unlinkSync(f.path); } catch (_) {}
+  }
+
+  p.fotos = [...(p.fotos || []), ...accepted.map(f => `/uploads/${req.params.id}/${f.filename}`)];
+  await savePerfiles(perfiles);
+
+  const warn = rejected.length > 0
+    ? `?warn=${encodeURIComponent(`Plan ${limits.label}: máximo ${limits.max_fotos} fotos. Se ignoraron ${rejected.length}.`)}`
+    : '';
+  res.redirect(`/admin/perfil/${req.params.id}/editar${warn}`);
+});
+
+// Subida de vídeo (solo Destacada)
+app.post('/admin/perfil/:id/video', requireAuth, upload.single('video'), async (req, res) => {
+  const perfiles = getPerfiles();
+  const p = perfiles.find(p => p.id === req.params.id);
+  if (!p || !checkOwnership(p, req.session.user)) return res.redirect('/panel');
+  const limits = getPlanLimits(p.plan);
+  if (!limits.allow_video) {
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch (_) {} }
+    return res.redirect(`/admin/perfil/${req.params.id}/editar?warn=${encodeURIComponent('El vídeo solo está disponible en plan Destacada.')}`);
+  }
+  if (req.file) {
+    // Borrar vídeo anterior si existía
+    if (p.video) {
+      const old = path.join(__dirname, 'public', p.video);
+      if (fs.existsSync(old)) { try { fs.unlinkSync(old); } catch (_) {} }
+    }
+    p.video = `/uploads/${req.params.id}/${req.file.filename}`;
+    await savePerfiles(perfiles);
+  }
   res.redirect(`/admin/perfil/${req.params.id}/editar`);
 });
 

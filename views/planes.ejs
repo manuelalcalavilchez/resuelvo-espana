@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planes y Precios | Queens Escort</title>
+  <meta name="description" content="Compara los planes Destacada y Catálogo de Queens Escort. Beneficios y diferencias.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-velvet">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/inicio" class="navbar-logo" style="text-decoration:none">
+      <img src="/img/queens-logo.png" alt="Queens Escort" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS ESCORT</span>'">
+    </a>
+    <div class="navbar-links">
+      <a href="/inicio">← Inicio</a>
+      <a href="/acceso/login">Acceso</a>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top:110px;padding-bottom:80px;max-width:1000px;">
+
+    <div style="text-align:center;margin-bottom:50px;">
+      <p class="section-title">Tarifas de anunciantes</p>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:12px;">Elige tu plan</h1>
+      <p class="text-muted" style="max-width:620px;margin:0 auto;font-size:0.95rem;line-height:1.6;">
+        Queens Escort ofrece dos niveles de visibilidad. Cuanto mayor sea tu plan, mayor tu alcance,
+        tus fotos, tu posición en el buscador y tus herramientas de contacto con clientes.
+      </p>
+    </div>
+
+    <div class="plans-grid">
+
+      <!-- DESTACADA -->
+      <div class="plan-card plan-destacada">
+        <div class="plan-badge">👑 Más popular</div>
+        <h2 class="plan-title gold-shimmer">Destacada</h2>
+        <p class="plan-subtitle">Máxima visibilidad · Corona dorada</p>
+
+        <ul class="plan-features">
+          <li><strong>Posición prioritaria</strong> — Aparece la primera en tu ciudad, en la sección 👑 Destacadas</li>
+          <li><strong>Tarjeta grande</strong> — Imagen de mayor tamaño con efecto premium</li>
+          <li><strong>Hasta 12 fotos</strong> en tu galería</li>
+          <li><strong>Vídeo de presentación</strong> ✨</li>
+          <li><strong>Descripción extendida</strong> hasta 800 caracteres</li>
+          <li><strong>Badge Corona 👑</strong> en todas las vistas</li>
+          <li><strong>Carrusel de portada</strong> — Aparición rotatoria en el home</li>
+          <li><strong>Estadísticas de visitas</strong> en tu panel</li>
+          <li><strong>Programa de afiliadas</strong> con recompensas aceleradas</li>
+        </ul>
+
+        <div class="plan-cta">
+          <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent('Hola Queens Escort, quiero contratar el plan DESTACADA. Envíame precios y pasos, por favor.') %>"
+             target="_blank" rel="noopener" class="btn-gold" style="display:block;text-align:center;padding:14px 20px;">
+            Contratar Destacada
+          </a>
+        </div>
+      </div>
+
+      <!-- BÁSICA -->
+      <div class="plan-card plan-basica">
+        <h2 class="plan-title" style="color:#c8d4e0;">Catálogo</h2>
+        <p class="plan-subtitle">Plan básico · Presencia asegurada</p>
+
+        <ul class="plan-features">
+          <li>Aparece en la <strong>sección Catálogo</strong> de tu ciudad</li>
+          <li>Tarjeta estándar</li>
+          <li><strong>Hasta 5 fotos</strong></li>
+          <li>Sin vídeo</li>
+          <li>Descripción breve hasta <strong>250 caracteres</strong></li>
+          <li>Filtros por categoría y disponibilidad</li>
+          <li>Contacto directo por WhatsApp</li>
+          <li class="muted">— Sin estadísticas</li>
+          <li class="muted">— Sin carrusel de portada</li>
+        </ul>
+
+        <div class="plan-cta">
+          <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent('Hola Queens Escort, quiero contratar el plan CATÁLOGO. Envíame precios y pasos, por favor.') %>"
+             target="_blank" rel="noopener" class="btn" style="display:block;text-align:center;padding:14px 20px;background:#0a0a0a;border:1px solid #444;color:#c8d4e0;text-decoration:none;border-radius:8px;">
+            Contratar Catálogo
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:50px;padding:24px;border:1px dashed rgba(212,175,55,0.3);border-radius:12px;">
+      <p style="color:#c8d4e0;font-size:0.9rem;margin-bottom:8px;">
+        💡 Las anunciantes con <strong>plan Destacada</strong> reciben en promedio <strong>5-8× más contactos</strong> que las del Catálogo.
+      </p>
+      <p class="text-muted" style="font-size:0.78rem;">Todos los precios se confirman por WhatsApp al <strong>+<%= whatsapp %></strong>.</p>
+    </div>
+
+  </div>
+
+  <a href="/ghost" class="ghost-trigger">● MODO SEGURO</a>
+
+  <style>
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .plan-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(8,14,28,0.8), rgba(0,0,0,0.9));
+      border-radius: 16px;
+      padding: 32px 28px;
+      transition: transform 0.3s ease;
+    }
+    .plan-card:hover { transform: translateY(-4px); }
+    .plan-destacada {
+      border: 2px solid #d4af37;
+      box-shadow: 0 0 40px rgba(212,175,55,0.15);
+    }
+    .plan-basica {
+      border: 1px solid rgba(200,210,220,0.2);
+    }
+    .plan-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #7a5c00, #d4af37);
+      color: #000;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 30px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .plan-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+    .plan-subtitle {
+      color: rgba(200,210,220,0.6);
+      font-size: 0.85rem;
+      margin-bottom: 22px;
+      letter-spacing: 1px;
+    }
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 26px 0;
+    }
+    .plan-features li {
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.85rem;
+      color: #c8d4e0;
+      line-height: 1.5;
+    }
+    .plan-features li::before {
+      content: "✓ ";
+      color: #d4af37;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .plan-features li.muted {
+      color: rgba(200,210,220,0.35);
+    }
+    .plan-features li.muted::before {
+      content: "";
+      margin-right: 0;
+    }
+    .plan-basica .plan-features li::before {
+      color: #888;
+    }
+  </style>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Queens Escort</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .text-danger { color: #ff3b6b; }
+    .text-warning { color: #ffab00; }
+    .text-success { color: #00e676; }
+  </style>
+</head>
+<body class="admin-body">
+  <% var _panel = typeof isPanel !== 'undefined' && isPanel; %>
+  <% var _base = _panel ? '/panel' : '/admin'; %>
+  <% var _logout = _panel ? '/acceso/logout' : '/admin/logout'; %>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <h1 class="gold-text">👑 QUEENS</h1>
+      <p><%= _panel ? 'TU PANEL' : 'PANEL DE ADMINISTRACIÓN' %></p>
+    </div>
+    <nav class="admin-nav">
+      <a href="<%= _base %>" class="active">📊 Dashboard</a>
+      <% if (!_panel || (typeof userRole !== 'undefined' && userRole === 'agencia')) { %>
+      <a href="/admin/perfil/nuevo">➕ Nuevo Perfil</a>
+      <% } %>
+      <% if (!_panel) { %>
+      <a href="/admin/recordatorios">🔔 Recordatorios <% if (stats.expiran7 > 0) { %><span style="background:#ffab00;color:#000;font-size:0.6rem;padding:1px 6px;border-radius:30px;font-weight:700;margin-left:4px;"><%= stats.expiran7 %></span><% } %></a>
+      <a href="/admin/agencias">🏢 Agencias</a>
+      <a href="/admin/config">⚙️ Configuración</a>
+      <% } %>
+      <a href="/" target="_blank">🌐 Ver Web</a>
+      <a href="<%= _logout %>" style="margin-top:auto;color:#ff3b6b;">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2>Dashboard</h2>
+      <% if (!_panel || (typeof userRole !== 'undefined' && userRole === 'agencia')) { %>
+      <a href="/admin/perfil/nuevo" class="btn btn-primary">+ Nuevo Perfil</a>
+      <% } %>
+    </div>
+
+    <!-- Widget de afiliada (solo modelos) -->
+    <% if (_panel && typeof perfil !== 'undefined' && perfil && perfil.estado === 'activo') {
+      const tiers = [ {count:1,days:7}, {count:3,days:15}, {count:5,days:30} ];
+      const refCount = perfil.referidos_count || 0;
+      const nextTier = tiers.find(t => refCount < t.count);
+      const progreso = nextTier ? Math.min(100, Math.round((refCount / nextTier.count) * 100)) : 100;
+      const affLink = `/inicio?ref=${perfil.id}`;
+      const waMsg = encodeURIComponent(`Hola! Te invito a anunciarte en Queens Escort. Usa mi link de afiliada y yo gano días gratis: https://queensescort.es${affLink}`);
+    %>
+    <div class="card" style="padding:20px;margin-bottom:24px;background:linear-gradient(135deg,#1a1205,#0a0a0a);border:1px solid #d4af37;">
+      <h3 class="gold-text font-cinzel-sm" style="margin-bottom:12px;">👑 Tu programa de afiliadas</h3>
+      <p style="font-size:0.82rem;color:#c8d4e0;margin-bottom:14px;">
+        Comparte tu código y gana días gratis cuando tus referidas se activen:
+        <strong style="color:#f9e27e;">1 → 7 días · 3 → 15 días · 5 → 30 días + Corona 👑</strong>
+      </p>
+
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <span style="font-size:0.78rem;color:#aaa;">Tu código:</span>
+        <code id="aff-code" style="background:#000;padding:6px 12px;border-radius:6px;color:#f9e27e;font-size:0.95rem;letter-spacing:1px;"><%= perfil.id %></code>
+        <button type="button" onclick="navigator.clipboard.writeText(location.origin+'<%= affLink %>');this.textContent='✓ Copiado'" class="btn btn-ghost btn-sm">📋 Copiar link</button>
+        <a href="https://wa.me/?text=<%= waMsg %>" target="_blank" class="btn btn-success btn-sm">📱 Compartir en WhatsApp</a>
+      </div>
+
+      <div style="font-size:0.78rem;color:#c8d4e0;margin-bottom:6px;">
+        Referidas confirmadas: <strong style="color:#f9e27e;"><%= refCount %></strong>
+        <% if (nextTier) { %>
+          · Siguiente recompensa: <strong><%= nextTier.count %> referidas → <%= nextTier.days %> días gratis</strong>
+        <% } else { %>
+          · <strong style="color:#00e676;">¡Has desbloqueado todas las recompensas!</strong>
+        <% } %>
+      </div>
+      <div style="background:#000;border-radius:20px;height:10px;overflow:hidden;border:1px solid #333;">
+        <div style="background:linear-gradient(90deg,#7a5c00,#d4af37);height:100%;width:<%= progreso %>%;transition:width 0.4s;"></div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value"><%= stats.total %></div>
+        <div class="stat-label">Total Perfiles</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-value"><%= stats.activos %></div>
+        <div class="stat-label">Activos</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-value"><%= stats.pendientes %></div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-value"><%= stats.expiran7 %></div>
+        <div class="stat-label">Expiran en 7 días</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="admin-table-wrap">
+      <form method="GET" action="<%= _base %>">
+        <div class="admin-filters">
+          <select name="estado" class="admin-filter-select" onchange="this.form.submit()">
+            <option value="">Todos los estados</option>
+            <option value="solicitud_recibida" <%= filters.estado==='solicitud_recibida'?'selected':'' %>>Solicitud Recibida</option>
+            <option value="pendiente_archivos" <%= filters.estado==='pendiente_archivos'?'selected':'' %>>Pendiente Archivos</option>
+            <option value="pendiente_verificacion" <%= filters.estado==='pendiente_verificacion'?'selected':'' %>>Pendiente Verificación</option>
+            <option value="pendiente_pago" <%= filters.estado==='pendiente_pago'?'selected':'' %>>Pendiente Pago</option>
+            <option value="activo" <%= filters.estado==='activo'?'selected':'' %>>Activo</option>
+            <option value="pausado" <%= filters.estado==='pausado'?'selected':'' %>>Pausado</option>
+            <option value="expirado" <%= filters.estado==='expirado'?'selected':'' %>>Expirado</option>
+            <option value="rechazado" <%= filters.estado==='rechazado'?'selected':'' %>>Rechazado</option>
+          </select>
+
+          <select name="ciudad" class="admin-filter-select" onchange="this.form.submit()">
+            <option value="">Todas las ciudades</option>
+            <% ciudadesLista.forEach(c => { %>
+              <option value="<%= c %>" <%= filters.ciudad===c?'selected':'' %>><%= c %></option>
+            <% }) %>
+          </select>
+
+          <select name="plan" class="admin-filter-select" onchange="this.form.submit()">
+            <option value="">Todos los planes</option>
+            <option value="destacada" <%= filters.plan==='destacada'?'selected':'' %>>👑 Destacada</option>
+            <option value="premium" <%= filters.plan==='premium'?'selected':'' %>>⭐ Premium</option>
+            <option value="basica" <%= filters.plan==='basica'?'selected':'' %>>Básica</option>
+          </select>
+
+          <a href="<%= _base %>" class="btn btn-ghost btn-sm">✕ Limpiar</a>
+          <span style="margin-left:auto;font-size:0.75rem;color:#4a5568;"><%= perfiles.length %> resultados</span>
+        </div>
+      </form>
+
+      <!-- Table -->
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Ciudad</th>
+              <th>Categoría</th>
+              <th>Plan</th>
+              <th>Estado</th>
+              <th>Expira</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (perfiles.length === 0) { %>
+            <tr><td colspan="8" style="text-align:center;padding:40px;color:#4a5568;">No hay perfiles con estos filtros</td></tr>
+            <% } %>
+            <% perfiles.forEach(p => { %>
+            <tr>
+              <td style="font-family:'Roboto Mono',monospace;font-size:0.72rem;color:var(--gold-2);"><%= p.id %></td>
+              <td style="font-weight:600;"><%= p.nombre %></td>
+              <td><%= p.ciudad %></td>
+              <td style="text-transform:capitalize;font-size:0.78rem;">
+                <%= p.categoria === 'chica' ? '♀' : p.categoria === 'chico' ? '♂' : '⚧' %> <%= p.categoria %>
+              </td>
+              <td><span class="badge badge-<%= p.plan %>"><%= p.plan.toUpperCase() %></span></td>
+              <td>
+                <span class="badge badge-<%= p.estado %>">
+                  <%= p.estado.replace(/_/g,' ').toUpperCase() %>
+                </span>
+              </td>
+              <td>
+                <% if (p.fecha_fin) { %>
+                  <span data-expiry="<%= p.fecha_fin %>" style="font-size:0.78rem;"><%= p.fecha_fin %></span>
+                <% } else { %>
+                  <span style="color:#4a5568;font-size:0.75rem;">—</span>
+                <% } %>
+              </td>
+              <td>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <a href="/admin/perfil/<%= p.id %>/editar" class="btn btn-primary btn-sm">✏️ Editar</a>
+
+                  <!-- Quick status -->
+                  <% if (p.estado === 'solicitud_recibida' || p.estado.startsWith('pendiente')) { %>
+                    <form action="/admin/perfil/<%= p.id %>/estado" method="POST" style="display:inline;">
+                      <input type="hidden" name="estado" value="activo">
+                      <button type="submit" class="btn btn-success btn-sm">✓ Activar</button>
+                    </form>
+                    <form action="/admin/perfil/<%= p.id %>/estado" method="POST" style="display:inline;">
+                      <input type="hidden" name="estado" value="rechazado">
+                      <button type="submit" class="btn btn-danger btn-sm">✗ Rechazar</button>
+                    </form>
+                  <% } else if (p.estado === 'activo') { %>
+                    <form action="/admin/perfil/<%= p.id %>/estado" method="POST" style="display:inline;">
+                      <input type="hidden" name="estado" value="pausado">
+                      <button type="submit" class="btn btn-warning btn-sm">⏸ Pausar</button>
+                    </form>
+                  <% } else if (p.estado === 'pausado' || p.estado === 'expirado') { %>
+                    <form action="/admin/perfil/<%= p.id %>/estado" method="POST" style="display:inline;">
+                      <input type="hidden" name="estado" value="activo">
+                      <button type="submit" class="btn btn-success btn-sm">▶ Activar</button>
+                    </form>
+                  <% } %>
+
+                  <!-- WhatsApp contact -->
+                  <a href="https://wa.me/<%= p.telefono.replace(/\D/g,'') %>" target="_blank" class="btn btn-ghost btn-sm">📱</a>
+
+                  <!-- Delete -->
+                  <form action="/admin/perfil/<%= p.id %>/eliminar" method="POST" class="confirm-delete" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

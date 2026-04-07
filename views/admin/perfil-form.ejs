@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= perfil ? 'Editar: ' + perfil.nombre : 'Nuevo Perfil' %> — Admin Queens
+  </title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="admin-body">
+
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <h1 class="gold-text">👑 QUEENS</h1>
+      <p>PANEL DE ADMINISTRACIÓN</p>
+    </div>
+    <nav class="admin-nav">
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/perfil/nuevo" class="<%= !perfil?'active':'' %>">➕ Nuevo Perfil</a>
+      <a href="/admin/recordatorios">🔔 Recordatorios</a>
+      <a href="/admin/agencias">🏢 Agencias</a>
+      <a href="/" target="_blank">🌐 Ver Web</a>
+      <a href="/admin/logout" style="color:#ff3b6b;">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2>
+        <%= perfil ? '✏️ Editar Perfil: ' + perfil.nombre : '➕ Nuevo Perfil' %>
+      </h2>
+      <a href="/admin" class="btn btn-ghost">← Volver</a>
+    </div>
+
+    <% if (perfil && perfil.referidos_count !==undefined) {
+      const tiers = [ {count:1,days:7}, {count:3,days:15}, {count:5,days:30} ];
+      const refCount = perfil.referidos_count || 0;
+      const nextTier = tiers.find(t => refCount < t.count);
+      const progreso = nextTier ? Math.min(100, Math.round((refCount / nextTier.count) * 100)) : 100;
+    %>
+      <div class="admin-form-card"
+        style="border:1px solid #d4af37; background:rgba(212, 175, 55, 0.05); margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin:0; font-size:0.9rem; color:#d4af37; text-transform:uppercase; letter-spacing:1px;">👑 Programa de afiliadas</h3>
+          <span style="font-weight:bold; color:#fff; background:#d4af37; padding:2px 10px; border-radius:12px; font-size:0.8rem;">
+            <%= refCount %> referidas
+          </span>
+        </div>
+
+        <p style="font-size:0.78rem;color:#aaa;margin-bottom:8px;">
+          Tiers: <strong>1 → 7 días · 3 → 15 días · 5 → 30 días + Corona 👑</strong>
+        </p>
+        <div style="height:10px; background:#222; border-radius:10px; overflow:hidden; border:1px solid #333;">
+          <div style="height:100%; background:linear-gradient(90deg, #d4af37, #f2d06b); width:<%= progreso %>%; transition:width 1s ease;"></div>
+        </div>
+
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;gap:10px;flex-wrap:wrap;">
+          <p style="margin:0; font-size:0.82rem; color:#ccc;">
+            <% if (!nextTier) { %>
+              <span style="color:#48bb78;">✓ Todas las recompensas desbloqueadas.</span>
+            <% } else { %>
+              Siguiente: <strong><%= nextTier.count - refCount %> referida(s)</strong> más para <%= nextTier.days %> días gratis.
+            <% } %>
+          </p>
+          <button type="button" class="btn btn-ghost" style="font-size:0.75rem; padding:5px 10px;"
+            onclick="copyRefLink('<%= perfil.id %>')">🔗 Copiar link de afiliada</button>
+        </div>
+
+        <% if (perfil.referida_por) { %>
+          <p style="margin-top:10px;font-size:0.75rem;color:#aaa;">
+            Trajo a esta modelo: <code style="background:#000;padding:2px 8px;border-radius:4px;color:#f9e27e;"><%= perfil.referida_por %></code>
+          </p>
+        <% } %>
+
+        <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+          <hr style="border-color:#333;margin:14px 0;">
+          <form method="POST" action="/admin/perfil/<%= perfil.id %>/acreditar-referida" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <label style="display:block;font-size:0.7rem;color:#aaa;margin-bottom:4px;">Acreditar nueva referida (código, ej: Q-A7F3)</label>
+              <input type="text" name="referente_id" placeholder="Q-XXXX" required
+                style="width:100%;padding:8px 10px;background:#000;border:1px solid #444;border-radius:6px;color:#f9e27e;text-transform:uppercase;">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">+ Acreditar</button>
+          </form>
+          <p style="font-size:0.7rem;color:#666;margin-top:6px;">
+            Introduce el código de la afiliada <strong>que trajo a esta modelo</strong>; se le sumará 1 a su contador y se aplicará el tier correspondiente.
+          </p>
+        <% } %>
+      </div>
+      <% } %>
+
+        <form action="<%= action %>" method="POST">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:24px;">
+
+            <!-- Main Info -->
+            <div>
+              <div class="admin-form-card">
+                <h3
+                  style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">
+                  Datos del Perfil</h3>
+
+                <div class="form-grid-2">
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Nombre Artístico *</label>
+                    <input type="text" name="nombre" class="admin-form-input" value="<%= perfil?.nombre || '' %>"
+                      required>
+                  </div>
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Edad</label>
+                    <input type="number" name="Edad" class="admin-form-input" value="<%= perfil?.Edad || '' %>" min="18"
+                      max="99" placeholder="18-99">
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Ciudad *</label>
+                    <select name="ciudad" class="admin-form-select" required>
+                      <% provincias.forEach(c=> { %>
+                        <option value="<%= c %>" <%=perfil?.ciudad===c?'selected':'' %>><%= c %>
+                        </option>
+                        <% }) %>
+                    </select>
+                  </div>
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Teléfono WhatsApp *</label>
+                    <input type="text" name="telefono" class="admin-form-input" value="<%= perfil?.telefono || '' %>"
+                      required placeholder="34612345678">
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Categoría *</label>
+                    <select name="categoria" class="admin-form-select" required>
+                      <option value="chica" <%=perfil?.categoria==='chica' ?'selected':'' %>>♀ Chica</option>
+                      <option value="chico" <%=perfil?.categoria==='chico' ?'selected':'' %>>♂ Chico</option>
+                      <option value="trans" <%=perfil?.categoria==='trans' ?'selected':'' %>>⚧ Trans</option>
+                    </select>
+                  </div>
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Tipo Anunciante</label>
+                    <select name="tipo_anunciante" class="admin-form-select">
+                      <option value="independiente" <%=perfil?.tipo_anunciante==='independiente' ?'selected':'' %>
+                        >Independiente</option>
+                      <option value="agencia" <%=perfil?.tipo_anunciante==='agencia' ?'selected':'' %>>Agencia</option>
+                      <option value="chalet" <%=perfil?.tipo_anunciante==='chalet' ?'selected':'' %>>Chalet</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Idiomas</label>
+                  <input type="text" name="idiomas" class="admin-form-input"
+                    value="<%= perfil?.idiomas || 'Español' %>" placeholder="Español, Inglés...">
+                </div>
+
+                <div class="admin-form-group">
+                  <% const _limDesc = PLAN_LIMITS[perfil?.plan || 'basica'].max_desc; %>
+                  <label class="admin-form-label">Descripción <small style="color:#888;">(máx. <%= _limDesc %> caracteres según plan)</small></label>
+                  <textarea name="descripcion" class="admin-form-textarea" maxlength="<%= _limDesc %>"
+                    oninput="document.getElementById('desc-count').textContent = this.value.length"
+                    placeholder="Descripción del perfil..."><%= perfil?.descripcion || '' %></textarea>
+                  <p style="font-size:0.7rem;color:#888;margin-top:4px;text-align:right;">
+                    <span id="desc-count"><%= (perfil?.descripcion || '').length %></span> / <%= _limDesc %>
+                  </p>
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Agencia (si aplica)</label>
+                  <select name="agencia_id" class="admin-form-select">
+                    <option value="">Independiente</option>
+                    <% agencias.forEach(a=> { %>
+                      <option value="<%= a.id %>" <%=perfil?.agencia_id===a.id?'selected':'' %>><%= a.nombre %> (<%=
+                            a.ciudad %>)</option>
+                      <% }) %>
+                  </select>
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Notas Internas (no visibles)</label>
+                  <textarea name="notas_internas" class="admin-form-textarea"
+                    placeholder="Notas del equipo..."><%= perfil?.notas_internas || '' %></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar settings -->
+            <div>
+              <div class="admin-form-card" style="margin-bottom:16px;">
+                <h3
+                  style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">
+                  Plan y Estado</h3>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Plan de Publicación</label>
+                  <select name="plan" class="admin-form-select">
+                    <option value="basica" <%=perfil?.plan==='basica' ||!perfil?'selected':'' %>>Catálogo (Básica)</option>
+                    <option value="destacada" <%=perfil?.plan==='destacada' ?'selected':'' %>>👑 Destacada (Corona)
+                    </option>
+                  </select>
+                  <% const _lim = PLAN_LIMITS[perfil?.plan || 'basica']; %>
+                  <p style="font-size:0.7rem;color:#888;margin-top:6px;line-height:1.5;">
+                    Límites: <strong><%= _lim.max_fotos %> fotos</strong> ·
+                    <%= _lim.allow_video ? 'vídeo ✓' : 'sin vídeo' %> ·
+                    desc. <%= _lim.max_desc %>c
+                  </p>
+                </div>
+
+                <% if (perfil) { %>
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Estado</label>
+                    <select name="estado" class="admin-form-select">
+                      <option value="solicitud_recibida" <%=perfil.estado==='solicitud_recibida' ?'selected':'' %>>📧
+                        Solicitud Recibida</option>
+                      <option value="pendiente_archivos" <%=perfil.estado==='pendiente_archivos' ?'selected':'' %>>📩
+                        Pendiente Archivos</option>
+                      <option value="pendiente_verificacion" <%=perfil.estado==='pendiente_verificacion' ?'' :''
+                        %>>🎥 Pendiente Verificación</option>
+                      <option value="pendiente_pago" <%=perfil.estado==='pendiente_pago' ?'selected':'' %>>💳
+                        Pendiente Pago</option>
+                      <option value="activo" <%=perfil.estado==='activo' ?'selected':'' %>>✓ Activo</option>
+                      <option value="pausado" <%=perfil.estado==='pausado' ?'selected':'' %>>⏸ Pausado</option>
+                      <option value="expirado" <%=perfil.estado==='expirado' ?'selected':'' %>>⌛ Expirado</option>
+                      <option value="rechazado" <%=perfil.estado==='rechazado' ?'selected':'' %>>✗ Rechazado</option>
+                    </select>
+                  </div>
+                  <% } %>
+
+                    <div class="admin-form-group">
+                      <label class="admin-form-label">Disponibilidad</label>
+                      <select name="disponibilidad" class="admin-form-select">
+                        <option value="disponible" <%=perfil?.disponibilidad==='disponible' ||!perfil?'selected':'' %>
+                          >🟢 Disponible</option>
+                        <option value="no_disponible" <%=perfil?.disponibilidad==='no_disponible' ?'selected':'' %>>
+                          🔴 No disponible</option>
+                        <option value="proximamente" <%=perfil?.disponibilidad==='proximamente' ?'selected':'' %>>
+                          🟡 Próximamente</option>
+                      </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                      <label class="admin-form-label">Orden manual (menor = antes)</label>
+                      <input type="number" name="orden_manual" class="admin-form-input"
+                        value="<%= perfil?.orden_manual || 99 %>" min="1" max="999">
+                    </div>
+              </div>
+
+              <div class="admin-form-card" style="margin-bottom:16px;">
+                <h3
+                  style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">
+                  Vigencia</h3>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Fecha inicio</label>
+                  <input type="date" name="fecha_inicio" class="admin-form-input"
+                    value="<%= perfil?.fecha_inicio || '' %>">
+                </div>
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Fecha fin (caducidad)</label>
+                  <input type="date" name="fecha_fin" class="admin-form-input" value="<%= perfil?.fecha_fin || '' %>">
+                </div>
+
+                <% if (perfil?.id) { %>
+                  <div style="margin-top:16px;padding:12px;background:rgba(212,175,55,0.05);border-radius:8px;">
+                    <p style="font-size:0.7rem;color:#4a5568;margin-bottom:6px;">ID Interno:</p>
+                    <p style="font-family:'Roboto Mono',monospace;font-size:0.85rem;color:var(--gold-2);">
+                      <%= perfil.id %>
+                    </p>
+                  </div>
+                  <% } %>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100"
+                style="justify-content:center;padding:14px;font-size:0.85rem;">
+                <%= perfil ? '💾 Guardar Cambios' : '✓ Crear Perfil' %>
+              </button>
+
+              <% if (perfil) { %>
+                <a href="https://wa.me/<%= perfil.telefono.replace(/\D/g,'') %>" target="_blank"
+                  class="btn btn-success w-100 mt-1" style="justify-content:center;padding:11px;">
+                  📱 Contactar por WhatsApp
+                </a>
+                <% } %>
+            </div>
+          </div>
+        </form>
+
+        <!-- Stats de visitas (solo Destacada) -->
+        <% if (perfil && PLAN_LIMITS[perfil.plan].stats_visible) { %>
+          <div class="admin-form-card mt-3" style="background:linear-gradient(135deg,#1a1205,#0a0a0a);border:1px solid #d4af37;">
+            <h3 style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">
+              📊 Estadísticas (plan Destacada)
+            </h3>
+            <div style="display:flex;gap:24px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:1.8rem;font-weight:700;color:#f9e27e;"><%= perfil.views || 0 %></div>
+                <div style="font-size:0.7rem;color:#888;letter-spacing:1px;text-transform:uppercase;">Visitas al perfil</div>
+              </div>
+              <div>
+                <div style="font-size:1.8rem;font-weight:700;color:#f9e27e;"><%= perfil.referidos_count || 0 %></div>
+                <div style="font-size:0.7rem;color:#888;letter-spacing:1px;text-transform:uppercase;">Referidas</div>
+              </div>
+              <div>
+                <div style="font-size:1.8rem;font-weight:700;color:#f9e27e;"><%= (perfil.fotos || []).length %></div>
+                <div style="font-size:0.7rem;color:#888;letter-spacing:1px;text-transform:uppercase;">Fotos subidas</div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Vídeo (solo Destacada) -->
+        <% if (perfil && PLAN_LIMITS[perfil.plan].allow_video) { %>
+          <div class="admin-form-card mt-3">
+            <h3 style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">
+              🎥 Vídeo de presentación (plan Destacada)
+            </h3>
+            <% if (perfil.video) { %>
+              <video src="<%= perfil.video %>" controls style="max-width:300px;width:100%;border-radius:8px;margin-bottom:12px;"></video>
+              <br>
+            <% } %>
+            <form action="/admin/perfil/<%= perfil.id %>/video" method="POST" enctype="multipart/form-data" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <input type="file" name="video" accept="video/*" required style="color:#c8d4e0;font-size:0.8rem;">
+              <button type="submit" class="btn btn-primary btn-sm">⬆ Subir vídeo</button>
+            </form>
+            <p style="font-size:0.7rem;color:#888;margin-top:6px;">Sube un archivo MP4/MOV (máx. 20 MB). El vídeo anterior se reemplazará.</p>
+          </div>
+        <% } %>
+
+        <!-- Aviso de límite excedido -->
+        <% if (typeof query !== 'undefined' && query && query.warn) { %>
+          <div style="background:rgba(255,171,0,0.1);border:1px solid #ffab00;color:#ffab00;padding:12px 16px;border-radius:10px;margin-top:16px;">
+            ⚠️ <%= query.warn %>
+          </div>
+        <% } %>
+
+        <!-- Photo Upload (only for existing profiles) -->
+        <% if (perfil) {
+          const _photoLim = PLAN_LIMITS[perfil.plan];
+          const _remaining = Math.max(0, _photoLim.max_fotos - (perfil.fotos || []).length);
+        %>
+          <div class="admin-form-card mt-3">
+            <h3
+              style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">
+              📸 Fotos del Perfil
+            </h3>
+            <p style="font-size:0.75rem;color:#888;margin-bottom:20px;">
+              <%= (perfil.fotos || []).length %> / <%= _photoLim.max_fotos %> fotos usadas ·
+              <strong style="color:<%= _remaining === 0 ? '#ff3b6b' : '#0a8d54' %>;">
+                <%= _remaining === 0 ? 'Límite alcanzado' : `${_remaining} disponibles` %>
+              </strong>
+            </p>
+
+            <% if (perfil.fotos.length> 0) { %>
+              <div
+                style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:20px;">
+                <% perfil.fotos.forEach(foto=> { %>
+                  <div
+                    style="position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(212,175,55,0.2);">
+                    <img src="<%= foto %>" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block;">
+                    <form action="/admin/perfil/<%= perfil.id %>/foto-eliminar" method="POST"
+                      style="position:absolute;top:4px;right:4px;">
+                      <input type="hidden" name="foto" value="<%= foto %>">
+                      <button type="submit" class="btn btn-danger btn-sm"
+                        style="padding:3px 8px;font-size:0.65rem;">✕</button>
+                    </form>
+                  </div>
+                  <% }) %>
+              </div>
+              <% } %>
+
+                <form action="/admin/perfil/<%= perfil.id %>/fotos" method="POST" enctype="multipart/form-data">
+                  <div style="border:2px dashed rgba(212,175,55,0.3);border-radius:8px;padding:24px;text-align:center;">
+                    <input type="file" name="fotos" id="file-upload" multiple accept="image/*,video/*"
+                      style="display:none">
+                    <label for="file-upload" style="cursor:pointer;">
+                      <div style="font-size:2rem;margin-bottom:8px;">📁</div>
+                      <p style="font-size:0.82rem;color:#6a7592;">Haz clic para subir fotos o vídeos</p>
+                      <p style="font-size:0.7rem;color:#4a5568;margin-top:4px;">JPEG, PNG, WebP, MP4 — Máx 20MB por
+                        archivo</p>
+                    </label>
+                  </div>
+                  <button type="submit" class="btn btn-ghost w-100 mt-1" style="justify-content:center;">⬆ Subir
+                    Archivos</button>
+                </form>
+          </div>
+          <% } %>
+  </main>
+
+  <script src="/js/main.js"></script>
+  <script>
+    function copyRefLink(id) {
+      const url = window.location.origin + '/inicio?ref=' + id;
+      navigator.clipboard.writeText(url).then(() => {
+        alert('¡Link de afiliada copiado!\n' + url + '\n\nCompártelo con otras modelos.');
+      }).catch(err => {
+        console.error('Error al copiar:', err);
+      });
+    }
+  </script>
+</body>
+
+</html>
+
