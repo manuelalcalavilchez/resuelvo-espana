@@ -188,7 +188,7 @@
     const refBtn = document.getElementById('btn-referral');
     if (refBtn) {
       refBtn.addEventListener('click', () => {
-        const url = `${window.location.origin}/r/<%= perfil.id %>`;
+        const url = `${window.location.origin}/inicio?ref=<%= perfil.id %>`;
         navigator.clipboard.writeText(url).then(() => { refBtn.textContent = 'Enlace copiado'; setTimeout(()=>refBtn.textContent='Invita a una amiga (copiar enlace)',2000); });
       });
     }

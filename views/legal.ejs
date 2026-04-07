@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="<%= t.lang %>" dir="<%= t.dir %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <% if (pageId === 'privacidad') { %>Política de Privacidad<% } %>
+    <% if (pageId === 'terminos') { %>Términos y Condiciones<% } %>
+    <% if (pageId === 'cookies') { %>Política de Cookies<% } %>
+    <% if (pageId === 'aviso') { %>Aviso Legal<% } %>
+    | Queens
+  </title>
+  <meta name="robots" content="index,follow">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-velvet">
+
+  <nav class="navbar">
+    <a href="/inicio" class="navbar-logo" style="text-decoration:none">
+      <img src="/img/queens-logo.png" alt="Queens" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS</span>'">
+    </a>
+    <div class="navbar-links">
+      <a href="/inicio">← Inicio</a>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top:110px;padding-bottom:80px;max-width:820px;">
+    <article class="legal-doc">
+
+      <% if (pageId === 'privacidad') { %>
+        <h1 class="gold-shimmer font-cinzel">Política de Privacidad</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <h2>1. Responsable del tratamiento</h2>
+        <p>Queens (en adelante, "la Plataforma") es un directorio online de perfiles profesionales independientes. Los datos de contacto del responsable están disponibles bajo solicitud a través del WhatsApp publicado en el sitio.</p>
+
+        <h2>2. Datos que tratamos</h2>
+        <ul>
+          <li><strong>De usuarios visitantes:</strong> dirección IP, datos de navegación, preferencia de idioma, cookies técnicas de sesión.</li>
+          <li><strong>De personas anunciadas:</strong> nombre artístico, ciudad, categoría, teléfono, edad declarada, idiomas, descripción y fotografías. Estos datos se publican <strong>únicamente con consentimiento expreso</strong> de la persona titular, mayor de 18 años, y previa verificación de identidad por nuestro equipo.</li>
+          <li><strong>De cuentas registradas:</strong> email y contraseña cifrada (bcrypt).</li>
+        </ul>
+
+        <h2>3. Finalidad</h2>
+        <p>Los datos se tratan exclusivamente para la prestación del servicio de directorio, la gestión de cuentas y el cumplimiento de obligaciones legales.</p>
+
+        <h2>4. Base legal</h2>
+        <p>Consentimiento explícito del interesado (art. 6.1.a RGPD) y ejecución del contrato de servicio (art. 6.1.b RGPD).</p>
+
+        <h2>5. Conservación</h2>
+        <p>Los datos se conservan mientras el perfil esté activo. Tras su baja, se eliminan en un plazo máximo de 30 días, salvo obligación legal de conservación.</p>
+
+        <h2>6. Derechos del interesado</h2>
+        <p>Puedes ejercer tus derechos de acceso, rectificación, supresión (derecho al olvido), limitación, portabilidad y oposición contactando al WhatsApp del administrador. La baja de un perfil se tramita en un plazo máximo de 72 horas.</p>
+
+        <h2>7. Destinatarios</h2>
+        <p>No cedemos datos a terceros salvo obligación legal. El hosting se realiza en servidores ubicados en la Unión Europea.</p>
+
+        <h2>8. Menores</h2>
+        <p>La Plataforma está reservada a mayores de 18 años, tanto visitantes como personas anunciadas. Cualquier detección de contenido relacionado con menores será denunciada a las autoridades competentes de inmediato.</p>
+
+        <h2>9. Reclamaciones</h2>
+        <p>Puedes presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).</p>
+
+      <% } else if (pageId === 'terminos') { %>
+        <h1 class="gold-shimmer font-cinzel">Términos y Condiciones</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <h2>1. Objeto</h2>
+        <p>Queens es un directorio online que pone en contacto a personas adultas que ofrecen servicios de acompañamiento legales con usuarios mayores de 18 años interesados. La Plataforma actúa únicamente como intermediaria publicitaria y <strong>no presta servicios personales ni participa en los acuerdos entre las partes</strong>.</p>
+
+        <h2>2. Acceso</h2>
+        <p>El acceso a la Plataforma está reservado exclusivamente a <strong>mayores de 18 años</strong>. Al entrar al sitio, el usuario declara bajo su responsabilidad ser adulto.</p>
+
+        <h2>3. Contenido de los anuncios</h2>
+        <p>Cada persona anunciada es responsable del contenido de su perfil y declara:</p>
+        <ul>
+          <li>Ser mayor de edad.</li>
+          <li>Actuar de forma libre y voluntaria.</li>
+          <li>Ser titular de todos los derechos sobre las fotografías aportadas.</li>
+          <li>Que los datos publicados son veraces.</li>
+        </ul>
+        <p>Queens verifica la identidad y la edad antes de activar cada perfil. Cualquier sospecha de coacción, trata de personas o contenido ilícito conlleva la suspensión inmediata del perfil y la comunicación a las autoridades.</p>
+
+        <h2>4. Prohibiciones</h2>
+        <ul>
+          <li>Queda prohibido publicar contenido que promueva actividades ilegales, explotación, trata de seres humanos o menores.</li>
+          <li>Queda prohibido el uso automatizado (scraping, bots) del directorio.</li>
+          <li>Queda prohibido suplantar la identidad de otra persona.</li>
+        </ul>
+
+        <h2>5. Planes y pagos</h2>
+        <p>Los planes de publicación (Destacada, Catálogo) se contratan por WhatsApp directamente con el equipo. Las condiciones económicas se comunican en el momento de la contratación. No existe renovación automática.</p>
+
+        <h2>6. Limitación de responsabilidad</h2>
+        <p>Queens no participa en los acuerdos entre personas anunciadas y usuarios ni garantiza la calidad, legalidad o resultado de los mismos. La Plataforma no es responsable de los daños derivados del uso indebido del sitio.</p>
+
+        <h2>7. Derechos de propiedad intelectual</h2>
+        <p>La marca, el logotipo y el diseño del sitio son propiedad de Queens. Las fotografías publicadas pertenecen a sus respectivos titulares y se utilizan con autorización.</p>
+
+        <h2>8. Ley aplicable y jurisdicción</h2>
+        <p>Estos términos se rigen por la legislación española. Para cualquier controversia serán competentes los tribunales del domicilio del responsable.</p>
+
+      <% } else if (pageId === 'cookies') { %>
+        <h1 class="gold-shimmer font-cinzel">Política de Cookies</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <h2>1. Qué son las cookies</h2>
+        <p>Las cookies son pequeños archivos de texto que los sitios web guardan en tu dispositivo. Nos ayudan a recordar tu idioma preferido y mantener tu sesión iniciada.</p>
+
+        <h2>2. Cookies que usamos</h2>
+        <ul>
+          <li><strong>queens.sid</strong> — Cookie de sesión (técnica). Estrictamente necesaria. Caduca en 24 horas.</li>
+          <li><strong>connect.sid</strong> — Alias interno de la cookie de sesión.</li>
+        </ul>
+        <p>No utilizamos cookies publicitarias, de seguimiento de terceros ni de perfilado.</p>
+
+        <h2>3. Cómo gestionarlas</h2>
+        <p>Puedes bloquear o eliminar las cookies desde la configuración de tu navegador. Ten en cuenta que si bloqueas las cookies técnicas, el sitio puede no funcionar correctamente (no podrás iniciar sesión ni mantener preferencias).</p>
+
+      <% } else if (pageId === 'aviso') { %>
+        <h1 class="gold-shimmer font-cinzel">Aviso Legal</h1>
+        <p class="text-muted" style="font-size:0.78rem;">Última actualización: <%= new Date().toISOString().split('T')[0] %></p>
+
+        <h2>1. Titularidad</h2>
+        <p>El presente sitio web es titularidad de Queens. Los datos identificativos del responsable están disponibles bajo solicitud a través del WhatsApp publicado en el sitio.</p>
+
+        <h2>2. Condiciones de uso</h2>
+        <p>El acceso al sitio implica la aceptación de los <a href="/legal/terminos">Términos y Condiciones</a> y la <a href="/legal/privacidad">Política de Privacidad</a>.</p>
+
+        <h2>3. Acceso exclusivo a mayores de 18 años</h2>
+        <p>Este sitio contiene información para adultos. El acceso está <strong>estrictamente prohibido a menores de 18 años</strong>.</p>
+
+        <h2>4. Responsabilidad</h2>
+        <p>Queens se reserva el derecho de actualizar, suspender o eliminar el contenido del sitio en cualquier momento sin previo aviso.</p>
+      <% } %>
+
+      <hr style="border:none;border-top:1px solid rgba(212,175,55,0.2);margin:40px 0 20px;">
+      <p class="text-muted" style="font-size:0.72rem;text-align:center;">
+        <a href="/legal/privacidad" style="color:#d4af37;">Privacidad</a> ·
+        <a href="/legal/terminos" style="color:#d4af37;">Términos</a> ·
+        <a href="/legal/cookies" style="color:#d4af37;">Cookies</a> ·
+        <a href="/legal/aviso" style="color:#d4af37;">Aviso Legal</a>
+      </p>
+    </article>
+  </div>
+
+  <style>
+    .legal-doc h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); margin-bottom: 8px; }
+    .legal-doc h2 {
+      font-family: 'Cinzel', serif;
+      color: #f9e27e;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 32px;
+      margin-bottom: 10px;
+    }
+    .legal-doc p, .legal-doc ul {
+      color: rgba(200, 210, 220, 0.78);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+    .legal-doc ul { padding-left: 22px; }
+    .legal-doc li { margin-bottom: 6px; }
+    .legal-doc strong { color: #f9e27e; }
+    .legal-doc a { color: #d4af37; }
+  </style>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

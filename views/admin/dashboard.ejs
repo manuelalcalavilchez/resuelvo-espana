@@ -53,7 +53,7 @@
       const nextTier = tiers.find(t => refCount < t.count);
       const progreso = nextTier ? Math.min(100, Math.round((refCount / nextTier.count) * 100)) : 100;
       const affLink = `/inicio?ref=${perfil.id}`;
-      const waMsg = encodeURIComponent(`Hola! Te invito a anunciarte en Queens. Usa mi link de afiliada y yo gano días gratis: https://queenviproyal.com${affLink}`);
+      const waMsg = encodeURIComponent(`Hola! Te invito a anunciarte en Queens. Usa mi link de afiliada y yo gano días gratis: ${affLink}`);
     %>
     <div class="card" style="padding:20px;margin-bottom:24px;background:linear-gradient(135deg,#1a1205,#0a0a0a);border:1px solid #d4af37;">
       <h3 class="gold-text font-cinzel-sm" style="margin-bottom:12px;">👑 Tu programa de afiliadas</h3>

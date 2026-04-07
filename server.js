@@ -1,5 +1,10 @@
 const express = require('express');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const pino = require('pino');
+const pinoHttp = require('pino-http');
 const multer = require('multer');
 const path = require('path');
 const cron = require('node-cron');
@@ -9,12 +14,75 @@ const bcrypt = require('bcrypt');
 const translations = require('./translations');
 const crypto = require('crypto');
 
+// ─── LOGGER ───────────────────────────────────────────────
+const logger = pino({
+  level: process.env.LOG_LEVEL || 'info',
+  transport: process.env.NODE_ENV === 'production'
+    ? undefined
+    : { target: 'pino-pretty', options: { colorize: true, translateTime: 'HH:MM:ss' } }
+});
+
+// ─── PRODUCTION SAFETY: secrets obligatorios ──────────────
+const IS_PROD = process.env.NODE_ENV === 'production';
+if (IS_PROD) {
+  const missing = [];
+  if (!process.env.ADMIN_PASSWORD) missing.push('ADMIN_PASSWORD');
+  if (!process.env.SESSION_SECRET) missing.push('SESSION_SECRET');
+  if (missing.length) {
+    logger.fatal({ missing }, 'Faltan variables de entorno críticas en producción');
+    console.error(`\n❌ FATAL: faltan env vars: ${missing.join(', ')}\n`);
+    process.exit(1);
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Detrás de proxy reverso (Easypanel/Traefik) → necesario para IP real en rate-limit
+app.set('trust proxy', 1);
+
+// ─── SECURITY HEADERS ─────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": ["'self'", "'unsafe-inline'"],
+      "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
+      "img-src": ["'self'", "data:", "https://flagcdn.com", "https://upload.wikimedia.org"],
+      "media-src": ["'self'"],
+      "connect-src": ["'self'"],
+      "frame-ancestors": ["'none'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
+}));
+
 // Middleware
+app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url.startsWith('/uploads') || req.url.startsWith('/css') || req.url.startsWith('/js') || req.url.startsWith('/img') } }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ─── CSRF vía Origin/Referer + SameSite=Strict ────────────
+// Alternativa simple a tokens CSRF: validamos que toda mutación venga del mismo host.
+app.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  const origin = req.get('Origin') || req.get('Referer') || '';
+  if (!origin) return res.status(403).send('CSRF: origen ausente');
+  try {
+    const originHost = new URL(origin).host;
+    const expected = req.get('Host');
+    if (originHost !== expected) {
+      logger.warn({ originHost, expected, path: req.path }, 'CSRF bloqueado: host mismatch');
+      return res.status(403).send('CSRF: origen no autorizado');
+    }
+  } catch (_) {
+    return res.status(403).send('CSRF: origen inválido');
+  }
+  next();
+});
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Queens2024!';
 const APP_VERSION = Date.now().toString(); // Genera un ID único cada vez que reinicias el servidor
@@ -29,7 +97,7 @@ const getConfig = () => {
     if (!fs.existsSync(CONFIG_FILE)) return { ...DEFAULT_CONFIG };
     return { ...DEFAULT_CONFIG, ...JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) };
   } catch (err) {
-    console.error('Error leyendo config.json:', err);
+    logger.error({ err }, 'Error leyendo config.json');
     return { ...DEFAULT_CONFIG };
   }
 };
@@ -84,7 +152,7 @@ const readDB = (file) => {
   try {
     return JSON.parse(fs.readFileSync(p, 'utf8'));
   } catch (err) {
-    console.error(`Error leyendo ${file}:`, err);
+    logger.error({ err, file }, 'Error leyendo DB file');
     return [];
   }
 };
@@ -135,11 +203,36 @@ const upload = multer({
 // ─── APP CONFIG ───────────────────────────────────────────
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+const SESSIONS_DIR = path.join(__dirname, 'data', 'sessions');
+if (!fs.existsSync(SESSIONS_DIR)) fs.mkdirSync(SESSIONS_DIR, { recursive: true });
 app.use(session({
+  store: new FileStore({ path: SESSIONS_DIR, ttl: 86400, retries: 1, logFn: () => {} }),
   secret: process.env.SESSION_SECRET || 'queens-secret-2024',
-  resave: false, saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  resave: false,
+  saveUninitialized: false,
+  name: 'queens.sid',
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: IS_PROD
+  }
 }));
+
+// ─── RATE LIMITERS ────────────────────────────────────────
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Demasiados intentos. Inténtalo de nuevo en 15 minutos.'
+});
+const formLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 // All 50 Spanish provinces
 const PROVINCIAS = [
@@ -209,10 +302,43 @@ const checkExpirations = async () => {
       p.estado = 'expirado'; changed++;
     }
   });
-  if (changed > 0) { await savePerfiles(perfiles); console.log(`⏳ ${changed} expirado(s)`); }
+  if (changed > 0) { await savePerfiles(perfiles); logger.info({ changed }, 'Perfiles expirados'); }
 };
 checkExpirations();
 cron.schedule('0 * * * *', checkExpirations);
+
+// ─── BACKUPS DIARIOS ──────────────────────────────────────
+const BACKUPS_DIR = path.join(__dirname, 'data', 'backups');
+if (!fs.existsSync(BACKUPS_DIR)) fs.mkdirSync(BACKUPS_DIR, { recursive: true });
+const runBackup = async () => {
+  try {
+    const stamp = new Date().toISOString().split('T')[0];
+    const snapDir = path.join(BACKUPS_DIR, stamp);
+    if (!fs.existsSync(snapDir)) fs.mkdirSync(snapDir, { recursive: true });
+    for (const f of ['perfiles.json', 'agencias.json', 'usuarios.json', 'config.json']) {
+      const src = path.join(DATA_DIR, f);
+      if (fs.existsSync(src)) {
+        await fsp.copyFile(src, path.join(snapDir, f));
+      }
+    }
+    // Retención: mantener últimos 14 backups
+    const entries = (await fsp.readdir(BACKUPS_DIR, { withFileTypes: true }))
+      .filter(e => e.isDirectory())
+      .map(e => e.name)
+      .sort()
+      .reverse();
+    const toDelete = entries.slice(14);
+    for (const d of toDelete) {
+      await fsp.rm(path.join(BACKUPS_DIR, d), { recursive: true, force: true });
+    }
+    logger.info({ stamp, pruned: toDelete.length }, 'Backup diario completado');
+  } catch (err) {
+    logger.error({ err }, 'Error en backup diario');
+  }
+};
+// Ejecuta 1 vez al arrancar (si no hay backup de hoy) y cada día a las 04:00
+runBackup();
+cron.schedule('0 4 * * *', runBackup);
 
 // ─────────────────────────────────────────────────────────
 // LANGUAGE ROUTE
@@ -275,7 +401,7 @@ app.get('/ciudad/:nombre', (req, res) => {
     perfiles.sort((a, b) => (a.distancia || 99999) - (b.distancia || 99999));
   } else {
     const planOrder = { destacada: 1, premium: 2, basica: 2 };
-    perfiles.sort((a, b) => (planOrder[a.plan] - planOrder[b.plan]) || (a.orden_manual - b.orden_manual));
+    perfiles.sort((a, b) => ((planOrder[a.plan] || 99) - (planOrder[b.plan] || 99)) || ((a.orden_manual || 99) - (b.orden_manual || 99)));
   }
   const agencias = getAgencias().filter(a => a.ciudad === nombre);
   res.render('city', {
@@ -312,9 +438,18 @@ app.get('/planes', (req, res) => {
   res.render('planes');
 });
 
+// ─── LEGAL PAGES ──────────────────────────────────────────
+app.get('/legal/privacidad', (req, res) => res.render('legal', { pageId: 'privacidad' }));
+app.get('/legal/terminos', (req, res) => res.render('legal', { pageId: 'terminos' }));
+app.get('/legal/cookies', (req, res) => res.render('legal', { pageId: 'cookies' }));
+app.get('/legal/aviso', (req, res) => res.render('legal', { pageId: 'aviso' }));
+
+// Healthcheck
+app.get('/health', (req, res) => res.json({ ok: true, version: APP_VERSION, ts: Date.now() }));
+
 app.get('/registro', (req, res) => res.render('registro', { provincias: PROVINCIAS }));
 
-app.post('/registro', async (req, res) => {
+app.post('/registro', formLimiter, async (req, res) => {
   const { nombre, ciudad, telefono, categoria, lat, lng, ref } = req.body;
   const id = generateId();
   const perfiles = getPerfiles();
@@ -392,12 +527,14 @@ app.get('/admin/login', (req, res) => {
   if (req.session.isAdmin) return res.redirect('/admin');
   res.render('admin/login', { error: null });
 });
-app.post('/admin/login', (req, res) => {
+app.post('/admin/login', loginLimiter, (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) {
     req.session.isAdmin = true;
     req.session.user = { id: 'root', rol: 'admin' };
+    logger.info({ ip: req.ip }, 'Admin login exitoso');
     return res.redirect('/admin');
   }
+  logger.warn({ ip: req.ip }, 'Admin login fallido');
   res.render('admin/login', { error: 'Contraseña incorrecta.' });
 });
 app.get('/admin/logout', (req, res) => { req.session.destroy(); res.redirect('/admin/login'); });
@@ -419,19 +556,26 @@ app.get('/acceso/login', (req, res) => {
   if (req.session.user) return res.redirect('/panel');
   res.render('acceso/login', { error: null });
 });
-app.post('/acceso/login', async (req, res) => {
+app.post('/acceso/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   const user = getUsuarios().find(u => u.email === email && u.estado === 'activo');
-  if (!user) return res.render('acceso/login', { error: 'Usuario o contraseña incorrectos' });
+  if (!user) {
+    logger.warn({ ip: req.ip, email }, 'Login fallido: usuario no encontrado');
+    return res.render('acceso/login', { error: 'Usuario o contraseña incorrectos' });
+  }
   const ok = await bcrypt.compare(password, user.password_hash || '');
-  if (!ok) return res.render('acceso/login', { error: 'Usuario o contraseña incorrectos' });
+  if (!ok) {
+    logger.warn({ ip: req.ip, email }, 'Login fallido: password incorrecta');
+    return res.render('acceso/login', { error: 'Usuario o contraseña incorrectos' });
+  }
   req.session.user = { id: user.id, rol: user.rol, agencia_id: user.agencia_id || null, perfil_id: user.perfil_id || null };
+  logger.info({ userId: user.id, rol: user.rol }, 'Login exitoso');
   res.redirect('/panel');
 });
 app.get('/acceso/registro', (req, res) => {
   res.render('acceso/registro', { error: null, agencias: getAgencias() });
 });
-app.post('/acceso/registro', async (req, res) => {
+app.post('/acceso/registro', formLimiter, async (req, res) => {
   const { email, password, rol, agencia_id, perfil_id } = req.body;
   const usuarios = getUsuarios();
   if (usuarios.find(u => u.email === email)) {
@@ -735,7 +879,15 @@ app.post('/admin/agencias/:id/eliminar', requireAdmin, (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n🏆 Queens → http://localhost:${PORT}`);
-  console.log(`🔑 Admin Panel   → http://localhost:${PORT}/admin`);
-  console.log(`🔑 Password      → ${ADMIN_PASSWORD}\n`);
+  logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'Queens server iniciado');
+  if (!IS_PROD) {
+    console.log(`\n🏆 Queens → http://localhost:${PORT}`);
+    console.log(`🔑 Admin Panel   → http://localhost:${PORT}/admin`);
+    console.log(`🔑 Password      → ${ADMIN_PASSWORD}\n`);
+  }
 });
+
+// Graceful shutdown
+process.on('SIGTERM', () => { logger.info('SIGTERM recibido, cerrando'); process.exit(0); });
+process.on('uncaughtException', (err) => { logger.fatal({ err }, 'uncaughtException'); process.exit(1); });
+process.on('unhandledRejection', (err) => { logger.error({ err }, 'unhandledRejection'); });

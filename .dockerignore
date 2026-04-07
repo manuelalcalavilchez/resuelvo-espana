@@ -11,6 +11,9 @@ npm-debug.log*
 data/perfiles.json
 data/usuarios.json
 data/agencias.json
+data/config.json
+data/sessions
+data/backups
 data/*.db
 public/uploads
 

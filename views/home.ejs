@@ -6,6 +6,10 @@
   <title><%= t.site_title %> | Queens en España</title>
   <meta name="description" content="Queens - Acompañantes verificadas en todas las provincias de España. Perfiles reales y exclusivos.">
   <link rel="stylesheet" href="/css/style.css">
+  <% ['es','en','ar','ro','pt','zh','de','fr','ca','eu'].forEach(function(l){ %>
+    <link rel="alternate" hreflang="<%= l %>" href="/lang/<%= l %>">
+  <% }) %>
+  <link rel="alternate" hreflang="x-default" href="/inicio">
 </head>
 <body class="bg-velvet">
 
@@ -104,7 +108,7 @@
         <% } else { %>
         Encuentra perfiles de exclusividad en todas las provincias de España.
         <% } %>
-        acompañantes de lujo. <strong>Acompañantes verificadas en España</strong>.
+        <strong>Acompañantes verificadas en España</strong>.
         Chicas, chicos y trans verificados.
       </p>
       <div class="seo-links">
@@ -115,6 +119,17 @@
     </div>
 
   </div>
+
+  <!-- Footer legal -->
+  <footer style="text-align:center;padding:30px 20px 20px;border-top:1px solid rgba(212,175,55,0.12);margin-top:40px;">
+    <p style="font-size:0.72rem;color:rgba(200,210,220,0.45);letter-spacing:0.5px;">
+      © Queens <%= new Date().getFullYear() %> · Solo mayores de 18 años ·
+      <a href="/legal/privacidad" style="color:#d4af37;text-decoration:none;">Privacidad</a> ·
+      <a href="/legal/terminos" style="color:#d4af37;text-decoration:none;">Términos</a> ·
+      <a href="/legal/cookies" style="color:#d4af37;text-decoration:none;">Cookies</a> ·
+      <a href="/legal/aviso" style="color:#d4af37;text-decoration:none;">Aviso Legal</a>
+    </p>
+  </footer>
 
   <!-- Ghost Mode -->
   <a href="/ghost" class="ghost-trigger"><%= t.ghost_btn %></a>

@@ -6,10 +6,13 @@ node_modules/
 .env.local
 .env.*.local
 
-# Runtime data (perfiles, usuarios, agencias se generan en producción)
+# Runtime data (perfiles, usuarios, agencias, sessions, backups, config)
 data/perfiles.json
 data/usuarios.json
 data/agencias.json
+data/config.json
+data/sessions/
+data/backups/
 
 # User uploads
 public/uploads/
