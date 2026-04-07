@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="<%= t.lang %>" dir="<%= t.dir %>">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= t.plans_title %> | Queens</title>
+  <title>
+    <%= t.plans_title %> | Queens
+  </title>
   <meta name="description" content="<%= t.plans_subtitle %>">
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="bg-velvet">
 
   <!-- Navbar -->
   <nav class="navbar">
     <a href="/inicio" class="navbar-logo" style="text-decoration:none">
-      <img src="/img/queens-logo.png" alt="Queens" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS</span>'">
+      <img src="/img/queens-logo.png" alt="Queens" style="height:36px;"
+        onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS</span>'">
     </a>
     <div class="navbar-links">
-      <a href="/inicio"><%= t.city_back %></a>
+      <a href="/inicio">
+        <%= t.city_back %>
+      </a>
     </div>
   </nav>
 
   <div class="container" style="padding-top:110px;padding-bottom:80px;max-width:1000px;">
 
     <div style="text-align:center;margin-bottom:50px;">
-      <p class="section-title"><%= t.plans_title %></p>
-      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:12px;"><%= t.plans_subtitle %></h1>
+      <p class="section-title">
+        <%= t.plans_title %>
+      </p>
+      <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:12px;">
+        <%= t.plans_subtitle %>
+      </h1>
       <p class="text-muted" style="max-width:620px;margin:0 auto;font-size:0.95rem;line-height:1.6;">
         Queens ofrece dos niveles de visibilidad. Cuanto mayor sea tu plan, mayor tu alcance,
         tus fotos, tu posición en el buscador y tus herramientas de contacto con clientes.
@@ -52,7 +63,7 @@
 
         <div class="plan-cta">
           <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent('Hola Queens, quiero contratar el plan DESTACADA. Envíame precios y pasos, por favor.') %>"
-             target="_blank" rel="noopener" class="btn-gold" style="display:block;text-align:center;padding:14px 20px;">
+            target="_blank" rel="noopener" class="btn-gold" style="display:block;text-align:center;padding:14px 20px;">
             Contratar Destacada
           </a>
         </div>
@@ -77,7 +88,8 @@
 
         <div class="plan-cta">
           <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent('Hola Queens, quiero contratar el plan CATÁLOGO. Envíame precios y pasos, por favor.') %>"
-             target="_blank" rel="noopener" class="btn" style="display:block;text-align:center;padding:14px 20px;background:#0a0a0a;border:1px solid #444;color:#c8d4e0;text-decoration:none;border-radius:8px;">
+            target="_blank" rel="noopener" class="btn"
+            style="display:block;text-align:center;padding:14px 20px;background:#0a0a0a;border:1px solid #444;color:#c8d4e0;text-decoration:none;border-radius:8px;">
             Contratar Catálogo
           </a>
         </div>
@@ -85,11 +97,15 @@
 
     </div>
 
-    <div style="text-align:center;margin-top:50px;padding:24px;border:1px dashed rgba(212,175,55,0.3);border-radius:12px;">
+    <div
+      style="text-align:center;margin-top:50px;padding:24px;border:1px dashed rgba(212,175,55,0.3);border-radius:12px;">
       <p style="color:#c8d4e0;font-size:0.9rem;margin-bottom:8px;">
-        💡 Las anunciantes con <strong>plan Destacada</strong> reciben en promedio <strong>5-8× más contactos</strong> que las del Catálogo.
+        💡 Las anunciantes con <strong>plan Destacada</strong> reciben en promedio <strong>5-8× más contactos</strong>
+        que las del Catálogo.
       </p>
-      <p class="text-muted" style="font-size:0.78rem;">Todos los precios se confirman por WhatsApp al <strong>+<%= whatsapp %></strong>.</p>
+      <p class="text-muted" style="font-size:0.78rem;">
+        <%= t.plans_contact_info %>
+      </p>
     </div>
 
   </div>
@@ -102,21 +118,28 @@
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 24px;
     }
+
     .plan-card {
       position: relative;
-      background: linear-gradient(180deg, rgba(8,14,28,0.8), rgba(0,0,0,0.9));
+      background: linear-gradient(180deg, rgba(8, 14, 28, 0.8), rgba(0, 0, 0, 0.9));
       border-radius: 16px;
       padding: 32px 28px;
       transition: transform 0.3s ease;
     }
-    .plan-card:hover { transform: translateY(-4px); }
+
+    .plan-card:hover {
+      transform: translateY(-4px);
+    }
+
     .plan-destacada {
       border: 2px solid #d4af37;
-      box-shadow: 0 0 40px rgba(212,175,55,0.15);
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
     }
+
     .plan-basica {
-      border: 1px solid rgba(200,210,220,0.2);
+      border: 1px solid rgba(200, 210, 220, 0.2);
     }
+
     .plan-badge {
       position: absolute;
       top: -14px;
@@ -132,46 +155,55 @@
       text-transform: uppercase;
       white-space: nowrap;
     }
+
     .plan-title {
       font-family: 'Cinzel', serif;
       font-size: 1.8rem;
       margin-bottom: 4px;
     }
+
     .plan-subtitle {
-      color: rgba(200,210,220,0.6);
+      color: rgba(200, 210, 220, 0.6);
       font-size: 0.85rem;
       margin-bottom: 22px;
       letter-spacing: 1px;
     }
+
     .plan-features {
       list-style: none;
       padding: 0;
       margin: 0 0 26px 0;
     }
+
     .plan-features li {
       padding: 9px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       font-size: 0.85rem;
       color: #c8d4e0;
       line-height: 1.5;
     }
+
     .plan-features li::before {
       content: "✓ ";
       color: #d4af37;
       font-weight: 700;
       margin-right: 6px;
     }
+
     .plan-features li.muted {
-      color: rgba(200,210,220,0.35);
+      color: rgba(200, 210, 220, 0.35);
     }
+
     .plan-features li.muted::before {
       content: "";
       margin-right: 0;
     }
+
     .plan-basica .plan-features li::before {
       color: #888;
     }
   </style>
 
 </body>
+
 </html>
