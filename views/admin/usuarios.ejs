@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuarios | Queens Escort</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-velvet">
+  <div class="container" style="padding-top:80px;">
+    <h1 class="gold-shimmer font-cinzel">Usuarios</h1>
+    <table class="table" style="width:100%;margin-top:16px;">
+      <thead><tr><th>ID</th><th>Email</th><th>Rol</th><th>Agencia</th><th>Perfil</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        <% usuarios.forEach(u => { %>
+          <tr>
+            <td><%= u.id %></td>
+            <td><%= u.email %></td>
+            <td><%= u.rol %></td>
+            <td><%= u.agencia_id || '-' %></td>
+            <td><%= u.perfil_id || '-' %></td>
+            <td><%= u.estado %></td>
+            <td>
+              <form method="POST" action="/admin/usuarios/<%= u.id %>/estado" style="display:flex;gap:6px;">
+                <select name="estado" class="input" style="padding:6px 8px;">
+                  <option value="pendiente" <%= u.estado==='pendiente'?'selected':'' %>>pendiente</option>
+                  <option value="activo" <%= u.estado==='activo'?'selected':'' %>>activo</option>
+                  <option value="bloqueado" <%= u.estado==='bloqueado'?'selected':'' %>>bloqueado</option>
+                </select>
+                <% if (u.rol === 'modelo') { %>
+                  <input type="text" name="perfil_id" class="input" style="padding:6px 8px; width:90px;" value="<%= u.perfil_id || '' %>" placeholder="Ej. Q-1234">
+                <% } else if (u.rol === 'agencia') { %>
+                  <input type="text" name="agencia_id" class="input" style="padding:6px 8px; width:100px;" value="<%= u.agencia_id || '' %>" placeholder="Agencia ID">
+                <% } %>
+                <button class="btn-gold" type="submit">Guardar</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumTrade Pro | Dashboard</title>
+  <meta name="description" content="QuantumTrade Pro - Advanced cryptocurrency and stock trading analytics platform.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f0f2f5; color: #1a202c; min-height: 100vh; }
+    .header { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+    .logo { font-weight: 700; font-size: 1.1rem; color: #2563eb; letter-spacing: -0.5px; }
+    .logo span { color: #1e40af; }
+    .nav-links { display: flex; gap: 24px; font-size: 0.83rem; color: #64748b; }
+    .nav-links a { color: #64748b; text-decoration: none; }
+    .nav-links a:hover { color: #2563eb; }
+    .badge-live { background: #dcfce7; color: #16a34a; font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 30px; }
+    .main { margin-top: 64px; padding: 32px; }
+    .page-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .page-sub { font-size: 0.82rem; color: #64748b; margin-bottom: 28px; }
+    .ticker-bar { background: #0f172a; color: #94a3b8; font-family: 'Roboto Mono', monospace; font-size: 0.72rem; padding: 8px 16px; overflow: hidden; white-space: nowrap; margin-bottom: 24px; border-radius: 8px; }
+    .ticker-bar span { margin-right: 40px; }
+    .ticker-bar .up { color: #22c55e; }
+    .ticker-bar .down { color: #ef4444; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-widget { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+    .stat-widget .label { font-size: 0.72rem; color: #64748b; font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-widget .value { font-size: 1.6rem; font-weight: 700; color: #0f172a; font-family: 'Roboto Mono', monospace; }
+    .stat-widget .change { font-size: 0.75rem; font-weight: 600; margin-top: 4px; }
+    .change.up { color: #16a34a; } .change.down { color: #dc2626; }
+    .chart-area { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .chart-title { font-size: 0.95rem; font-weight: 600; }
+    .chart-tabs { display: flex; gap: 6px; }
+    .chart-tab { padding: 5px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; color: #64748b; background: transparent; }
+    .chart-tab.active { background: #2563eb; color: #fff; border-color: transparent; }
+    .chart-svg { width: 100%; height: 180px; }
+    .table-area { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .table-head { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+    .table-head h3 { font-size: 0.9rem; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8fafc; padding: 10px 16px; text-align: left; font-size: 0.7rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.83rem; }
+    .btn-buy { background: #dcfce7; color: #16a34a; border: none; padding: 5px 14px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+    .btn-sell { background: #fee2e2; color: #dc2626; border: none; padding: 5px 14px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+    .back-btn { position: fixed; bottom: 24px; right: 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 30px; padding: 8px 16px; font-size: 0.72rem; cursor: pointer; color: #64748b; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-decoration: none; }
+    .back-btn:hover { border-color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">Quantum<span>Trade</span> Pro</div>
+    <nav class="nav-links">
+      <a href="#">Dashboard</a>
+      <a href="#">Portfolio</a>
+      <a href="#">Markets</a>
+      <a href="#">Analytics</a>
+      <a href="#">News</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="badge-live">● LIVE</span>
+      <span style="font-size:0.8rem;color:#64748b;">Market Open</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <h1 class="page-title">Portfolio Dashboard</h1>
+    <p class="page-sub">Wednesday, April 2, 2026 · Real-time data</p>
+
+    <div class="ticker-bar">
+      <span>BTC <span class="up">€84,201 ▲ 2.4%</span></span>
+      <span>ETH <span class="up">€3,187 ▲ 1.8%</span></span>
+      <span>NVDA <span class="up">$875.20 ▲ 0.9%</span></span>
+      <span>TSLA <span class="down">$168.45 ▼ 1.2%</span></span>
+      <span>SPX <span class="up">5,182 ▲ 0.4%</span></span>
+      <span>AAPL <span class="up">$229.10 ▲ 0.6%</span></span>
+      <span>SOL <span class="up">€148.20 ▲ 3.1%</span></span>
+      <span>EUR/USD <span class="down">1.0812 ▼ 0.1%</span></span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-widget">
+        <div class="label">Portfolio Value</div>
+        <div class="value">€47,832</div>
+        <div class="change up">▲ +€1,240 today</div>
+      </div>
+      <div class="stat-widget">
+        <div class="label">Total P&L</div>
+        <div class="value" style="color:#16a34a;">+12.4%</div>
+        <div class="change up">▲ Since last month</div>
+      </div>
+      <div class="stat-widget">
+        <div class="label">Open Positions</div>
+        <div class="value">8</div>
+        <div class="change" style="color:#64748b;">3 crypto · 5 stocks</div>
+      </div>
+      <div class="stat-widget">
+        <div class="label">24h Volume</div>
+        <div class="value">€8,420</div>
+        <div class="change down">▼ -5% vs avg</div>
+      </div>
+    </div>
+
+    <div class="chart-area">
+      <div class="chart-header">
+        <div class="chart-title">BTC/EUR — Price Chart</div>
+        <div class="chart-tabs">
+          <button class="chart-tab">1H</button>
+          <button class="chart-tab">4H</button>
+          <button class="chart-tab active">1D</button>
+          <button class="chart-tab">1W</button>
+          <button class="chart-tab">1M</button>
+        </div>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 800 180" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2563eb" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,150 L50,140 L100,120 L150,130 L200,100 L250,110 L300,80 L350,90 L400,60 L450,70 L500,50 L550,65 L600,40 L650,55 L700,30 L750,20 L800,35" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+        <path d="M0,150 L50,140 L100,120 L150,130 L200,100 L250,110 L300,80 L350,90 L400,60 L450,70 L500,50 L550,65 L600,40 L650,55 L700,30 L750,20 L800,35 L800,180 L0,180Z" fill="url(#chartGrad)"/>
+      </svg>
+    </div>
+
+    <div class="table-area">
+      <div class="table-head">
+        <h3>Open Positions</h3>
+        <button style="background:#2563eb;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer;">+ New Trade</button>
+      </div>
+      <table>
+        <thead><tr><th>Asset</th><th>Amount</th><th>Avg Price</th><th>Current</th><th>P&L</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><strong>BTC</strong></td><td>0.42 BTC</td><td>€61,200</td><td>€84,201</td><td style="color:#16a34a;font-weight:600;">+€9,666</td><td><button class="btn-sell">Sell</button></td></tr>
+          <tr><td><strong>ETH</strong></td><td>3.5 ETH</td><td>€2,800</td><td>€3,187</td><td style="color:#16a34a;font-weight:600;">+€1,354</td><td><button class="btn-sell">Sell</button></td></tr>
+          <tr><td><strong>NVDA</strong></td><td>12 shares</td><td>$820</td><td>$875.20</td><td style="color:#16a34a;font-weight:600;">+€621</td><td><button class="btn-sell">Sell</button></td></tr>
+          <tr><td><strong>TSLA</strong></td><td>25 shares</td><td>$172</td><td>$168.45</td><td style="color:#dc2626;font-weight:600;">-€83</td><td><button class="btn-buy">Hold</button></td></tr>
+          <tr><td><strong>SOL</strong></td><td>45 SOL</td><td>€120</td><td>€148.20</td><td style="color:#16a34a;font-weight:600;">+€1,269</td><td><button class="btn-sell">Sell</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <a href="/" class="back-btn">← Exit</a>
+</body>
+</html>

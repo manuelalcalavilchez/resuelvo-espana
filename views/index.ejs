@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queens Escort | Lujo y Exclusividad en España</title>
+  <meta name="description" content="Queens Escort — La plataforma premium de acompañantes verificadas en España. Perfiles reales, verificados y exclusivos.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body class="bg-velvet">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-logo gold-shimmer">QUEENS ESCORT</div>
+    <div class="navbar-links">
+      <a href="/registro">Anúnciate</a>
+      <a href="#ciudades">Ciudades</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-crown">👑</div>
+    <h1 class="hero-title gold-shimmer font-cinzel">QUEENS ESCORT</h1>
+    <p class="hero-subtitle">Lujo · Exclusividad · Verificación Real</p>
+    <div class="hero-divider"></div>
+
+    <!-- City + Category Selector -->
+    <div class="selector-grid" id="ciudades">
+      <!-- Cities -->
+      <div class="selector-panel">
+        <h3>Selecciona Ciudad</h3>
+        <div class="city-list">
+          <% const topCiudades = ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao', 'Málaga', 'Zaragoza', 'Murcia']; %>
+          <% topCiudades.forEach(c => { %>
+            <a href="/ciudad/<%= c %>" class="city-btn">
+              <%= c %>
+              <% const found = ciudades.find(x => x.ciudad === c); %>
+              <% if (found) { %><span style="color:#d4af37;font-size:0.7rem"> (<%=found.total%>)</span><% } %>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="selector-divider"></div>
+
+      <!-- Categories -->
+      <div class="selector-panel">
+        <h3>Categoría</h3>
+        <div class="category-list">
+          <a href="/ciudad/Madrid?categoria=chica" class="cat-btn chica">♀  Chica</a>
+          <a href="/ciudad/Madrid?categoria=chico" class="cat-btn chico">♂  Chico</a>
+          <a href="/ciudad/Madrid?categoria=trans" class="cat-btn trans">⚧  Trans</a>
+        </div>
+        <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(212,175,55,0.15); text-align:center;">
+          <p class="text-muted" style="font-size:0.72rem;letter-spacing:1px;margin-bottom:12px;">¿Quieres anunciarte?</p>
+          <a href="/registro" class="btn-gold" style="display:inline-block;width:auto;padding:12px 28px;font-size:0.78rem;">
+            👑 Únete a Queens
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <% if (ciudades.length > 0) { %>
+    <div style="margin-top:40px;display:flex;gap:40px;justify-content:center;flex-wrap:wrap;">
+      <div style="text-align:center">
+        <div class="gold-text" style="font-size:1.6rem;font-family:'Cinzel',serif;font-weight:700;"><%= ciudades.reduce((a,c)=>a+c.total,0) %></div>
+        <div class="text-muted" style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;">Perfiles Activos</div>
+      </div>
+      <div style="text-align:center">
+        <div class="gold-text" style="font-size:1.6rem;font-family:'Cinzel',serif;font-weight:700;"><%= ciudades.length %></div>
+        <div class="text-muted" style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;">Ciudades</div>
+      </div>
+      <div style="text-align:center">
+        <div class="gold-text" style="font-size:1.6rem;font-family:'Cinzel',serif;font-weight:700;">100%</div>
+        <div class="text-muted" style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;">Verificadas</div>
+      </div>
+    </div>
+    <% } %>
+  </section>
+
+  <!-- Ghost Mode -->
+  <a href="/ghost" class="ghost-trigger">● MODO SEGURO</a>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

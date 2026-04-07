@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agencias — Admin Queens</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <h1 class="gold-text">👑 QUEENS</h1>
+      <p>PANEL DE ADMINISTRACIÓN</p>
+    </div>
+    <nav class="admin-nav">
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/perfil/nuevo">➕ Nuevo Perfil</a>
+      <a href="/admin/recordatorios">🔔 Recordatorios</a>
+      <a href="/admin/agencias" class="active">🏢 Agencias</a>
+      <a href="/" target="_blank">🌐 Ver Web</a>
+      <a href="/admin/logout" style="color:#ff3b6b;">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2>🏢 Agencias y Chalets</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:24px;">
+
+      <!-- New Agency Form -->
+      <div class="admin-form-card">
+        <h3 style="font-size:0.8rem;color:var(--gold-2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Nueva Agencia / Chalet</h3>
+        <form action="/admin/agencias/nueva" method="POST">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Nombre *</label>
+            <input type="text" name="nombre" class="admin-form-input" required placeholder="Nombre del establecimiento">
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Ciudad *</label>
+            <select name="ciudad" class="admin-form-select" required>
+              <% provincias.forEach(c => { %><option value="<%= c %>"><%= c %></option><% }) %>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Descripción</label>
+            <textarea name="descripcion" class="admin-form-textarea" placeholder="Descripción breve..."></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Contacto (WhatsApp, sin +)</label>
+            <input type="text" name="contacto" class="admin-form-input" placeholder="34612345678">
+          </div>
+          <button type="submit" class="btn btn-primary w-100" style="justify-content:center;">➕ Crear Agencia</button>
+        </form>
+      </div>
+
+      <!-- Agencies List -->
+      <div>
+        <% if (agencias.length === 0) { %>
+        <div style="text-align:center;padding:60px 20px;background:#0a1020;border:1px solid rgba(212,175,55,0.15);border-radius:12px;">
+          <div style="font-size:2rem;margin-bottom:12px;">🏢</div>
+          <p style="color:#4a5568;font-size:0.85rem;">No hay agencias registradas todavía</p>
+        </div>
+        <% } %>
+        <% agencias.forEach(a => { %>
+        <div class="admin-form-card" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+            <div>
+              <h3 style="font-size:0.95rem;color:#c8d0e0;margin-bottom:4px;"><%= a.nombre %></h3>
+              <span class="badge badge-basica"><%= a.ciudad %></span>
+            </div>
+            <form action="/admin/agencias/<%= a.id %>/eliminar" method="POST" class="confirm-delete">
+              <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+            </form>
+          </div>
+          <% if (a.descripcion) { %><p style="font-size:0.8rem;color:#4a5568;margin-bottom:8px;"><%= a.descripcion %></p><% } %>
+          <% if (a.contacto) { %>
+            <a href="https://wa.me/<%= a.contacto.replace(/\D/g,'') %>" target="_blank" class="btn btn-success btn-sm">📱 WhatsApp</a>
+          <% } %>
+          <p style="font-size:0.65rem;color:#2a3450;margin-top:8px;">ID: <%= a.id %></p>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regístrate | Queens Escort</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-velvet">
+
+  <nav class="navbar">
+    <a href="/inicio" class="navbar-logo" style="text-decoration:none">
+      <img src="/img/queens-logo.png" alt="Queens Escort" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS ESCORT</span>'">
+    </a>
+    <div class="navbar-links"><a href="/inicio">← Volver</a></div>
+  </nav>
+
+  <div style="min-height:100vh;display:flex;align-items:center;padding:100px 24px 60px;flex-wrap:wrap;gap:40px;max-width:1100px;margin:0 auto;">
+
+    <!-- Steps -->
+    <div style="flex:1;min-width:260px;">
+      <p class="section-title">El proceso</p>
+      <h2 class="gold-text font-cinzel" style="font-size:1.8rem;margin-bottom:24px;">¿Cómo funciona?</h2>
+      <ol class="steps-list">
+        <li>Rellenas el formulario con tus datos básicos</li>
+        <li>Te redirigimos automaticamente a WhatsApp con tu ID único</li>
+        <li>Envías fotos HD sin filtros y vídeo de verificación</li>
+        <li>Nuestro equipo verifica tu identidad (24-48h)</li>
+        <li>Eliges tu plan y realizas el pago</li>
+        <li>¡Tu perfil aparece en Queens Escort!</li>
+      </ol>
+
+      <div style="margin-top:32px;padding:20px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:12px;">
+        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.7;">
+          🎥 <strong style="color:var(--gold-2);">Vídeo obligatorio:</strong> Graba un vídeo diciendo «Hola, soy [nombre] y hoy es [fecha]» para verificar que las fotos son tuyas.
+        </p>
+      </div>
+
+      <div style="margin-top:16px;">
+        <p style="font-size:0.78rem;color:var(--text-muted);">💎 Planes disponibles:</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;border:1px solid rgba(212,175,55,0.15);border-radius:8px;font-size:0.8rem;">
+            <span>Básico</span><span class="text-muted">Solo listado</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;border:1px solid rgba(212,175,55,0.3);border-radius:8px;font-size:0.8rem;background:rgba(212,175,55,0.05);">
+            <span class="gold-text">⭐ Premium</span><span class="text-muted">Posición destacada</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;border:1px solid var(--gold-2);border-radius:8px;font-size:0.8rem;background:rgba(212,175,55,0.08);">
+            <span class="gold-shimmer">👑 Destacada</span><span class="text-muted">Máxima visibilidad</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div style="flex:1;min-width:300px;max-width:480px;">
+      <div class="registro-card">
+        <p class="section-title text-center">Paso 1 de 6</p>
+        <h2 class="gold-text font-cinzel" style="font-size:1.4rem;margin-bottom:24px;text-align:center;">Formulario de Alta</h2>
+
+        <form action="/registro" method="POST">
+          <div class="form-group">
+            <label class="form-label">Nombre artístico</label>
+            <input type="text" name="nombre" class="form-input" placeholder="Tu nombre como anunciante" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Provincia</label>
+            <select name="ciudad" class="form-select" required>
+              <option value="">Selecciona tu provincia</option>
+              <% provincias.forEach(c => { %>
+                <option value="<%= c %>"><%= c %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Teléfono WhatsApp</label>
+            <input type="tel" name="telefono" class="form-input" placeholder="Ej: 34612345678" required>
+            <p style="font-size:0.67rem;color:var(--text-muted);margin-top:4px;">Con prefijo de país, sin espacios ni guiones</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" class="form-select" required>
+              <option value="">Selecciona categoría</option>
+              <option value="chica">♀ Escort Chica</option>
+              <option value="chico">♂ Escort Chico</option>
+              <option value="trans">⚧ Escort Trans</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-gold" style="margin-top:8px;">
+            📱 Continuar por WhatsApp →
+          </button>
+
+          <p style="text-align:center;font-size:0.7rem;color:var(--text-muted);margin-top:16px;line-height:1.5;">
+            Al continuar, aceptas que tus datos serán gestionados por el equipo de Queens Escort para el proceso de alta.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <a href="/ghost" class="ghost-trigger">● MODO SEGURO</a>
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recordatorios — Admin Queens</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <h1 class="gold-text">👑 QUEENS</h1>
+      <p>PANEL DE ADMINISTRACIÓN</p>
+    </div>
+    <nav class="admin-nav">
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/perfil/nuevo">➕ Nuevo Perfil</a>
+      <a href="/admin/recordatorios" class="active">🔔 Recordatorios</a>
+      <a href="/admin/agencias">🏢 Agencias</a>
+      <a href="/" target="_blank">🌐 Ver Web</a>
+      <a href="/admin/logout" style="color:#ff3b6b;">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2>🔔 Recordatorios de Renovación</h2>
+      <a href="/admin" class="btn btn-ghost">← Dashboard</a>
+    </div>
+
+    <!-- Expiran en 1 día -->
+    <% if (expiran1.length > 0) { %>
+    <div class="alert alert-danger">
+      🚨 <strong><%= expiran1.length %> perfil(es) expiran MAÑANA</strong> — Contacta urgentemente
+    </div>
+    <div class="admin-table-wrap" style="margin-bottom:24px;">
+      <div style="padding:12px 20px;background:rgba(255,59,107,0.1);border-bottom:1px solid rgba(255,59,107,0.2);">
+        <strong style="color:#ff3b6b;font-size:0.8rem;">⚠️ EXPIRAN MAÑANA</strong>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Nombre</th><th>Ciudad</th><th>Plan</th><th>Expira</th><th>Contacto</th></tr></thead>
+        <tbody>
+          <% expiran1.forEach(p => { %>
+          <tr>
+            <td style="color:var(--gold-2);font-size:0.72rem;"><%= p.id %></td>
+            <td style="font-weight:600;"><%= p.nombre %></td>
+            <td><%= p.ciudad %></td>
+            <td><span class="badge badge-<%= p.plan %>"><%= p.plan.toUpperCase() %></span></td>
+            <td style="color:#ff3b6b;font-weight:700;"><%= p.fecha_fin %></td>
+            <td><a href="https://wa.me/<%= p.telefono.replace(/\D/g,'') %>" target="_blank" class="btn btn-success btn-sm">📱 WhatsApp</a></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+
+    <!-- Expiran en 3 días -->
+    <% if (expiran3.length > 0) { %>
+    <div class="alert alert-warning">
+      ⚠️ <strong><%= expiran3.length %> perfil(es) expiran en 2-3 días</strong>
+    </div>
+    <div class="admin-table-wrap" style="margin-bottom:24px;">
+      <div style="padding:12px 20px;background:rgba(255,171,0,0.1);border-bottom:1px solid rgba(255,171,0,0.2);">
+        <strong style="color:#ffab00;font-size:0.8rem;">⏰ EXPIRAN EN 2-3 DÍAS</strong>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Nombre</th><th>Ciudad</th><th>Plan</th><th>Expira</th><th>Contacto</th></tr></thead>
+        <tbody>
+          <% expiran3.forEach(p => { %>
+          <tr>
+            <td style="color:var(--gold-2);font-size:0.72rem;"><%= p.id %></td>
+            <td style="font-weight:600;"><%= p.nombre %></td>
+            <td><%= p.ciudad %></td>
+            <td><span class="badge badge-<%= p.plan %>"><%= p.plan.toUpperCase() %></span></td>
+            <td style="color:#ffab00;font-weight:600;"><%= p.fecha_fin %></td>
+            <td><a href="https://wa.me/<%= p.telefono.replace(/\D/g,'') %>" target="_blank" class="btn btn-success btn-sm">📱 WhatsApp</a></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+
+    <!-- Expiran en 7 días -->
+    <% if (expiran7.length > 0) { %>
+    <div class="admin-table-wrap">
+      <div style="padding:12px 20px;background:rgba(212,175,55,0.05);border-bottom:1px solid rgba(212,175,55,0.15);">
+        <strong style="color:var(--gold-2);font-size:0.8rem;">📅 EXPIRAN EN 4-7 DÍAS</strong>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Nombre</th><th>Ciudad</th><th>Plan</th><th>Expira</th><th>Contacto</th></tr></thead>
+        <tbody>
+          <% expiran7.forEach(p => { %>
+          <tr>
+            <td style="color:var(--gold-2);font-size:0.72rem;"><%= p.id %></td>
+            <td style="font-weight:600;"><%= p.nombre %></td>
+            <td><%= p.ciudad %></td>
+            <td><span class="badge badge-<%= p.plan %>"><%= p.plan.toUpperCase() %></span></td>
+            <td><%= p.fecha_fin %></td>
+            <td><a href="https://wa.me/<%= p.telefono.replace(/\D/g,'') %>" target="_blank" class="btn btn-success btn-sm">📱 WhatsApp</a></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+
+    <% if (expiran1.length + expiran3.length + expiran7.length === 0) { %>
+    <div style="text-align:center;padding:80px 20px;">
+      <div style="font-size:3rem;margin-bottom:16px;">✅</div>
+      <h3 style="color:var(--gold-2);font-family:'Cinzel',serif;">Todo al día</h3>
+      <p style="color:#4a5568;font-size:0.85rem;margin-top:8px;">No hay perfiles que expiren en los próximos 7 días.</p>
+    </div>
+    <% } %>
+  </main>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

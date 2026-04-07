@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Runtime data (perfiles, usuarios, agencias se generan en producción)
+data/perfiles.json
+data/usuarios.json
+data/agencias.json
+
+# User uploads
+public/uploads/
+
+# OS / IDE
+Thumbs.db
+.DS_Store
+*.lnk
+.claude/
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build artifacts
+dist/
+build/
+
+# Imágenes de debug temporales
+public/img/models/debug-*.png
+public/img/models/hero-banner-nomast.png
