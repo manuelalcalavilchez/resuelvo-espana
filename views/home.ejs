@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= t.site_title %> | Queens Escort en España</title>
-  <meta name="description" content="Queens Escort - Escorts verificadas en todas las provincias de España. Perfiles reales y exclusivos.">
+  <title><%= t.site_title %> | Queens en España</title>
+  <meta name="description" content="Queens - Acompañantes verificadas en todas las provincias de España. Perfiles reales y exclusivos.">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="bg-velvet">
@@ -12,7 +12,7 @@
   <!-- Navbar -->
   <nav class="navbar">
     <a href="/" class="navbar-logo" style="text-decoration:none">
-      <img src="/img/queens-logo.png" alt="Queens Escort" style="height:40px;" onerror="this.outerHTML='<span class=\'gold-shimmer\'>QUEENS ESCORT</span>'">
+      <img src="/img/queens-logo.png" alt="Queens" style="height:40px;" onerror="this.outerHTML='<span class=\'gold-shimmer\'>QUEENS</span>'">
     </a>
     <div class="navbar-links">
       <a href="/registro"><%= t.advertise %></a>
@@ -27,17 +27,17 @@
     <div style="text-align:center;margin-bottom:48px;">
       <p class="section-title"><%= t.cities %></p>
       <h1 class="gold-shimmer font-cinzel" style="font-size:clamp(1.6rem,4vw,2.8rem);margin-bottom:8px;"><%= t.home_subtitle %></h1>
-      <p class="text-muted" style="font-size:0.8rem;letter-spacing:2px;">QUEENS ESCORT | ESCORT EN ESPAÑA</p>
+      <p class="text-muted" style="font-size:0.8rem;letter-spacing:2px;">QUEENS | MODELOS EN ESPAÑA</p>
     </div>
 
     <!-- Inscripción (Chica / Agencia) -->
     <%
       const refSuffix = refCode ? ` Vengo recomendada por la afiliada ${refCode}.` : '';
-      const msgChica = `Hola Queens Escort, quiero inscribirme como CHICA. Envíame los pasos y precios, por favor.${refSuffix}`;
-      const msgAgencia = `Hola Queens Escort, quiero inscribir mi AGENCIA / CHALET. Envíame los pasos y precios, por favor.${refSuffix}`;
+      const msgChica = `Hola Queens, quiero inscribirme como CHICA. Envíame los pasos y precios, por favor.${refSuffix}`;
+      const msgAgencia = `Hola Queens, quiero inscribir mi AGENCIA / CHALET. Envíame los pasos y precios, por favor.${refSuffix}`;
     %>
     <div class="inscripcion-wrap">
-      <p class="inscripcion-title">¿Quieres anunciarte en Queens Escort?</p>
+      <p class="inscripcion-title">¿Quieres anunciarte en Queens?</p>
       <% if (refCode) { %>
         <p style="color:#0a8d54;font-size:0.8rem;margin-bottom:14px;">
           ✨ Vienes recomendada por la afiliada <strong><%= refCode %></strong>
@@ -92,24 +92,24 @@
 
     <!-- SEO Text Block -->
     <div class="seo-text-block">
-      <h2>Queens Escort | Escort en España</h2>
+      <h2>Queens | Acompañantes en España</h2>
       <p>
-        Bienvenido a <strong>Queens Escort</strong>, la plataforma premium de <strong>escort en España</strong>.
+        Bienvenido a <strong>Queens</strong>, la plataforma premium de <strong>acompañantes en España</strong>.
         Todos nuestros perfiles son verificados personalmente por nuestro equipo.
         <% if (ciudadesList.length > 0) { %>
-        Encuentra escorts en 
+        Encuentra acompañantes en 
         <% ciudadesList.forEach((prov, i) => { %>
           <strong><%= prov %></strong><%= i < ciudadesList.length - 1 ? ', ' : '' %>
         <% }) %> y en el resto de provincias de España.
         <% } else { %>
         Encuentra perfiles de exclusividad en todas las provincias de España.
         <% } %>
-        Escort de lujo. <strong>Acompañantes verificadas en España</strong>.
-        Chicas escort, chicos escort y trans escort.
+        acompañantes de lujo. <strong>Acompañantes verificadas en España</strong>.
+        Chicas, chicos y trans verificados.
       </p>
       <div class="seo-links">
         <% ciudadesList.forEach(prov => { %>
-          <a href="/ciudad/<%= encodeURIComponent(prov) %>">Escort en <%= prov %></a>
+          <a href="/ciudad/<%= encodeURIComponent(prov) %>">Acompañantes en <%= prov %></a>
         <% }) %>
       </div>
     </div>

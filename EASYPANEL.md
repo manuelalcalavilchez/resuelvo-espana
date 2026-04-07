@@ -1,4 +1,4 @@
-# Despliegue en Easypanel — Queens Escort
+# Despliegue en Easypanel — Queens
 
 Guía rápida para desplegar este proyecto en [Easypanel](https://easypanel.io/) usando el `Dockerfile` incluido.
 
@@ -48,7 +48,7 @@ Easypanel los crea automáticamente en `/etc/easypanel/projects/<proj>/<service>
 ## 4. Dominio y HTTPS
 
 1. Pestaña **Domains** → **+ Add Domain**.
-2. Escribe tu dominio (ej. `queensescort.es`).
+2. Escribe tu dominio (ej. `queebweb.com`).
 3. Activa **HTTPS** (Let's Encrypt automático).
 4. Apunta tu DNS (`A` record) a la IP de tu servidor Easypanel.
 

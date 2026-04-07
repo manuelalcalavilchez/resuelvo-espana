@@ -343,7 +343,7 @@ app.post('/registro', async (req, res) => {
   // para evitar que cualquiera rellene formularios falsos. Ver applyAffiliateCredit().
 
   const refMsg = refCode ? ` Me recomendó la afiliada ${refCode}.` : '';
-  const msg = `Hola! Soy ${nombre}, mi ID es ${id}. Quiero anunciarme en Queens Escort. Ciudad: ${ciudad}. Categoría: ${categoria}.${refMsg}`;
+  const msg = `Hola! Soy ${nombre}, mi ID es ${id}. Quiero anunciarme en Queens. Ciudad: ${ciudad}. Categoría: ${categoria}.${refMsg}`;
   res.redirect(`https://wa.me/${getWhatsappNumber()}?text=${encodeURIComponent(msg)}`);
 });
 
@@ -735,7 +735,7 @@ app.post('/admin/agencias/:id/eliminar', requireAdmin, (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n🏆 Queens Escort → http://localhost:${PORT}`);
+  console.log(`\n🏆 Queens → http://localhost:${PORT}`);
   console.log(`🔑 Admin Panel   → http://localhost:${PORT}/admin`);
   console.log(`🔑 Password      → ${ADMIN_PASSWORD}\n`);
 });

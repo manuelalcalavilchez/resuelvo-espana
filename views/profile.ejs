@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= perfil.nombre %> — Queens Escort <%= perfil.ciudad %></title>
-  <meta name="description" content="<%= perfil.nombre %>, escort en <%= perfil.ciudad %>. Perfil verificado en Queens Escort.">
+  <title><%= perfil.nombre %> — Queens <%= perfil.ciudad %></title>
+  <meta name="description" content="<%= perfil.nombre %>, acompañantes en <%= perfil.ciudad %>. Perfil verificado en Queens.">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="bg-velvet">
 
   <nav class="navbar">
     <a href="/inicio" class="navbar-logo" style="text-decoration:none">
-      <img src="/img/queens-logo.png" alt="Queens Escort" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS ESCORT</span>'">
+      <img src="/img/queens-logo.png" alt="Queens" style="height:36px;" onerror="this.outerHTML='<span class=&quot;gold-shimmer&quot;>QUEENS</span>'">
     </a>
     <div class="navbar-links">
       <a href="/ciudad/<%= perfil.ciudad %>">← <%= perfil.ciudad %></a>
@@ -54,7 +54,7 @@
           <span style="font-size:1.2rem;">✅</span>
           <div>
             <div style="font-size:0.75rem;font-weight:700;color:#00e676;letter-spacing:1px;">PERFIL VERIFICADO</div>
-            <div style="font-size:0.65rem;color:var(--text-muted);">Identidad y fotos comprobadas por Queens Escort</div>
+            <div style="font-size:0.65rem;color:var(--text-muted);">Identidad y fotos comprobadas por Queens</div>
           </div>
         </div>
       </div>

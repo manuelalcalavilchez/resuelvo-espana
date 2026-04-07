@@ -1,7 +1,7 @@
 ﻿{
-  "name": "queens-escort",
+  "name": "queebweb",
   "version": "1.0.0",
-  "description": "Queens Escort - Premium Marketplace MVP",
+  "description": "Queens - Premium Marketplace MVP",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

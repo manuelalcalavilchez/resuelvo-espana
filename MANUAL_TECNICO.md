@@ -1,5 +1,5 @@
 # Documentación Técnica y Manual de Operaciones
-## Queens Escort
+## Queens
 
 **Autor:** Manuel Alcala  
 **Año:** 2026  
@@ -7,7 +7,7 @@
 ---
 
 ### 1. Introducción y Descripción General
-El presente documento define la estructura, tecnología y metodologías de operación detrás de la plataforma "Queens Escort". Este sistema funciona como un mercado de anuncios clasificados estrictamente gestionado, con arquitectura optimizada para minimizar la carga de infraestructuras y facilitar portabilidad completa entre entornos de virtualización.
+El presente documento define la estructura, tecnología y metodologías de operación detrás de la plataforma "Queens". Este sistema funciona como un mercado de anuncios clasificados estrictamente gestionado, con arquitectura optimizada para minimizar la carga de infraestructuras y facilitar portabilidad completa entre entornos de virtualización.
 
 ### 2. Pila Tecnológica Utilizada (Tech Stack)
 El desarrollo hace uso de un entorno altamente portable para evitar requerimientos de compilación nativa en servidores de destino.
@@ -54,4 +54,4 @@ Dado el uso de tecnologías independientes gracias a la contenerización nativa,
     *   `ADMIN_PASSWORD` (Clave directa para acceder al directorio `/admin`).
     *   `WHATSAPP_NUMBER` (Referencia telefónica comercial sin espacios).
     *   `SESSION_SECRET` (Llave criptográfica generadora de firmas temporales).
-4.  **Generación de la Imagen y Despliegue:** Construya la imagen nativamente operando en la raíz del entorno: `docker build -t queens-escort .` seguido de la inicialización de ejecución adjuntando los volúmenes anteriormente descriptos y finalizando por el puerto expuesto especificado. Esto reanudará toda la carga persistente original de forma íntegra.
+4.  **Generación de la Imagen y Despliegue:** Construya la imagen nativamente operando en la raíz del entorno: `docker build -t queebweb .` seguido de la inicialización de ejecución adjuntando los volúmenes anteriormente descriptos y finalizando por el puerto expuesto especificado. Esto reanudará toda la carga persistente original de forma íntegra.
