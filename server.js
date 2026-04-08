@@ -150,7 +150,13 @@ const APP_VERSION = Date.now().toString(); // Genera un ID único cada vez que r
 // ─── CONFIG (editable desde admin) ────────────────────────
 const CONFIG_FILE = path.join(__dirname, 'data', 'config.json');
 const DEFAULT_CONFIG = {
-  whatsapp_number: process.env.WHATSAPP_NUMBER || '34600000000'
+  whatsapp_number: process.env.WHATSAPP_NUMBER || '34600000000',
+  // Mensajes automáticos de WhatsApp (editables desde /admin/config)
+  msg_chica: 'Hola Queens, quiero inscribirme como CHICA. Envíame los pasos y precios, por favor.',
+  msg_agencia: 'Hola Queens, quiero inscribir mi AGENCIA / CHALET. Envíame los pasos y precios, por favor.',
+  msg_plan_destacada: 'Hola Queens, quiero contratar el plan DESTACADA. Envíame precios y pasos, por favor.',
+  msg_plan_basica: 'Hola Queens, quiero contratar el plan CATÁLOGO. Envíame precios y pasos, por favor.',
+  msg_registro: 'Hola! Soy {nombre}, mi ID es {id}. Quiero anunciarme en Queens. Ciudad: {ciudad}. Categoría: {categoria}.'
 };
 const getConfig = () => {
   try {
@@ -378,6 +384,7 @@ app.use((req, res, next) => {
   }
 
   res.locals.whatsapp = getWhatsappNumber(); // Hacer accesible el número (editable desde admin/config)
+  res.locals.waMessages = getConfig(); // Mensajes WhatsApp editables desde admin/config
   res.locals.PLAN_LIMITS = PLAN_LIMITS;
   next();
 });
@@ -618,7 +625,7 @@ app.get('/health', (req, res) => res.json({ ok: true, version: APP_VERSION, ts: 
 app.get('/registro', (req, res) => res.render('registro', { provincias: PROVINCIAS }));
 
 app.post('/registro', formLimiter, async (req, res) => {
-  const { nombre, ciudad, telefono, categoria, lat, lng, ref } = req.body;
+  const { nombre, ciudad, telefono, categoria, descripcion, edad, lat, lng, ref } = req.body;
   const id = generateId();
   const perfiles = getPerfiles();
 
@@ -630,11 +637,14 @@ app.post('/registro', formLimiter, async (req, res) => {
     if (refProfile) refCode = refClean;
   }
 
+  const descLimit = getPlanLimits('basica').max_desc;
   perfiles.push({
     id, nombre, ciudad, telefono, categoria,
     tipo_anunciante: 'independiente', agencia_id: null, plan: 'basica',
     estado: 'solicitud_recibida', disponibilidad: 'disponible',
-    descripcion: null, edad: null, idiomas: 'Español', fotos: [], lat: lat ? parseFloat(lat) : null, lng: lng ? parseFloat(lng) : null,
+    descripcion: descripcion ? String(descripcion).slice(0, descLimit) : null,
+    edad: edad ? parseInt(edad) : null,
+    idiomas: 'Español', fotos: [], lat: lat ? parseFloat(lat) : null, lng: lng ? parseFloat(lng) : null,
     orden_manual: 99, fecha_inicio: null, fecha_fin: null,
     notas_internas: null, created_at: new Date().toISOString(),
     referidos_count: 0, recompensa: false,
@@ -646,7 +656,12 @@ app.post('/registro', formLimiter, async (req, res) => {
   // para evitar que cualquiera rellene formularios falsos. Ver applyAffiliateCredit().
 
   const refMsg = refCode ? ` Me recomendó la afiliada ${refCode}.` : '';
-  const msg = `Hola! Soy ${nombre}, mi ID es ${id}. Quiero anunciarme en Queens. Ciudad: ${ciudad}. Categoría: ${categoria}.${refMsg}`;
+  const template = getConfig().msg_registro || DEFAULT_CONFIG.msg_registro;
+  const msg = template
+    .replace(/\{nombre\}/g, nombre || '')
+    .replace(/\{id\}/g, id)
+    .replace(/\{ciudad\}/g, ciudad || '')
+    .replace(/\{categoria\}/g, categoria || '') + refMsg;
   res.redirect(`https://wa.me/${getWhatsappNumber()}?text=${encodeURIComponent(msg)}`);
 });
 
@@ -715,6 +730,13 @@ app.post('/admin/config', requireAdmin, async (req, res) => {
   const cfg = getConfig();
   const numero = (req.body.whatsapp_number || '').replace(/\D/g, '');
   if (numero) cfg.whatsapp_number = numero;
+  // Mensajes automáticos de WhatsApp (editables)
+  const msgFields = ['msg_chica', 'msg_agencia', 'msg_plan_destacada', 'msg_plan_basica', 'msg_registro'];
+  for (const f of msgFields) {
+    if (typeof req.body[f] === 'string') {
+      cfg[f] = String(req.body[f]).slice(0, 1000);
+    }
+  }
   await saveConfig(cfg);
   res.redirect('/admin/config?ok=1');
 });

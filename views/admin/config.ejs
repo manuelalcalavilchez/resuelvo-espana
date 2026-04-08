@@ -64,6 +64,56 @@
           Actual: <strong>+<%= config.whatsapp_number || '—' %></strong>
         </p>
 
+        <hr style="border-color:#222;margin:28px 0 20px;">
+
+        <h3 class="gold-text font-cinzel-sm" style="margin-bottom:8px;">✉️ Mensajes automáticos de WhatsApp</h3>
+        <p class="text-muted" style="font-size:0.8rem;margin-bottom:16px;">
+          Edita los mensajes pre-rellenados que se abren al pulsar los botones de inscripción y contratación de planes.
+          En el mensaje de registro puedes usar las variables <code>{nombre}</code>, <code>{id}</code>, <code>{ciudad}</code>, <code>{categoria}</code>.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <label style="display:block;margin-bottom:6px;font-size:0.82rem;color:#c8d4e0;">
+              Inscripción Independiente (botón "Inscribir Independiente" del home)
+            </label>
+            <textarea name="msg_chica" rows="3" maxlength="1000"
+              style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid rgba(212,175,55,0.3);border-radius:8px;color:#f9e27e;font-size:0.85rem;font-family:inherit;resize:vertical;"><%= config.msg_chica || '' %></textarea>
+          </div>
+
+          <div>
+            <label style="display:block;margin-bottom:6px;font-size:0.82rem;color:#c8d4e0;">
+              Inscripción Agencia (botón "Inscribir Agencia" del home)
+            </label>
+            <textarea name="msg_agencia" rows="3" maxlength="1000"
+              style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid rgba(212,175,55,0.3);border-radius:8px;color:#f9e27e;font-size:0.85rem;font-family:inherit;resize:vertical;"><%= config.msg_agencia || '' %></textarea>
+          </div>
+
+          <div>
+            <label style="display:block;margin-bottom:6px;font-size:0.82rem;color:#c8d4e0;">
+              Contratar plan Destacada
+            </label>
+            <textarea name="msg_plan_destacada" rows="3" maxlength="1000"
+              style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid rgba(212,175,55,0.3);border-radius:8px;color:#f9e27e;font-size:0.85rem;font-family:inherit;resize:vertical;"><%= config.msg_plan_destacada || '' %></textarea>
+          </div>
+
+          <div>
+            <label style="display:block;margin-bottom:6px;font-size:0.82rem;color:#c8d4e0;">
+              Contratar plan Catálogo (Básica)
+            </label>
+            <textarea name="msg_plan_basica" rows="3" maxlength="1000"
+              style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid rgba(212,175,55,0.3);border-radius:8px;color:#f9e27e;font-size:0.85rem;font-family:inherit;resize:vertical;"><%= config.msg_plan_basica || '' %></textarea>
+          </div>
+
+          <div>
+            <label style="display:block;margin-bottom:6px;font-size:0.82rem;color:#c8d4e0;">
+              Tras completar registro (variables: {nombre}, {id}, {ciudad}, {categoria})
+            </label>
+            <textarea name="msg_registro" rows="3" maxlength="1000"
+              style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid rgba(212,175,55,0.3);border-radius:8px;color:#f9e27e;font-size:0.85rem;font-family:inherit;resize:vertical;"><%= config.msg_registro || '' %></textarea>
+          </div>
+        </div>
+
         <div style="display:flex;gap:12px;margin-top:24px;">
           <button type="submit" class="btn btn-primary">💾 Guardar cambios</button>
           <a href="https://wa.me/<%= config.whatsapp_number %>" target="_blank" class="btn btn-success">📱 Probar WhatsApp</a>

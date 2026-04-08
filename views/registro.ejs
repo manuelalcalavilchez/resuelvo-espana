@@ -90,6 +90,19 @@
             </select>
           </div>
 
+          <div class="form-group">
+            <label class="form-label">Edad</label>
+            <input type="number" name="edad" class="form-input" min="18" max="99" placeholder="18-99">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descripción <small style="color:var(--text-muted);">(opcional)</small></label>
+            <textarea name="descripcion" class="form-input" rows="4" maxlength="250"
+              placeholder="Cuéntanos brevemente sobre ti (máx. 250 caracteres)"
+              style="resize:vertical;font-family:inherit;"></textarea>
+            <p style="font-size:0.67rem;color:var(--text-muted);margin-top:4px;">Podrás ampliarla o cambiarla más tarde desde tu panel.</p>
+          </div>
+
           <button type="submit" class="btn-gold" style="margin-top:8px;">
             📱 Continuar por WhatsApp →
           </button>

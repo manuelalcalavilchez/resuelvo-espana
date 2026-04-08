@@ -62,7 +62,7 @@
         </ul>
 
         <div class="plan-cta">
-          <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent('Hola Queens, quiero contratar el plan DESTACADA. Envíame precios y pasos, por favor.') %>"
+          <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent(waMessages.msg_plan_destacada || '') %>"
             target="_blank" rel="noopener" class="btn-gold" style="display:block;text-align:center;padding:14px 20px;">
             Contratar Destacada
           </a>
@@ -87,7 +87,7 @@
         </ul>
 
         <div class="plan-cta">
-          <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent('Hola Queens, quiero contratar el plan CATÁLOGO. Envíame precios y pasos, por favor.') %>"
+          <a href="https://wa.me/<%= whatsapp %>?text=<%= encodeURIComponent(waMessages.msg_plan_basica || '') %>"
             target="_blank" rel="noopener" class="btn"
             style="display:block;text-align:center;padding:14px 20px;background:#0a0a0a;border:1px solid #444;color:#c8d4e0;text-decoration:none;border-radius:8px;">
             Contratar Catálogo

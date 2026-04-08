@@ -48,9 +48,9 @@
     </div>
 
     <!-- Inscripción (Chica / Agencia) -->
-    <% const refSuffix=refCode ? ` Vengo recomendada por la afiliada ${refCode}.` : '' ; const msgChica=`Hola Queens,
-      quiero inscribirme como CHICA. Envíame los pasos y precios, por favor.${refSuffix}`; const msgAgencia=`Hola
-      Queens, quiero inscribir mi AGENCIA / CHALET. Envíame los pasos y precios, por favor.${refSuffix}`; %>
+    <% const refSuffix=refCode ? ` Vengo recomendada por la afiliada ${refCode}.` : '';
+       const msgChica = (waMessages.msg_chica || '') + refSuffix;
+       const msgAgencia = (waMessages.msg_agencia || '') + refSuffix; %>
       <div class="inscripcion-wrap">
         <p class="inscripcion-title">¿Quieres anunciarte en Queens?</p>
         <% if (refCode) { %>
