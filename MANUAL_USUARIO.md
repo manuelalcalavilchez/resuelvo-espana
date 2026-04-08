@@ -60,6 +60,8 @@ La primera vez que entras al sitio aparece una **pantalla de verificación de ed
    - **Disponibilidad**: Disponible ahora · Próximamente · No disponible
 4. Pulsa el botón **"[Categoría] más cercanas"** para que el navegador detecte tu ubicación y ordene los perfiles por proximidad.
 
+En el listado de cada provincia verás primero las fichas **👑 Destacadas** — con marco dorado animado, badge Corona brillante y un fragmento amplio de la descripción (hasta 800 caracteres, se expande al pasar el cursor). Debajo aparece el **Catálogo** con un resumen compacto de la descripción (hasta 250 caracteres).
+
 ### 3.3 Ver una ficha de perfil
 
 En cada ficha encontrarás:
@@ -101,8 +103,8 @@ En la parte superior derecha (próximamente, según diseño actual) o en el foot
 
 | Plan | Fotos | Vídeo | Descripción | Posición | Badge |
 |---|---|---|---|---|---|
-| **Catálogo (básico)** | 5 | ❌ | 250 caracteres | Estándar | — |
-| **👑 Destacada** | 12 | ✅ | 800 caracteres | Prioritaria + carrusel home | 👑 Corona |
+| **Catálogo (básico)** | 5 | ❌ | 250 caracteres (visibles en el listado) | Estándar | — |
+| **👑 Destacada** | 12 | ✅ | 800 caracteres (visibles y expandibles al hover) | Prioritaria + carrusel home + marco dorado animado | 👑 Corona |
 
 ### 4.4 Acceder a tu panel
 
