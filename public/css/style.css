@@ -370,17 +370,143 @@ h1, h2, h3, h4, h5 { line-height: 1.2; }
 }
 
 .profile-card.highlighted-card {
-  border-color: var(--gold-2);
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+    linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 25%, #fff4c2 50%, var(--gold-2) 75%, var(--gold-1) 100%) border-box;
+  background-size: 100% 100%, 300% 300%;
+  box-shadow:
+    0 0 0 1px rgba(249, 226, 126, 0.25),
+    0 10px 40px rgba(212, 175, 55, 0.35),
+    0 0 60px rgba(212, 175, 55, 0.25),
+    inset 0 0 30px rgba(212, 175, 55, 0.08);
+  animation: highlightedBorderShift 6s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+@keyframes highlightedBorderShift {
+  0%, 100% { background-position: 0% 0%, 0% 50%; }
+  50%      { background-position: 0% 0%, 100% 50%; }
+}
+
+.profile-card.highlighted-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 0 0 1px rgba(249, 226, 126, 0.5),
+    0 20px 60px rgba(212, 175, 55, 0.5),
+    0 0 90px rgba(212, 175, 55, 0.4),
+    inset 0 0 40px rgba(212, 175, 55, 0.12);
 }
 
 .profile-card.highlighted-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold-1), transparent);
-  z-index: 1;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-1), #fff4c2, var(--gold-1), transparent);
+  z-index: 3;
+  filter: blur(0.5px);
+}
+
+.profile-card.highlighted-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 244, 194, 0.18) 50%, transparent 70%);
+  background-size: 250% 100%;
+  background-position: 200% 0;
+  pointer-events: none;
+  z-index: 2;
+  animation: shimmerSweep 4.5s ease-in-out infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes shimmerSweep {
+  0%   { background-position: 200% 0; }
+  60%  { background-position: -100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.profiles-grid.highlighted .card-image,
+.profiles-grid.highlighted .card-image-placeholder {
+  aspect-ratio: 3/4.2;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.profile-card.highlighted-card:hover .card-image {
+  transform: scale(1.06);
+}
+
+.profiles-grid.highlighted .card-overlay {
+  padding: 70px 20px 22px;
+  background: linear-gradient(0deg,
+    rgba(2, 5, 16, 0.97) 0%,
+    rgba(2, 5, 16, 0.75) 45%,
+    transparent 100%);
+}
+
+.profiles-grid.highlighted .card-name {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #fff4c2 0%, var(--gold-1) 50%, var(--gold-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 20px rgba(212, 175, 55, 0.3);
+  margin-bottom: 6px;
+}
+
+.profiles-grid.highlighted .card-meta {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  letter-spacing: 1.5px;
+  opacity: 0.85;
+}
+
+.profiles-grid.highlighted .card-description {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  opacity: 0.92;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 12;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+  white-space: pre-line;
+}
+
+/* Al hacer hover la descripción se expande completa */
+.profile-card.highlighted-card:hover .card-description {
+  -webkit-line-clamp: unset;
+}
+
+/* Descripción compacta para fichas básicas */
+.profiles-grid.basic-grid .card-description.basic {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  opacity: 0.82;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.profiles-grid.basic-grid .card-overlay {
+  padding: 40px 14px 14px;
 }
 
 .card-image {
@@ -441,8 +567,24 @@ h1, h2, h3, h4, h5 { line-height: 1.2; }
 }
 
 .card-plan-badge.destacada {
-  background: linear-gradient(135deg, var(--gold-3), var(--gold-1));
-  color: #000;
+  background: linear-gradient(135deg, var(--gold-3) 0%, var(--gold-1) 40%, #fff4c2 50%, var(--gold-1) 60%, var(--gold-3) 100%);
+  background-size: 200% 100%;
+  color: #1a0f00;
+  border: 1px solid rgba(255, 244, 194, 0.6);
+  box-shadow:
+    0 4px 14px rgba(212, 175, 55, 0.5),
+    0 0 20px rgba(249, 226, 126, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  padding: 6px 14px;
+  font-size: 0.65rem;
+  letter-spacing: 2.5px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: badgeShine 3s ease-in-out infinite;
+}
+
+@keyframes badgeShine {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 
 .card-plan-badge.premium {
