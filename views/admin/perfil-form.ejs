@@ -160,12 +160,14 @@
 
                 <div class="admin-form-group">
                   <% const _planKey = perfil?.plan || 'basica'; const _limDesc = (PLAN_LIMITS[_planKey] || PLAN_LIMITS.basica).max_desc; %>
-                  <label class="admin-form-label">Descripción <small style="color:#888;">(máx. <%= _limDesc %> caracteres según plan)</small></label>
-                  <textarea name="descripcion" class="admin-form-textarea" maxlength="<%= _limDesc %>"
+                  <label class="admin-form-label">Descripción <small style="color:#888;">(máx. <span id="desc-max"><%= _limDesc %></span> caracteres según plan)</small></label>
+                  <textarea name="descripcion" id="descripcion-field" class="admin-form-textarea" maxlength="<%= _limDesc %>"
+                    data-limit-basica="<%= PLAN_LIMITS.basica.max_desc %>"
+                    data-limit-destacada="<%= PLAN_LIMITS.destacada.max_desc %>"
                     oninput="document.getElementById('desc-count').textContent = this.value.length"
                     placeholder="Descripción del perfil..."><%= perfil?.descripcion || '' %></textarea>
                   <p style="font-size:0.7rem;color:#888;margin-top:4px;text-align:right;">
-                    <span id="desc-count"><%= (perfil?.descripcion || '').length %></span> / <%= _limDesc %>
+                    <span id="desc-count"><%= (perfil?.descripcion || '').length %></span> / <span id="desc-max-2"><%= _limDesc %></span>
                   </p>
                 </div>
 
@@ -392,6 +394,26 @@
 
   <script src="/js/main.js"></script>
   <script>
+    // Ajustar maxlength de descripción al cambiar de plan
+    (function(){
+      var planSel = document.querySelector('select[name="plan"]');
+      var desc = document.getElementById('descripcion-field');
+      if (!planSel || !desc) return;
+      function sync() {
+        var key = planSel.value === 'destacada' ? 'destacada' : 'basica';
+        var lim = parseInt(desc.getAttribute('data-limit-' + key), 10) || 250;
+        desc.setAttribute('maxlength', lim);
+        if (desc.value.length > lim) desc.value = desc.value.slice(0, lim);
+        var a = document.getElementById('desc-max');
+        var b = document.getElementById('desc-max-2');
+        var c = document.getElementById('desc-count');
+        if (a) a.textContent = lim;
+        if (b) b.textContent = lim;
+        if (c) c.textContent = desc.value.length;
+      }
+      planSel.addEventListener('change', sync);
+    })();
+
     function copyRefLink(id) {
       const url = window.location.origin + '/inicio?ref=' + id;
       navigator.clipboard.writeText(url).then(() => {
