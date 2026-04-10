@@ -31,6 +31,7 @@
       <a href="/admin/recordatorios">🔔 Recordatorios <% if (stats.expiran7 > 0) { %><span style="background:#ffab00;color:#000;font-size:0.6rem;padding:1px 6px;border-radius:30px;font-weight:700;margin-left:4px;"><%= stats.expiran7 %></span><% } %></a>
       <a href="/admin/agencias">🏢 Agencias</a>
       <a href="/admin/config">⚙️ Configuración</a>
+      <a href="/admin/clicks">🖱️ Clicks</a>
       <% } %>
       <a href="/" target="_blank">🌐 Ver Web</a>
       <a href="<%= _logout %>" style="margin-top:auto;color:#ff3b6b;">🚪 Salir</a>
@@ -180,6 +181,7 @@
               <td>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                   <a href="/admin/perfil/<%= p.id %>/editar" class="btn btn-primary btn-sm">✏️ Editar</a>
+                  <a href="/perfil/<%= p.id %>" target="_blank" class="btn btn-ghost btn-sm" style="font-size:0.65rem;">👁 Ver</a>
 
                   <!-- Quick status -->
                   <% if (p.estado === 'solicitud_recibida' || p.estado.startsWith('pendiente')) { %>

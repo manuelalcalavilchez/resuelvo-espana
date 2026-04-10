@@ -6,9 +6,20 @@
   <title>Clicks — Queens Admin</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .text-danger { color: #ff3b6b; }
-    .text-warning { color: #ffab00; }
-    .text-success { color: #00e676; }
+    .click-detail { font-size: 0.72rem; color: #9ca3af; line-height: 1.6; }
+    .click-detail strong { color: #e5e7eb; }
+    .click-row { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .click-row:hover { background: rgba(212,175,55,0.04); }
+    .click-main { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+    .click-expand { padding: 0 16px 14px; display: none; }
+    .click-expand.open { display: block; }
+    .click-toggle { cursor: pointer; user-select: none; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; }
+    .detail-item { font-size: 0.7rem; }
+    .detail-item span { color: #6b7280; }
+    .detail-item strong { color: #d1d5db; font-weight: 500; }
+    .map-link { color: #d4af37; text-decoration: none; font-size: 0.7rem; }
+    .map-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body class="admin-body">
@@ -54,44 +65,89 @@
         <div class="stat-value"><%= clicks.filter(c => c.tipo === 'telefono').length %></div>
         <div class="stat-label">Llamadas</div>
       </div>
+      <%
+        var devices = {};
+        clicks.forEach(function(c) { var d = c.dispositivo || 'Desconocido'; devices[d] = (devices[d]||0)+1; });
+        var topDevice = Object.entries(devices).sort(function(a,b){return b[1]-a[1];})[0];
+      %>
+      <div class="stat-card">
+        <div class="stat-value" style="font-size:1.2rem;"><%= topDevice ? topDevice[0] : '—' %></div>
+        <div class="stat-label">Dispositivo top (<%= topDevice ? topDevice[1] : 0 %>)</div>
+      </div>
     </div>
 
-    <!-- Tabla -->
+    <!-- Tabla expandible -->
     <div class="admin-table-wrap">
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha/Hora</th>
-              <th>Perfil</th>
-              <th>Tipo</th>
-              <th>IP</th>
-              <th>Usuario</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (clicks.length === 0) { %>
-            <tr><td colspan="5" style="text-align:center;padding:40px;color:#4a5568;">No hay clics registrados aún</td></tr>
+      <% if (clicks.length === 0) { %>
+        <div style="text-align:center;padding:60px;color:#4a5568;">No hay clics registrados aún</div>
+      <% } %>
+      <% clicks.forEach(function(c, i) { %>
+      <div class="click-row">
+        <div class="click-main click-toggle" data-idx="<%= i %>">
+          <div style="min-width:36px;text-align:center;">
+            <% if (c.tipo === 'whatsapp') { %>
+              <span style="font-size:1.3rem;">💬</span>
+            <% } else { %>
+              <span style="font-size:1.3rem;">📞</span>
             <% } %>
-            <% clicks.forEach(c => { %>
-            <tr>
-              <td style="font-size:0.75rem;"><%= new Date(c.created_at).toLocaleString() %></td>
-              <td style="font-weight:600;"><%= c.perfil_nombre %> (<%= c.perfil_id %>)</td>
-              <td>
-                <span class="badge badge-<%= c.tipo === 'whatsapp' ? 'success' : 'warning' %>">
-                  <%= c.tipo === 'whatsapp' ? 'WhatsApp' : 'Llamada' %>
-                </span>
-              </td>
-              <td style="font-size:0.7rem;color:#6b7280;"><%= c.ip %></td>
-              <td style="font-size:0.7rem;color:#6b7280;"><%= c.ua.slice(0, 50) %><%= c.ua.length > 50 ? '...' : '' %></td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:0.85rem;color:#e5e7eb;">
+              <%= c.perfil_nombre %> <span style="color:#6b7280;font-weight:400;">(<%= c.perfil_id %>)</span>
+            </div>
+            <div style="font-size:0.7rem;color:#6b7280;">
+              <%= new Date(c.created_at).toLocaleString() %>
+              <% if (c.perfil_ciudad) { %> · <%= c.perfil_ciudad %><% } %>
+              <% if (c.perfil_zona) { %> · <%= c.perfil_zona %><% } %>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <span class="badge badge-<%= c.tipo === 'whatsapp' ? 'success' : 'warning' %>" style="font-size:0.65rem;">
+              <%= c.tipo === 'whatsapp' ? 'WhatsApp' : 'Llamada' %>
+            </span>
+            <div style="font-size:0.65rem;color:#6b7280;margin-top:2px;">
+              <%= c.dispositivo || '' %> · <%= c.navegador || '' %>
+            </div>
+          </div>
+          <div style="color:#4a5568;font-size:0.8rem;padding:0 8px;">▼</div>
+        </div>
+        <div class="click-expand" id="expand-<%= i %>">
+          <div class="detail-grid" style="padding:8px 48px;">
+            <div class="detail-item"><span>IP:</span> <strong><%= c.ip %></strong></div>
+            <div class="detail-item"><span>Dispositivo:</span> <strong><%= c.dispositivo || 'Desconocido' %></strong></div>
+            <div class="detail-item"><span>Navegador:</span> <strong><%= c.navegador || 'Desconocido' %></strong></div>
+            <div class="detail-item"><span>Idioma:</span> <strong><%= c.idioma || 'No disponible' %></strong></div>
+            <div class="detail-item"><span>Referer:</span> <strong><%= c.referer ? c.referer.replace(/https?:\/\//, '').slice(0, 40) : 'Directo' %></strong></div>
+            <div class="detail-item"><span>Perfil contactado:</span> <strong><%= c.perfil_nombre %> (<%= c.perfil_id %>)</strong></div>
+            <div class="detail-item"><span>Ciudad perfil:</span> <strong><%= c.perfil_ciudad || '—' %></strong></div>
+            <div class="detail-item"><span>Zona perfil:</span> <strong><%= c.perfil_zona || '—' %></strong></div>
+            <% if (c.visitante_lat && c.visitante_lng) { %>
+            <div class="detail-item" style="grid-column: span 2;">
+              <span>Ubicación visitante:</span>
+              <strong><%= c.visitante_lat.toFixed(4) %>, <%= c.visitante_lng.toFixed(4) %></strong>
+              <a class="map-link" href="https://www.google.com/maps?q=<%= c.visitante_lat %>,<%= c.visitante_lng %>" target="_blank" rel="noopener"> Ver en mapa ↗</a>
+            </div>
+            <% } else { %>
+            <div class="detail-item" style="grid-column: span 2;"><span>Ubicación visitante:</span> <strong>GPS no disponible</strong></div>
+            <% } %>
+            <div class="detail-item" style="grid-column: span 2;"><span>User-Agent:</span> <strong style="word-break:break-all;font-size:0.6rem;"><%= c.ua %></strong></div>
+          </div>
+        </div>
       </div>
+      <% }) %>
     </div>
   </main>
 
   <script src="/js/main.js"></script>
+  <script>
+    document.querySelectorAll('.click-toggle').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var expand = document.getElementById('expand-' + el.dataset.idx);
+        expand.classList.toggle('open');
+        var arrow = el.querySelector('div:last-child');
+        arrow.textContent = expand.classList.contains('open') ? '▲' : '▼';
+      });
+    });
+  </script>
 </body>
 </html>

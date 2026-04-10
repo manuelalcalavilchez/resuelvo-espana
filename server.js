@@ -1081,19 +1081,43 @@ app.post('/admin/agencias/:id/eliminar', requireAdmin, (req, res) => {
 
 // ─── CLICK TRACKING ROUTE ─────────────────────────────────
 app.get('/perfil/:id/contacto', async (req, res) => {
-  const { tipo } = req.query; // 'whatsapp' o 'telefono'
+  const { tipo, vlat, vlng } = req.query; // 'whatsapp' o 'telefono' + geoloc visitante
   const perfil = getPerfiles().find(p => p.id === req.params.id && p.estado === 'activo');
   if (!perfil) return res.redirect('/inicio');
 
-  // Registrar el clic
+  // Parsear User-Agent para datos legibles
+  const ua = req.get('User-Agent') || '';
+  let dispositivo = 'Desconocido';
+  if (/iPhone/i.test(ua)) dispositivo = 'iPhone';
+  else if (/iPad/i.test(ua)) dispositivo = 'iPad';
+  else if (/Android/i.test(ua)) dispositivo = 'Android';
+  else if (/Windows/i.test(ua)) dispositivo = 'Windows PC';
+  else if (/Mac/i.test(ua)) dispositivo = 'Mac';
+  else if (/Linux/i.test(ua)) dispositivo = 'Linux';
+
+  let navegador = 'Otro';
+  if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) navegador = 'Chrome';
+  else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) navegador = 'Safari';
+  else if (/Firefox/i.test(ua)) navegador = 'Firefox';
+  else if (/Edge/i.test(ua)) navegador = 'Edge';
+
+  // Registrar el clic con todos los datos posibles
   const clicks = getClicks();
   clicks.push({
     id: 'CLK-' + Date.now(),
     perfil_id: perfil.id,
     perfil_nombre: perfil.nombre,
+    perfil_ciudad: perfil.ciudad,
+    perfil_zona: perfil.zona || null,
     tipo: tipo || 'whatsapp',
     ip: req.ip,
-    ua: req.get('User-Agent') || '',
+    ua,
+    dispositivo,
+    navegador,
+    idioma: req.get('Accept-Language') ? req.get('Accept-Language').split(',')[0] : null,
+    referer: req.get('Referer') || null,
+    visitante_lat: vlat ? parseFloat(vlat) : null,
+    visitante_lng: vlng ? parseFloat(vlng) : null,
     created_at: new Date().toISOString()
   });
   saveClicks(clicks).catch(() => {});
