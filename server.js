@@ -516,7 +516,9 @@ app.get('/ciudad/:nombre', (req, res) => {
   if (disponibilidad) perfiles = perfiles.filter(p => p.disponibilidad === disponibilidad);
   if (lat && lng) {
     perfiles = perfiles.map(p => {
-      if (p.lat && p.lng) p.distancia = Math.round(haversineKm(parseFloat(lat), parseFloat(lng), p.lat, p.lng));
+      const pLat = p.zona_lat || p.lat;
+      const pLng = p.zona_lng || p.lng;
+      if (pLat && pLng) p.distancia = Math.round(haversineKm(parseFloat(lat), parseFloat(lng), pLat, pLng));
       return p;
     });
     if (max_km) perfiles = perfiles.filter(p => p.distancia !== undefined && p.distancia <= parseInt(max_km));
