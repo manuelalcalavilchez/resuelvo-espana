@@ -134,6 +134,31 @@
 
                 <div class="form-grid-2">
                   <div class="admin-form-group">
+                    <label class="admin-form-label">Zona / Barrio <small style="color:#888;">(nombre informal)</small></label>
+                    <input type="text" name="zona" class="admin-form-input" value="<%= perfil?.zona || '' %>"
+                      placeholder="Ej: Centro, Salamanca, cerca del Bernabéu...">
+                  </div>
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Nacionalidad <small style="color:#888;">(código ISO 2 letras)</small></label>
+                    <input type="text" name="nacionalidad" class="admin-form-input" value="<%= perfil?.nacionalidad || '' %>"
+                      placeholder="Ej: es, co, br, ve, ro..." maxlength="2" style="text-transform:lowercase;">
+                  </div>
+                </div>
+                <div class="form-grid-2">
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Latitud zona <small style="color:#888;">(para cálculo distancia)</small></label>
+                    <input type="text" name="zona_lat" class="admin-form-input" value="<%= perfil?.zona_lat || '' %>"
+                      placeholder="Ej: 40.4168" inputmode="decimal">
+                  </div>
+                  <div class="admin-form-group">
+                    <label class="admin-form-label">Longitud zona</label>
+                    <input type="text" name="zona_lng" class="admin-form-input" value="<%= perfil?.zona_lng || '' %>"
+                      placeholder="Ej: -3.7038" inputmode="decimal">
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="admin-form-group">
                     <label class="admin-form-label">Categoría *</label>
                     <select name="categoria" class="admin-form-select" required>
                       <option value="chica" <%=perfil?.categoria==='chica' ?'selected':'' %>>♀ Chica</option>

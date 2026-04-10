@@ -891,7 +891,7 @@ app.post('/admin/perfil/nuevo', requireAuth, (req, res) => {
   if (req.session.user.rol === 'modelo') return res.redirect('/panel');
   const id = generateId();
   const { nombre, ciudad, telefono, categoria, tipo_anunciante, agencia_id, plan,
-    disponibilidad, descripcion, edad, idiomas, fecha_inicio, fecha_fin, notas_internas } = req.body;
+    disponibilidad, descripcion, edad, idiomas, fecha_inicio, fecha_fin, notas_internas, zona, zona_lat, zona_lng, nacionalidad } = req.body;
   const perfiles = getPerfiles();
   const ownerAgencia = req.session.user.rol === 'agencia' ? req.session.user.agencia_id : (agencia_id || null);
   perfiles.push({
@@ -901,6 +901,8 @@ app.post('/admin/perfil/nuevo', requireAuth, (req, res) => {
     descripcion: descripcion ? String(descripcion).slice(0, getPlanLimits(plan || 'basica').max_desc) : null,
     edad: edad ? parseInt(edad) : null,
     idiomas: idiomas || 'Español', fotos: [], video: null, views: 0, orden_manual: 99,
+    zona: zona || null, zona_lat: zona_lat ? parseFloat(zona_lat) : null, zona_lng: zona_lng ? parseFloat(zona_lng) : null,
+    nacionalidad: nacionalidad ? nacionalidad.toLowerCase().trim() : null,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
     notas_internas: notas_internas || null, created_at: new Date().toISOString(),
     referidos_count: 0, recompensa: false, tiers_cobrados: []
@@ -943,7 +945,7 @@ app.post('/admin/perfil/:id/editar', requireAuth, (req, res) => {
   if (idx === -1) return res.redirect('/panel');
   if (!checkOwnership(perfiles[idx], req.session.user)) return res.status(403).send('Sin permiso');
   const { nombre, ciudad, telefono, categoria, tipo_anunciante, agencia_id, plan, estado,
-    disponibilidad, descripcion, edad, idiomas, fecha_inicio, fecha_fin, notas_internas, orden_manual } = req.body;
+    disponibilidad, descripcion, edad, idiomas, fecha_inicio, fecha_fin, notas_internas, orden_manual, zona, zona_lat, zona_lng, nacionalidad } = req.body;
   perfiles[idx] = {
     ...perfiles[idx], nombre, ciudad, telefono, categoria,
     tipo_anunciante: tipo_anunciante || 'independiente',
@@ -952,6 +954,8 @@ app.post('/admin/perfil/:id/editar', requireAuth, (req, res) => {
     estado, disponibilidad,
     descripcion: descripcion ? String(descripcion).slice(0, getPlanLimits(plan).max_desc) : null,
     edad: edad ? parseInt(edad) : null, idiomas: idiomas || 'Español',
+    zona: zona || null, zona_lat: zona_lat ? parseFloat(zona_lat) : null, zona_lng: zona_lng ? parseFloat(zona_lng) : null,
+    nacionalidad: nacionalidad ? nacionalidad.toLowerCase().trim() : null,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
     notas_internas: notas_internas || null, orden_manual: parseInt(orden_manual) || 99
   };

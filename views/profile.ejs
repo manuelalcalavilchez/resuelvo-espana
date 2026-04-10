@@ -22,9 +22,28 @@
     <div class="profile-detail-grid">
 
       <!-- Photo Gallery -->
-      <div class="photo-gallery">
+      <div class="photo-gallery" style="position:relative;">
         <% if (perfil.fotos.length > 0) { %>
-          <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>" alt="<%= perfil.nombre %>">
+          <div style="position:relative;">
+            <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>" alt="<%= perfil.nombre %>">
+            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:2;">
+              <% if (perfil.nacionalidad) { %>
+              <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+                <img src="https://flagcdn.com/<%= perfil.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;">
+              </span>
+              <% } %>
+              <% if (perfil.edad) { %>
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+                <%= perfil.edad %> años
+              </span>
+              <% } %>
+              <% if (perfil.zona) { %>
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+                📍 <%= perfil.zona %><span id="dist-photo" style="margin-left:4px;color:#d4af37;"></span>
+              </span>
+              <% } %>
+            </div>
+          </div>
           <% if (perfil.fotos.length > 1) { %>
           <div class="photo-thumbs">
             <% perfil.fotos.forEach((foto, i) => { %>
@@ -135,9 +154,15 @@
             </tr>
             <% } %>
             <tr style="border-bottom:1px solid rgba(212,175,55,0.1)">
-              <td style="padding:10px 0;color:var(--text-muted);">ciudad</td>
+              <td style="padding:10px 0;color:var(--text-muted);">Ciudad</td>
               <td style="padding:10px 0;text-align:right;"><%= perfil.ciudad %></td>
             </tr>
+            <% if (perfil.zona) { %>
+            <tr style="border-bottom:1px solid rgba(212,175,55,0.1)">
+              <td style="padding:10px 0;color:var(--text-muted);">Zona</td>
+              <td style="padding:10px 0;text-align:right;"><%= perfil.zona %><span id="dist-badge" style="display:none;margin-left:6px;font-size:0.7rem;color:#d4af37;"></span></td>
+            </tr>
+            <% } %>
             <tr style="border-bottom:1px solid rgba(212,175,55,0.1)">
               <td style="padding:10px 0;color:var(--text-muted);">Categoría</td>
               <td style="padding:10px 0;text-align:right;text-transform:capitalize;"><%= perfil.categoria %></td>
@@ -185,6 +210,29 @@
   <a href="/ghost" class="ghost-trigger">● MODO SEGURO</a>
   <script src="/js/main.js"></script>
   <script>
+    // Cálculo de distancia GPS → zona del perfil
+    <% if (perfil.zona_lat && perfil.zona_lng) { %>
+    (function() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        var lat1 = pos.coords.latitude, lng1 = pos.coords.longitude;
+        var lat2 = <%= perfil.zona_lat %>, lng2 = <%= perfil.zona_lng %>;
+        var R = 6371; // km
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+                Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+                Math.sin(dLng/2)*Math.sin(dLng/2);
+        var d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var txt = '~' + (d < 1 ? Math.round(d*1000) + ' m' : d.toFixed(1) + ' km');
+        var badge = document.getElementById('dist-badge');
+        if (badge) { badge.textContent = txt; badge.style.display = 'inline'; }
+        var photo = document.getElementById('dist-photo');
+        if (photo) { photo.textContent = txt; }
+      }, function(){}, { timeout: 5000 });
+    })();
+    <% } %>
+
     const refBtn = document.getElementById('btn-referral');
     if (refBtn) {
       refBtn.addEventListener('click', () => {

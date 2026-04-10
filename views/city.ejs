@@ -95,6 +95,9 @@
           <a href="/perfil/<%= p.id %>" class="profile-card highlighted-card">
             <span class="card-plan-badge destacada">👑 Corona</span>
             <div class="availability-dot <%= p.disponibilidad %>"></div>
+            <% if (p.nacionalidad) { %>
+              <img src="https://flagcdn.com/<%= p.nacionalidad %>.svg" alt="<%= p.nacionalidad %>" style="position:absolute;top:10px;right:10px;width:28px;height:20px;border-radius:3px;z-index:2;box-shadow:0 1px 4px rgba(0,0,0,0.4);">
+            <% } %>
             <% if (p.fotos.length> 0) { %>
               <img class="card-image" src="<%= p.fotos[0] %>" alt="<%= p.nombre %>" loading="lazy">
               <% } else { %>
@@ -104,11 +107,11 @@
                 <% } %>
                   <div class="card-overlay">
                     <div class="card-name">
+                      <% if (p.nacionalidad) { %><img src="https://flagcdn.com/<%= p.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;vertical-align:middle;margin-right:4px;"><% } %>
                       <%= p.nombre %>
                     </div>
                     <div class="card-meta">
-                      <%= p.edad ? p.edad + ' años · ' : '' %>
-                        <%= p.idiomas || 'Español' %>
+                      <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %><%= (p.edad || p.zona) && (p.idiomas && p.idiomas !== 'Español') ? ' · ' + p.idiomas : '' %>
                     </div>
                     <% if (p.descripcion) { %>
                       <div class="card-description">
@@ -133,6 +136,9 @@
             <% basicas.forEach(p=> { %>
               <a href="/perfil/<%= p.id %>" class="profile-card">
                 <div class="availability-dot <%= p.disponibilidad %>"></div>
+                <% if (p.nacionalidad) { %>
+                  <img src="https://flagcdn.com/<%= p.nacionalidad %>.svg" alt="<%= p.nacionalidad %>" style="position:absolute;top:8px;right:8px;width:24px;height:17px;border-radius:2px;z-index:2;box-shadow:0 1px 4px rgba(0,0,0,0.4);">
+                <% } %>
                 <% if (p.fotos.length> 0) { %>
                   <img class="card-image" src="<%= p.fotos[0] %>" alt="<%= p.nombre %>" loading="lazy">
                   <% } else { %>
@@ -142,10 +148,11 @@
                     <% } %>
                       <div class="card-overlay">
                         <div class="card-name" style="font-size:0.9rem">
+                          <% if (p.nacionalidad) { %><img src="https://flagcdn.com/<%= p.nacionalidad %>.svg" alt="" style="width:16px;height:11px;border-radius:2px;vertical-align:middle;margin-right:3px;"><% } %>
                           <%= p.nombre %>
                         </div>
                         <div class="card-meta">
-                          <%= p.edad ? p.edad + ' años' : '' %>
+                          <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %>
                         </div>
                         <% if (p.descripcion) { %>
                           <div class="card-description basic">
