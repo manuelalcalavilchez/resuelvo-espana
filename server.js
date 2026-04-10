@@ -48,10 +48,10 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       "default-src": ["'self'"],
-      "script-src": ["'self'", "'unsafe-inline'"],
-      "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+      "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
-      "img-src": ["'self'", "data:", "https://flagcdn.com", "https://upload.wikimedia.org"],
+      "img-src": ["'self'", "data:", "https://flagcdn.com", "https://upload.wikimedia.org", "https://*.tile.openstreetmap.org"],
       "media-src": ["'self'"],
       "connect-src": ["'self'"],
       "frame-ancestors": ["'none'"]

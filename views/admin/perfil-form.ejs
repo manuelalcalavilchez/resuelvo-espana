@@ -8,6 +8,7 @@
     <%= perfil ? 'Editar: ' + perfil.nombre : 'Nuevo Perfil' %> — Admin Queens
   </title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 
 <body class="admin-body">
@@ -144,17 +145,15 @@
                       placeholder="Ej: es, co, br, ve, ro..." maxlength="2" style="text-transform:lowercase;">
                   </div>
                 </div>
-                <div class="form-grid-2">
-                  <div class="admin-form-group">
-                    <label class="admin-form-label">Latitud zona <small style="color:#888;">(para cálculo distancia)</small></label>
-                    <input type="text" name="zona_lat" class="admin-form-input" value="<%= perfil?.zona_lat || '' %>"
-                      placeholder="Ej: 40.4168" inputmode="decimal">
+                <div class="admin-form-group">
+                  <label class="admin-form-label">Ubicación zona <small style="color:#888;">(haz clic en el mapa para seleccionar)</small></label>
+                  <div id="zona-map" style="height:260px;border-radius:10px;border:1px solid rgba(212,175,55,0.2);margin-bottom:8px;z-index:0;"></div>
+                  <div style="display:flex;gap:12px;font-size:0.75rem;color:#888;">
+                    <span>Lat: <strong id="lat-display"><%= perfil?.zona_lat || '—' %></strong></span>
+                    <span>Lng: <strong id="lng-display"><%= perfil?.zona_lng || '—' %></strong></span>
                   </div>
-                  <div class="admin-form-group">
-                    <label class="admin-form-label">Longitud zona</label>
-                    <input type="text" name="zona_lng" class="admin-form-input" value="<%= perfil?.zona_lng || '' %>"
-                      placeholder="Ej: -3.7038" inputmode="decimal">
-                  </div>
+                  <input type="hidden" name="zona_lat" id="zona_lat" value="<%= perfil?.zona_lat || '' %>">
+                  <input type="hidden" name="zona_lng" id="zona_lng" value="<%= perfil?.zona_lng || '' %>">
                 </div>
 
                 <div class="form-grid-2">
@@ -447,6 +446,31 @@
         console.error('Error al copiar:', err);
       });
     }
+  </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function() {
+      var initLat = parseFloat('<%= perfil?.zona_lat || "" %>') || 40.4168;
+      var initLng = parseFloat('<%= perfil?.zona_lng || "" %>') || -3.7038;
+      var hasCoords = '<%= perfil?.zona_lat || "" %>' !== '';
+      var map = L.map('zona-map').setView([initLat, initLng], hasCoords ? 14 : 6);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+      }).addTo(map);
+      var marker = hasCoords ? L.marker([initLat, initLng]).addTo(map) : null;
+      map.on('click', function(e) {
+        var lat = Math.round(e.latlng.lat * 10000) / 10000;
+        var lng = Math.round(e.latlng.lng * 10000) / 10000;
+        if (marker) marker.setLatLng(e.latlng);
+        else marker = L.marker(e.latlng).addTo(map);
+        document.getElementById('zona_lat').value = lat;
+        document.getElementById('zona_lng').value = lng;
+        document.getElementById('lat-display').textContent = lat;
+        document.getElementById('lng-display').textContent = lng;
+      });
+      // Fix render si el mapa está en un tab oculto
+      setTimeout(function() { map.invalidateSize(); }, 300);
+    })();
   </script>
 </body>
 
