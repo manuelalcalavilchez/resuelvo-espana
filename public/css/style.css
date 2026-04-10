@@ -555,42 +555,55 @@ h1, h2, h3, h4, h5 { line-height: 1.2; }
 
 .card-plan-badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 4px 12px;
-  border-radius: 30px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  z-index: 3;
+  pointer-events: none;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 0;
 }
 
 .card-plan-badge.destacada {
-  background: linear-gradient(135deg, var(--gold-3) 0%, var(--gold-1) 40%, #fff4c2 50%, var(--gold-1) 60%, var(--gold-3) 100%);
-  background-size: 200% 100%;
-  color: #1a0f00;
-  border: 1px solid rgba(255, 244, 194, 0.6);
-  box-shadow:
-    0 4px 14px rgba(212, 175, 55, 0.5),
-    0 0 20px rgba(249, 226, 126, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  padding: 6px 14px;
-  font-size: 0.65rem;
-  letter-spacing: 2.5px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-  animation: badgeShine 3s ease-in-out infinite;
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
-@keyframes badgeShine {
+.card-plan-badge.destacada::after {
+  content: '👑';
+  position: absolute;
+  top: 12px;
+  left: -28px;
+  width: 120px;
+  text-align: center;
+  padding: 5px 0;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #1a0f00;
+  background: linear-gradient(135deg, var(--gold-3) 0%, var(--gold-1) 40%, #fff4c2 50%, var(--gold-1) 60%, var(--gold-3) 100%);
+  background-size: 200% 100%;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(212, 175, 55, 0.3);
+  transform: rotate(-45deg);
+  animation: ribbonShine 3s ease-in-out infinite;
+}
+
+@keyframes ribbonShine {
   0%, 100% { background-position: 0% 50%; }
   50%      { background-position: 100% 50%; }
 }
 
 .card-plan-badge.premium {
-  background: rgba(212, 175, 55, 0.2);
-  border: 1px solid var(--gold-2);
-  color: var(--gold-1);
+  background: none;
+  border: none;
 }
 
 .availability-dot {
