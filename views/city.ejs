@@ -203,12 +203,19 @@
     if (btn) {
       btn.addEventListener("click", () => {
         if (!navigator.geolocation) return alert("Activa la ubicación");
-        navigator.geolocation.getCurrentPosition(pos => {
-          document.querySelector("input[name=\"lat\"]").value = pos.coords.latitude.toFixed(5);
-          document.querySelector("input[name=\"lng\"]").value = pos.coords.longitude.toFixed(5);
-          document.querySelector("input[name=\"max_km\"]").value = 50;
-          document.getElementById("geoForm").submit();
-        }, () => alert("No pudimos Obténer tu ubicación"));
+        var GEO_KEY = 'queens_geo_consent';
+        function doGeo() {
+          localStorage.setItem(GEO_KEY, '1');
+          navigator.geolocation.getCurrentPosition(pos => {
+            document.querySelector("input[name=\"lat\"]").value = pos.coords.latitude.toFixed(5);
+            document.querySelector("input[name=\"lng\"]").value = pos.coords.longitude.toFixed(5);
+            document.querySelector("input[name=\"max_km\"]").value = 50;
+            document.getElementById("geoForm").submit();
+          }, () => alert("No pudimos obtener tu ubicación"));
+        }
+        if (localStorage.getItem(GEO_KEY) === '1') { doGeo(); }
+        else if (confirm('📍 ¿Permitir acceder a tu ubicación para mostrarte perfiles cercanos?\n\nSe usa solo para calcular distancia. Datos anonimizados, máx. 90 días.\nMás info en /legal/privacidad')) { doGeo(); }
+        else { localStorage.setItem(GEO_KEY, '0'); }
       });
     }
     const banner = document.getElementById("recompensa-banner");

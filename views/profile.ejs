@@ -207,13 +207,30 @@
     <% } %>
   </div>
 
+  <!-- Banner consentimiento ubicación (RGPD) -->
+  <div id="geo-consent-banner" style="display:none;position:fixed;bottom:12px;left:12px;right:12px;z-index:9998;background:rgba(8,14,28,0.96);border:1px solid rgba(212,175,55,0.4);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.55);backdrop-filter:blur(8px);padding:14px 18px;animation:cookieSlideUp 0.4s ease;">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;max-width:1100px;margin:0 auto;">
+      <div style="flex:1 1 320px;color:#e8eef5;font-size:0.82rem;line-height:1.55;">
+        <strong style="color:#f9e27e;">📍 Ubicación</strong>
+        ¿Quieres ver la distancia aproximada a este perfil? Usaremos tu ubicación solo para calcular la distancia. Los datos se guardan de forma anónima durante 90 días máximo.
+        <a href="/legal/privacidad" style="color:#d4af37;">Más info</a>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" id="geo-consent-yes" style="display:inline-block;padding:9px 18px;border-radius:9px;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;cursor:pointer;border:1px solid #d4af37;background:linear-gradient(135deg,#7a5c00,#d4af37);color:#0a0a0a;font-family:inherit;">Permitir</button>
+        <button type="button" id="geo-consent-no" style="display:inline-block;padding:9px 18px;border-radius:9px;font-size:0.8rem;font-weight:700;cursor:pointer;border:1px solid rgba(200,210,220,0.3);background:transparent;color:rgba(200,210,220,0.85);font-family:inherit;">No, gracias</button>
+      </div>
+    </div>
+  </div>
+
   <a href="/ghost" class="ghost-trigger">● MODO SEGURO</a>
   <script src="/js/main.js"></script>
   <script>
-    // Geolocalización del visitante: distancia + enriquecer links de contacto
+    // Geolocalización del visitante (con consentimiento RGPD)
     (function() {
       if (!navigator.geolocation) return;
-      navigator.geolocation.getCurrentPosition(function(pos) {
+      // Solo pedir GPS si el usuario ya consintió o tras aceptar
+      var GEO_KEY = 'queens_geo_consent';
+      function onPosition(pos) {
         var lat1 = pos.coords.latitude, lng1 = pos.coords.longitude;
 
         // Añadir coordenadas a los links de contacto para tracking
@@ -238,7 +255,25 @@
         var photo = document.getElementById('dist-photo');
         if (photo) { photo.textContent = txt; }
         <% } %>
-      }, function(){}, { timeout: 5000 });
+      }
+      if (localStorage.getItem(GEO_KEY) === '1') {
+        navigator.geolocation.getCurrentPosition(onPosition, function(){}, { timeout: 5000 });
+      } else if (localStorage.getItem(GEO_KEY) !== '0') {
+        // Mostrar banner de consentimiento
+        var banner = document.getElementById('geo-consent-banner');
+        if (banner) {
+          banner.style.display = 'block';
+          document.getElementById('geo-consent-yes').addEventListener('click', function() {
+            localStorage.setItem(GEO_KEY, '1');
+            banner.style.display = 'none';
+            navigator.geolocation.getCurrentPosition(onPosition, function(){}, { timeout: 5000 });
+          });
+          document.getElementById('geo-consent-no').addEventListener('click', function() {
+            localStorage.setItem(GEO_KEY, '0');
+            banner.style.display = 'none';
+          });
+        }
+      }
     })();
 
     const refBtn = document.getElementById('btn-referral');

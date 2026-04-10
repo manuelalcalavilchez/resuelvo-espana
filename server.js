@@ -462,6 +462,24 @@ const runBackup = async () => {
 runBackup();
 cron.schedule('0 4 * * *', runBackup);
 
+// ─── PURGA DE CLICKS (retención 90 días RGPD) ────────────
+const purgeOldClicks = async () => {
+  try {
+    const clicks = getClicks();
+    const now = Date.now();
+    const NINETY_DAYS = 90 * 24 * 60 * 60 * 1000;
+    const kept = clicks.filter(c => (now - new Date(c.created_at).getTime()) < NINETY_DAYS);
+    if (kept.length < clicks.length) {
+      await saveClicks(kept);
+      logger.info({ purged: clicks.length - kept.length, remaining: kept.length }, 'Clicks antiguos eliminados (retención 90d)');
+    }
+  } catch (err) {
+    logger.error({ err }, 'Error en purga de clicks');
+  }
+};
+purgeOldClicks();
+cron.schedule('0 5 * * *', purgeOldClicks);
+
 // ─────────────────────────────────────────────────────────
 // LANGUAGE ROUTE
 // ─────────────────────────────────────────────────────────
@@ -1116,8 +1134,8 @@ app.get('/perfil/:id/contacto', async (req, res) => {
     navegador,
     idioma: req.get('Accept-Language') ? req.get('Accept-Language').split(',')[0] : null,
     referer: req.get('Referer') || null,
-    visitante_lat: vlat ? parseFloat(vlat) : null,
-    visitante_lng: vlng ? parseFloat(vlng) : null,
+    visitante_lat: vlat ? Math.round(parseFloat(vlat) * 100) / 100 : null,  // ~1km precisión (RGPD minimización)
+    visitante_lng: vlng ? Math.round(parseFloat(vlng) * 100) / 100 : null,
     created_at: new Date().toISOString()
   });
   saveClicks(clicks).catch(() => {});

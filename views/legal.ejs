@@ -43,7 +43,14 @@
 
         <h2>2. Datos que tratamos</h2>
         <ul>
-          <li><strong>De usuarios visitantes:</strong> dirección IP, registros de navegación, preferencia de idioma, cookies técnicas de sesión (queens.sid), cookie de verificación de edad (queens_age_18). <em>No usamos cookies publicitarias ni de seguimiento.</em></li>
+          <li><strong>De usuarios visitantes:</strong> dirección IP (anonimizada tras 90 días), registros de navegación, preferencia de idioma, cookies técnicas de sesión (queens.sid), cookie de verificación de edad (queens_age_18). <em>No usamos cookies publicitarias ni de seguimiento.</em></li>
+          <li><strong>Datos de geolocalización (opcional):</strong> Si el usuario lo autoriza expresamente a través del diálogo del navegador, se recoge su ubicación aproximada (coordenadas redondeadas a ~1 km) con las siguientes finalidades:
+            <ul>
+              <li>Calcular la distancia aproximada a los perfiles anunciados (procesado en el navegador del usuario).</li>
+              <li>Estadísticas internas agregadas de contacto (almacenadas en el servidor con precisión reducida).</li>
+            </ul>
+            La base legal es el <strong>consentimiento explícito</strong> (art. 6.1.a RGPD). El usuario puede revocar este consentimiento en cualquier momento desactivando los permisos de ubicación en su navegador. Los datos de geolocalización se eliminan automáticamente a los <strong>90 días</strong>.
+          </li>
           <li><strong>De personas anunciadas (modelos independientes y agencias):</strong> nombre artístico, ciudad, categoría, teléfono, edad declarada, idiomas, descripción, fotografías y, opcionalmente, vídeo de presentación. Estos datos se publican <strong>únicamente con consentimiento expreso e informado</strong>, previa verificación de identidad y mayoría de edad por parte de nuestro equipo (DNI/pasaporte comprobado por videollamada o presencialmente).</li>
           <li><strong>De cuentas registradas:</strong> dirección de email y contraseña cifrada con bcrypt (nunca en claro).</li>
           <li><strong>De solicitudes legales:</strong> nombre, email y contenido de las reclamaciones de retirada (takedown) y de las solicitudes de derechos RGPD.</li>
@@ -55,6 +62,8 @@
           <li>Verificación de identidad y edad de las personas anunciadas.</li>
           <li>Gestión de cuentas de usuario y sesiones.</li>
           <li>Prevención del fraude, la suplantación de identidad y la publicación de contenido ilícito.</li>
+          <li>Estadísticas internas de contacto (clicks en WhatsApp/teléfono) para medir el rendimiento de los perfiles anunciados.</li>
+          <li>Cálculo de distancia aproximada entre el visitante y la zona del perfil (con consentimiento previo del visitante).</li>
           <li>Atención a solicitudes de derechos RGPD y reclamaciones de retirada.</li>
           <li>Cumplimiento de requerimientos legales y judiciales.</li>
         </ul>
@@ -73,6 +82,8 @@
           <li><strong>Perfiles dados de baja:</strong> eliminación completa en un plazo máximo de <strong>30 días naturales</strong>, salvo obligación legal de conservación.</li>
           <li><strong>Registros contables y fiscales:</strong> 6 años (art. 30 Código de Comercio).</li>
           <li><strong>Logs de seguridad:</strong> máximo 90 días.</li>
+          <li><strong>Datos de contacto (clicks):</strong> máximo <strong>90 días</strong>. Transcurrido este plazo, los registros se eliminan automáticamente. Las direcciones IP se anonimizan.</li>
+          <li><strong>Datos de geolocalización:</strong> máximo <strong>90 días</strong>, almacenados con precisión reducida (~1 km). Se eliminan junto con los registros de contacto.</li>
           <li><strong>Cookies técnicas:</strong> 24 horas (sesión) / 30 días (age gate).</li>
         </ul>
 
