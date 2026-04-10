@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clicks — Queens Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .text-danger { color: #ff3b6b; }
+    .text-warning { color: #ffab00; }
+    .text-success { color: #00e676; }
+  </style>
+</head>
+<body class="admin-body">
+  <% var _base = '/admin'; %>
+  <% var _logout = '/admin/logout'; %>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <h1 class="gold-text">👑 QUEENS</h1>
+      <p>PANEL DE ADMINISTRACIÓN</p>
+    </div>
+    <nav class="admin-nav">
+      <a href="<%= _base %>">📊 Dashboard</a>
+      <a href="/admin/perfil/nuevo">➕ Nuevo Perfil</a>
+      <a href="/admin/recordatorios">🔔 Recordatorios</a>
+      <a href="/admin/agencias">🏢 Agencias</a>
+      <a href="/admin/config">⚙️ Configuración</a>
+      <a href="<%= _base %>/clicks" class="active">🖱️ Clicks</a>
+      <a href="/" target="_blank">🌐 Ver Web</a>
+      <a href="<%= _logout %>" style="margin-top:auto;color:#ff3b6b;">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2>Estadísticas de Contactos</h2>
+      <a href="<%= _base %>" class="btn btn-ghost btn-sm">← Volver al Dashboard</a>
+    </div>
+
+    <!-- Resumen -->
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-value"><%= clicks.length %></div>
+        <div class="stat-label">Total de clics</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-value"><%= clicks.filter(c => c.tipo === 'whatsapp').length %></div>
+        <div class="stat-label">WhatsApp</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-value"><%= clicks.filter(c => c.tipo === 'telefono').length %></div>
+        <div class="stat-label">Llamadas</div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="admin-table-wrap">
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha/Hora</th>
+              <th>Perfil</th>
+              <th>Tipo</th>
+              <th>IP</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (clicks.length === 0) { %>
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:#4a5568;">No hay clics registrados aún</td></tr>
+            <% } %>
+            <% clicks.forEach(c => { %>
+            <tr>
+              <td style="font-size:0.75rem;"><%= new Date(c.created_at).toLocaleString() %></td>
+              <td style="font-weight:600;"><%= c.perfil_nombre %> (<%= c.perfil_id %>)</td>
+              <td>
+                <span class="badge badge-<%= c.tipo === 'whatsapp' ? 'success' : 'warning' %>">
+                  <%= c.tipo === 'whatsapp' ? 'WhatsApp' : 'Llamada' %>
+                </span>
+              </td>
+              <td style="font-size:0.7rem;color:#6b7280;"><%= c.ip %></td>
+              <td style="font-size:0.7rem;color:#6b7280;"><%= c.ua.slice(0, 50) %><%= c.ua.length > 50 ? '...' : '' %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

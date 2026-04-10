@@ -156,7 +156,8 @@ const DEFAULT_CONFIG = {
   msg_agencia: 'Hola Queens, quiero inscribir mi AGENCIA / CHALET. Envíame los pasos y precios, por favor.',
   msg_plan_destacada: 'Hola Queens, quiero contratar el plan DESTACADA. Envíame precios y pasos, por favor.',
   msg_plan_basica: 'Hola Queens, quiero contratar el plan CATÁLOGO. Envíame precios y pasos, por favor.',
-  msg_registro: 'Hola! Soy {nombre}, mi ID es {id}. Quiero anunciarme en Queens. Ciudad: {ciudad}. Categoría: {categoria}.'
+  msg_registro: 'Hola! Soy {nombre}, mi ID es {id}. Quiero anunciarme en Queens. Ciudad: {ciudad}. Categoría: {categoria}.',
+  msg_contacto_cliente: 'Encantado/a de contactar contigo. He llegado hasta aquí a través de QUEENVIP ROYAL. ¿Podemos hablar para concertar una cita?'
 };
 const getConfig = () => {
   try {
@@ -236,6 +237,10 @@ const getAgencias = () => readDB('agencias.json');
 const saveAgencias = async (d) => await writeDB('agencias.json', d);
 const getUsuarios = () => readDB('usuarios.json');
 const saveUsuarios = async (d) => await writeDB('usuarios.json', d);
+
+// ─── CLICK TRACKING ───────────────────────────────────────
+const getClicks = () => readDB('clicks.json');
+const saveClicks = async (d) => await writeDB('clicks.json', d);
 
 const generateId = () => 'Q-' + crypto.randomBytes(2).toString('hex').toUpperCase();
 const generateUserId = () => 'U-' + crypto.randomBytes(4).toString('hex').toUpperCase();
@@ -1066,6 +1071,57 @@ app.post('/admin/agencias/nueva', requireAdmin, (req, res) => {
 app.post('/admin/agencias/:id/eliminar', requireAdmin, (req, res) => {
   saveAgencias(getAgencias().filter(a => a.id !== req.params.id));
   res.redirect('/admin/agencias');
+});
+
+// ─── CLICK TRACKING ROUTE ─────────────────────────────────
+app.get('/perfil/:id/contacto', async (req, res) => {
+  const { tipo } = req.query; // 'whatsapp' o 'telefono'
+  const perfil = getPerfiles().find(p => p.id === req.params.id && p.estado === 'activo');
+  if (!perfil) return res.redirect('/inicio');
+
+  // Registrar el clic
+  const clicks = getClicks();
+  clicks.push({
+    id: 'CLK-' + Date.now(),
+    perfil_id: perfil.id,
+    perfil_nombre: perfil.nombre,
+    tipo: tipo || 'whatsapp',
+    ip: req.ip,
+    ua: req.get('User-Agent') || '',
+    created_at: new Date().toISOString()
+  });
+  saveClicks(clicks).catch(() => {});
+
+  // Actualizar contador en el perfil
+  const perfiles = getPerfiles();
+  const p = perfiles.find(x => x.id === req.params.id);
+  if (p) {
+    if (tipo === 'telefono') {
+      p.calls = (p.calls || 0) + 1;
+    } else {
+      p.whatsapps = (p.whatsapps || 0) + 1;
+    }
+    savePerfiles(perfiles).catch(() => {});
+  }
+
+  // Construir el mensaje prellenado de WhatsApp
+  if (tipo === 'whatsapp') {
+    const config = getConfig();
+    const msg = config.msg_contacto_cliente || 'Encantado/a de contactar contigo. He llegado hasta aquí a través de QUEENVIP ROYAL. ¿Podemos hablar para concertar una cita?';
+    const waUrl = `https://wa.me/${(perfil.telefono || '').replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+    return res.redirect(waUrl);
+  }
+
+  // Para teléfono: redirigir a tel:
+  return res.redirect(`tel:${(perfil.telefono || '').replace(/\s/g, '')}`);
+});
+
+// ─── ADMIN CLICKS VIEW ────────────────────────────────────
+app.get('/admin/clicks', requireAdmin, (req, res) => {
+  const clicks = getClicks()
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 500); // últimos 500
+  res.render('admin/clicks', { clicks });
 });
 
 app.listen(PORT, () => {
