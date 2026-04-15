@@ -48,12 +48,12 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       "default-src": ["'self'"],
-      "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+      "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
-      "img-src": ["'self'", "data:", "https://flagcdn.com", "https://upload.wikimedia.org", "https://*.tile.openstreetmap.org"],
+      "img-src": ["'self'", "data:", "https://flagcdn.com", "https://upload.wikimedia.org", "https://*.tile.openstreetmap.org", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://googleads.g.doubleclick.net"],
       "media-src": ["'self'"],
-      "connect-src": ["'self'"],
+      "connect-src": ["'self'", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://stats.g.doubleclick.net"],
       "frame-ancestors": ["'none'"]
     }
   },
