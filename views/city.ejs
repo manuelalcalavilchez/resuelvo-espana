@@ -112,11 +112,6 @@
                     <div class="card-meta">
                       <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %><%= (p.edad || p.zona) && (p.idiomas && p.idiomas !== 'Español') ? ' · ' + p.idiomas : '' %>
                     </div>
-                    <% if (p.descripcion) { %>
-                      <div class="card-description">
-                        <%= p.descripcion.length > 800 ? p.descripcion.slice(0, 800).trim() + '…' : p.descripcion %>
-                      </div>
-                      <% } %>
                     <% if (p.distancia !==undefined) { %>
                       <div class="badge" style="margin-top:6px;">A <%= p.distancia %> km</div>
                       <% } %>
@@ -153,11 +148,6 @@
                         <div class="card-meta">
                           <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %>
                         </div>
-                        <% if (p.descripcion) { %>
-                          <div class="card-description basic">
-                            <%= p.descripcion.length > 250 ? p.descripcion.slice(0, 250).trim() + '…' : p.descripcion %>
-                          </div>
-                          <% } %>
                         <% if (p.distancia !==undefined) { %>
                           <div class="badge" style="margin-top:6px;">A <%= p.distancia %> km</div>
                           <% } %>
