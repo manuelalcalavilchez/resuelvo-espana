@@ -1245,6 +1245,109 @@ tbody td { padding: 14px 16px; vertical-align: middle; }
   .profiles-grid.basic-grid { grid-template-columns: 1fr 1fr; }
 }
 
+/* ─── LIGHTBOX ───────────────────────────────────────────── */
+.qlb-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.97);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.qlb-overlay.open { display: flex; }
+
+.qlb-img-wrap {
+  position: relative;
+  max-width: 90vw;
+  max-height: 82vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qlb-img {
+  max-width: 90vw;
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  display: block;
+}
+.qlb-img.visible { opacity: 1; }
+
+
+.qlb-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #d4af37;
+  font-size: 1.6rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10001;
+  user-select: none;
+}
+.qlb-arrow:hover { background: rgba(212, 175, 55, 0.28); }
+.qlb-arrow.left { left: 16px; }
+.qlb-arrow.right { right: 16px; }
+
+.qlb-close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 10001;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.qlb-close:hover { color: #fff; }
+
+.qlb-counter {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: rgba(212,175,55,0.7);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.qlb-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.qlb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.3);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.qlb-dot.active { background: #d4af37; transform: scale(1.4); }
+
+/* wrapper foto principal */
+.photo-main-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  cursor: zoom-in;
+}
+
 /* ─── UTILITIES ──────────────────────────────────────────── */
 .mt-1 { margin-top: 8px; }
 .mt-2 { margin-top: 16px; }

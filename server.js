@@ -48,7 +48,7 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       "default-src": ["'self'"],
-      "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+      "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
       "img-src": ["'self'", "data:", "https://flagcdn.com", "https://upload.wikimedia.org", "https://*.tile.openstreetmap.org", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://googleads.g.doubleclick.net"],
@@ -925,6 +925,7 @@ app.post('/admin/perfil/nuevo', requireAuth, (req, res) => {
     nacionalidad: nacionalidad ? nacionalidad.toLowerCase().trim() : null,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
     notas_internas: notas_internas || null, created_at: new Date().toISOString(),
+    pixelar_cara: false,
     referidos_count: 0, recompensa: false, tiers_cobrados: []
   });
   savePerfiles(perfiles);
@@ -977,7 +978,8 @@ app.post('/admin/perfil/:id/editar', requireAuth, (req, res) => {
     zona: zona || null, zona_lat: zona_lat ? parseFloat(zona_lat) : null, zona_lng: zona_lng ? parseFloat(zona_lng) : null,
     nacionalidad: nacionalidad ? nacionalidad.toLowerCase().trim() : null,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
-    notas_internas: notas_internas || null, orden_manual: parseInt(orden_manual) || 99
+    notas_internas: notas_internas || null, orden_manual: parseInt(orden_manual) || 99,
+    pixelar_cara: req.body.pixelar_cara === 'on'
   };
   savePerfiles(perfiles);
   res.redirect('/panel');

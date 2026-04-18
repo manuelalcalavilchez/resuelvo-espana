@@ -24,8 +24,13 @@
       <!-- Photo Gallery -->
       <div class="photo-gallery" style="position:relative;">
         <% if (perfil.fotos.length > 0) { %>
-          <div style="position:relative;">
-            <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>" alt="<%= perfil.nombre %>">
+          <%
+            const fotosPublicas = perfil.fotos;
+            const pixelar = perfil.pixelar_cara === true;
+          %>
+          <!-- Foto principal (click abre lightbox) -->
+          <div class="photo-main-wrap" id="gallery-main-wrap" onclick="qlbOpen(0)">
+            <img id="main-photo" class="photo-main" style="margin-bottom:0;cursor:zoom-in;" src="<%= fotosPublicas[0] %>" alt="<%= perfil.nombre %>" crossorigin="anonymous">
             <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:2;">
               <% if (perfil.nacionalidad) { %>
               <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
@@ -42,19 +47,51 @@
                 📍 <%= perfil.zona %><span id="dist-photo" style="margin-left:4px;color:#d4af37;"></span>
               </span>
               <% } %>
+              <% if (fotosPublicas.length > 1) { %>
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+                🖼 1 / <%= fotosPublicas.length %>
+              </span>
+              <% } %>
             </div>
           </div>
-          <% if (perfil.fotos.length > 1) { %>
+
+          <!-- Miniaturas (solo destacada con >1 foto) -->
+          <% if (perfil.plan === 'destacada' && fotosPublicas.length > 1) { %>
           <div class="photo-thumbs">
-            <% perfil.fotos.forEach((foto, i) => { %>
-              <img class="photo-thumb <%= i===0?'active':'' %>" src="<%= foto %>" data-full="<%= foto %>" alt="Foto <%= i+1 %>">
+            <% fotosPublicas.forEach((foto, i) => { %>
+              <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);cursor:zoom-in;" onclick="qlbOpen(<%= i %>)">
+                <img class="photo-thumb <%= i===0?'active':'' %>" src="<%= foto %>" data-idx="<%= i %>" alt="Foto <%= i+1 %>" style="margin:0;" crossorigin="anonymous">
+              </div>
             <% }) %>
           </div>
           <% } %>
+
         <% } else { %>
           <div class="card-image-placeholder" style="border-radius:14px;border:1px solid rgba(212,175,55,0.3);font-size:4rem;color:var(--gold-3);aspect-ratio:3/4;">
             <%= perfil.nombre.charAt(0).toUpperCase() %>
           </div>
+        <% } %>
+
+        <!-- ── LIGHTBOX OVERLAY ─────────────────────────── -->
+        <% if (perfil.fotos.length > 0) { %>
+        <div id="qlb" class="qlb-overlay" role="dialog" aria-modal="true" onclick="if(event.target===this)qlbClose()">
+          <button class="qlb-close" onclick="qlbClose()" aria-label="Cerrar">✕</button>
+          <% if (perfil.fotos.length > 1) { %>
+          <button class="qlb-arrow left" onclick="qlbPrev()" aria-label="Anterior">‹</button>
+          <button class="qlb-arrow right" onclick="qlbNext()" aria-label="Siguiente">›</button>
+          <% } %>
+          <div class="qlb-img-wrap" id="qlb-img-wrap">
+            <img id="qlb-img" class="qlb-img" src="" alt="" crossorigin="anonymous">
+          </div>
+          <div class="qlb-counter" id="qlb-counter"></div>
+          <% if (perfil.fotos.length > 1) { %>
+          <div class="qlb-dots" id="qlb-dots">
+            <% perfil.fotos.forEach((_, i) => { %>
+              <div class="qlb-dot <%= i===0?'active':'' %>" onclick="qlbGo(<%= i %>)"></div>
+            <% }) %>
+          </div>
+          <% } %>
+        </div>
         <% } %>
 
         <!-- Vídeo de presentación (solo Destacada) -->
@@ -284,6 +321,163 @@
       });
     }
   </script>
+
+  <!-- ── LIGHTBOX + PIXELACIÓN DE CARA ────────────────── -->
+  <% if (perfil.fotos && perfil.fotos.length > 0) { %>
+  <% if (perfil.pixelar_cara) { %>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <% } %>
+  <script>
+    const FOTOS_LB = <%- JSON.stringify(perfil.fotos) %>;
+    const PIXELAR  = <%= perfil.pixelar_cara ? 'true' : 'false' %>;
+    let qlbIdx = 0;
+    let touchStartX = 0;
+    const faceCache = {}; // url → [{x,y,w,h}] relativo (0-1)
+
+    // ── Lightbox ──────────────────────────────────────────
+    function qlbOpen(i) {
+      qlbIdx = i;
+      document.getElementById('qlb').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      qlbShow(i);
+    }
+    function qlbClose() {
+      document.getElementById('qlb').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function qlbNext() { qlbIdx = (qlbIdx + 1) % FOTOS_LB.length; qlbShow(qlbIdx); }
+    function qlbPrev() { qlbIdx = (qlbIdx - 1 + FOTOS_LB.length) % FOTOS_LB.length; qlbShow(qlbIdx); }
+    function qlbGo(i)  { qlbIdx = i; qlbShow(i); }
+
+    function qlbShow(i) {
+      const img = document.getElementById('qlb-img');
+      img.classList.remove('visible');
+
+      // Quitar canvas anterior de pixelado
+      const wrap = document.getElementById('qlb-img-wrap');
+      wrap.querySelectorAll('canvas').forEach(c => c.remove());
+
+      img.onload = () => {
+        img.classList.add('visible');
+        if (PIXELAR) applyPixelCanvas(wrap, img);
+      };
+      img.src = FOTOS_LB[i];
+      if (img.complete && img.naturalWidth) { img.classList.add('visible'); if (PIXELAR) applyPixelCanvas(wrap, img); }
+
+      // Contador
+      const ctr = document.getElementById('qlb-counter');
+      if (ctr) ctr.textContent = `${i + 1} / ${FOTOS_LB.length}`;
+
+      // Dots
+      document.querySelectorAll('.qlb-dot').forEach((d, j) => d.classList.toggle('active', j === i));
+    }
+
+    // ── Teclado y swipe ───────────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('qlb').classList.contains('open')) return;
+      if (e.key === 'Escape')      qlbClose();
+      if (e.key === 'ArrowRight')  qlbNext();
+      if (e.key === 'ArrowLeft')   qlbPrev();
+    });
+    document.getElementById('qlb').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    document.getElementById('qlb').addEventListener('touchend',   e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) dx < 0 ? qlbNext() : qlbPrev();
+    });
+
+    // ── Pixelación de cara con face-api.js ───────────────
+    <% if (perfil.pixelar_cara) { %>
+    async function getFaces(imgEl) {
+      const url = imgEl.src;
+      if (faceCache[url] !== undefined) return faceCache[url];
+      try {
+        const dets = await faceapi.detectAllFaces(
+          imgEl,
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 })
+        );
+        faceCache[url] = dets.map(d => ({
+          x: d.box.x / imgEl.naturalWidth,
+          y: d.box.y / imgEl.naturalHeight,
+          w: d.box.width  / imgEl.naturalWidth,
+          h: d.box.height / imgEl.naturalHeight
+        }));
+      } catch(_) { faceCache[url] = []; }
+      return faceCache[url];
+    }
+
+    function drawPixel(canvas, imgEl, faces) {
+      canvas.width  = imgEl.offsetWidth  || imgEl.naturalWidth;
+      canvas.height = imgEl.offsetHeight || imgEl.naturalHeight;
+      if (!canvas.width || !canvas.height || !faces.length) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      faces.forEach(f => {
+        const pad = 0.25;
+        const x  = (f.x - f.w * pad) * canvas.width;
+        const y  = (f.y - f.h * pad) * canvas.height;
+        const w  = f.w * (1 + pad * 2) * canvas.width;
+        const h  = f.h * (1 + pad * 2) * canvas.height;
+        const px = Math.max(0, x), py = Math.max(0, y);
+        const pw = Math.min(canvas.width  - px, w);
+        const ph = Math.min(canvas.height - py, h);
+
+        // Coordenadas en imagen natural
+        const sx = (px / canvas.width)  * imgEl.naturalWidth;
+        const sy = (py / canvas.height) * imgEl.naturalHeight;
+        const sw = (pw / canvas.width)  * imgEl.naturalWidth;
+        const sh = (ph / canvas.height) * imgEl.naturalHeight;
+
+        // Pixelar: reducir a bloque pequeño y escalar sin suavizado
+        const PSIZE = 14;
+        const tmp = document.createElement('canvas');
+        tmp.width  = Math.max(1, Math.round(pw / PSIZE));
+        tmp.height = Math.max(1, Math.round(ph / PSIZE));
+        const tc = tmp.getContext('2d');
+        tc.imageSmoothingEnabled = false;
+        tc.drawImage(imgEl, sx, sy, sw, sh, 0, 0, tmp.width, tmp.height);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(tmp, 0, 0, tmp.width, tmp.height, px, py, pw, ph);
+      });
+    }
+
+    function applyPixelCanvas(container, imgEl) {
+      let canvas = container.querySelector('canvas.face-pixel');
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.className = 'face-pixel';
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;border-radius:inherit;';
+        container.appendChild(canvas);
+      }
+      getFaces(imgEl).then(faces => drawPixel(canvas, imgEl, faces));
+    }
+
+    // Inicializar face-api y aplicar a galería
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector').then(() => {
+      // Foto principal
+      const mainWrap = document.getElementById('gallery-main-wrap');
+      const mainImg  = document.getElementById('main-photo');
+      if (mainWrap && mainImg) {
+        if (mainImg.complete && mainImg.naturalWidth) applyPixelCanvas(mainWrap, mainImg);
+        else mainImg.addEventListener('load', () => applyPixelCanvas(mainWrap, mainImg));
+        new ResizeObserver(() => getFaces(mainImg).then(f => {
+          const c = mainWrap.querySelector('canvas.face-pixel');
+          if (c) drawPixel(c, mainImg, f);
+        })).observe(mainWrap);
+      }
+
+      // Miniaturas
+      document.querySelectorAll('.photo-thumb').forEach(img => {
+        const wrap = img.parentElement;
+        if (img.complete && img.naturalWidth) applyPixelCanvas(wrap, img);
+        else img.addEventListener('load', () => applyPixelCanvas(wrap, img));
+      });
+    });
+    <% } else { %>
+    function applyPixelCanvas() {}  // no-op si pixelar desactivado
+    <% } %>
+  </script>
+  <% } %>
 </body>
 </html>
 
