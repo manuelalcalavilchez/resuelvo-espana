@@ -1345,8 +1345,13 @@ tbody td { padding: 14px 16px; vertical-align: middle; }
   overflow: hidden;
   border-radius: var(--radius-md);
   margin-bottom: 12px;
-  cursor: zoom-in;
+  cursor: pointer;
 }
+.photo-main-wrap:hover .gallery-hover-hint { opacity: 1 !important; }
+.photo-main-wrap:hover .photo-main { transform: scale(1.02); }
+.photo-main { transition: transform 0.4s ease; }
+
+.thumb-item:hover img { transform: scale(1.08); }
 
 /* ─── UTILITIES ──────────────────────────────────────────── */
 .mt-1 { margin-top: 8px; }

@@ -1063,6 +1063,19 @@ app.post('/admin/perfil/:id/video', requireAuth, upload.single('video'), async (
   res.redirect(`/admin/perfil/${req.params.id}/editar`);
 });
 
+// Poner foto como portada (moverla al índice 0)
+app.post('/admin/perfil/:id/foto-portada', requireAuth, (req, res) => {
+  const { foto } = req.body;
+  const perfiles = getPerfiles();
+  const p = perfiles.find(p => p.id === req.params.id);
+  if (p && checkOwnership(p, req.session.user)) {
+    const fotos = (p.fotos || []).filter(f => f !== foto);
+    p.fotos = [foto, ...fotos];
+    savePerfiles(perfiles);
+  }
+  res.redirect(`/admin/perfil/${req.params.id}/editar`);
+});
+
 app.post('/admin/perfil/:id/foto-eliminar', requireAuth, (req, res) => {
   const { foto } = req.body;
   const perfiles = getPerfiles();

@@ -28,39 +28,53 @@
             const fotosPublicas = perfil.fotos;
             const pixelar = perfil.pixelar_cara === true;
           %>
-          <!-- Foto principal (click abre lightbox) -->
-          <div class="photo-main-wrap" id="gallery-main-wrap" onclick="qlbOpen(0)">
-            <img id="main-photo" class="photo-main" style="margin-bottom:0;cursor:zoom-in;" src="<%= fotosPublicas[0] %>" alt="<%= perfil.nombre %>" crossorigin="anonymous">
-            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:2;">
+          <!-- Foto portada → clic abre lightbox -->
+          <div class="photo-main-wrap" id="gallery-main-wrap" onclick="qlbOpen(0)" title="Ver fotos">
+            <img id="main-photo" class="photo-main" style="margin-bottom:0;" src="<%= fotosPublicas[0] %>" alt="<%= perfil.nombre %>" crossorigin="anonymous">
+
+            <!-- Badges info -->
+            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:3;">
               <% if (perfil.nacionalidad) { %>
-              <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+              <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 <img src="https://flagcdn.com/<%= perfil.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;">
               </span>
               <% } %>
               <% if (perfil.edad) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 <%= perfil.edad %> años
               </span>
               <% } %>
               <% if (perfil.zona) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 📍 <%= perfil.zona %><span id="dist-photo" style="margin-left:4px;color:#d4af37;"></span>
               </span>
               <% } %>
-              <% if (fotosPublicas.length > 1) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
-                🖼 1 / <%= fotosPublicas.length %>
-              </span>
-              <% } %>
             </div>
+
+            <!-- Indicador de fotos (esquina superior derecha) -->
+            <% if (fotosPublicas.length > 1) { %>
+            <div style="position:absolute;top:10px;right:10px;z-index:3;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.72);padding:5px 11px;border-radius:20px;backdrop-filter:blur(4px);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              <span style="font-size:0.72rem;color:#f9e27e;font-weight:600;"><%= fotosPublicas.length %> fotos</span>
+            </div>
+            <% } %>
+
+            <!-- Hint "toca para ver" solo con >1 foto -->
+            <% if (fotosPublicas.length > 1) { %>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;z-index:2;" class="gallery-hover-hint">
+              <div style="background:rgba(0,0,0,0.55);padding:10px 18px;border-radius:30px;border:1px solid rgba(212,175,55,0.5);color:#f9e27e;font-size:0.78rem;letter-spacing:1px;backdrop-filter:blur(6px);">
+                Ver todas las fotos
+              </div>
+            </div>
+            <% } %>
           </div>
 
-          <!-- Miniaturas (solo destacada con >1 foto) -->
-          <% if (perfil.plan === 'destacada' && fotosPublicas.length > 1) { %>
-          <div class="photo-thumbs">
+          <!-- Tira de miniaturas (todas las fotos, todos los planes) -->
+          <% if (fotosPublicas.length > 1) { %>
+          <div class="photo-thumbs" style="margin-top:10px;">
             <% fotosPublicas.forEach((foto, i) => { %>
-              <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);cursor:zoom-in;" onclick="qlbOpen(<%= i %>)">
-                <img class="photo-thumb <%= i===0?'active':'' %>" src="<%= foto %>" data-idx="<%= i %>" alt="Foto <%= i+1 %>" style="margin:0;" crossorigin="anonymous">
+              <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);cursor:pointer;border:2px solid <%= i===0 ? '#d4af37' : 'rgba(212,175,55,0.15)' %>;" onclick="qlbOpen(<%= i %>)" class="thumb-item">
+                <img class="photo-thumb" src="<%= foto %>" data-idx="<%= i %>" alt="Foto <%= i+1 %>" style="margin:0;width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:transform 0.25s;" crossorigin="anonymous">
               </div>
             <% }) %>
           </div>
