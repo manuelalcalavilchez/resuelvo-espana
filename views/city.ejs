@@ -92,47 +92,36 @@
       </div>
       <div class="profiles-grid highlighted">
         <% destacadas.forEach(p=> { %>
-          <div class="dest-card" data-id="<%= p.id %>" data-fotos="<%- JSON.stringify(p.fotos) %>">
-
-            <!-- Imagen con filo dorado -->
-            <div class="dest-img-wrap">
-              <span class="card-plan-badge destacada"></span>
-              <div class="availability-dot <%= p.disponibilidad %>"></div>
-              <% if (p.fotos.length > 0) { %>
-                <img class="card-image dest-main-img" src="<%= p.fotos[0] %>" alt="<%= p.nombre %>" loading="lazy">
+          <a href="/perfil/<%= p.id %>" class="profile-card highlighted-card">
+            <span class="card-plan-badge destacada"></span>
+            <div class="availability-dot <%= p.disponibilidad %>"></div>
+            <% if (p.fotos.length> 0) { %>
+              <% p.fotos.forEach(function(foto, fi) { %>
+                <img class="card-image card-slide" data-slide-group="<%= p.id %>" src="<%= foto %>" alt="<%= p.nombre %>" loading="lazy" style="<%= fi > 0 ? 'opacity:0;' : 'opacity:1;' %>position:<%= fi > 0 ? 'absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;' : 'relative;' %>transition:opacity 1s ease;">
+              <% }) %>
               <% } else { %>
-                <div class="card-image-placeholder"><%= p.nombre.charAt(0).toUpperCase() %></div>
-              <% } %>
-
-              <!-- Flechas solo si hay >1 foto -->
-              <% if (p.fotos.length > 1) { %>
-              <button class="dest-arrow dest-prev" onclick="destNav(event,this,-1)" aria-label="Anterior">&#8249;</button>
-              <button class="dest-arrow dest-next" onclick="destNav(event,this,+1)" aria-label="Siguiente">&#8250;</button>
-              <div class="dest-dots">
-                <% p.fotos.forEach((_, fi) => { %>
-                <span class="dest-dot <%= fi===0?'active':'' %>"></span>
-                <% }) %>
-              </div>
-              <% } %>
-
-              <!-- Botón ampliar -->
-              <button class="dest-expand" onclick="destExpand(event,this)" aria-label="Ampliar">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-              </button>
-            </div>
-
-            <!-- Info debajo de la imagen (fuera de la foto) -->
-            <a href="/perfil/<%= p.id %>" class="dest-info">
-              <div class="dest-name">
-                <% if (p.nacionalidad) { %><img src="https://flagcdn.com/<%= p.nacionalidad %>.svg" alt="" style="width:16px;height:11px;border-radius:2px;vertical-align:middle;margin-right:4px;"><% } %>
-                <%= p.nombre %>
-              </div>
-              <div class="dest-meta">
-                <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %>
-                <% if (p.distancia !== undefined) { %> · <span style="color:#d4af37;">~<%= p.distancia %> km</span><% } %>
-              </div>
-            </a>
-          </div>
+                <div class="card-image-placeholder">
+                  <%= p.nombre.charAt(0).toUpperCase() %>
+                </div>
+                <% } %>
+                  <div class="card-overlay">
+                    <div class="card-name">
+                      <% if (p.nacionalidad) { %><img src="https://flagcdn.com/<%= p.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;vertical-align:middle;margin-right:4px;"><% } %>
+                      <%= p.nombre %>
+                    </div>
+                    <div class="card-meta">
+                      <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %><%= (p.edad || p.zona) && (p.idiomas && p.idiomas !== 'Español') ? ' · ' + p.idiomas : '' %>
+                    </div>
+                    <% if (p.descripcion) { %>
+                      <div class="card-description">
+                        <%= p.descripcion.length > 800 ? p.descripcion.slice(0, 800).trim() + '…' : p.descripcion %>
+                      </div>
+                      <% } %>
+                    <% if (p.distancia !==undefined) { %>
+                      <div class="badge" style="margin-top:6px;">A <%= p.distancia %> km</div>
+                      <% } %>
+                  </div>
+          </a>
           <% }) %>
       </div>
       <% } %>
@@ -164,6 +153,11 @@
                         <div class="card-meta">
                           <%= p.edad ? p.edad + ' años' : '' %><%= p.edad && p.zona ? ' · ' : '' %><%= p.zona || '' %>
                         </div>
+                        <% if (p.descripcion) { %>
+                          <div class="card-description basic">
+                            <%= p.descripcion.length > 250 ? p.descripcion.slice(0, 250).trim() + '…' : p.descripcion %>
+                          </div>
+                          <% } %>
                         <% if (p.distancia !==undefined) { %>
                           <div class="badge" style="margin-top:6px;">A <%= p.distancia %> km</div>
                           <% } %>
@@ -228,69 +222,24 @@
     const closeBtn = document.getElementById("banner-close");
     if (banner && closeBtn) closeBtn.addEventListener("click", () => banner.style.display = "none");
 
-    // ── Tarjetas destacadas: flechas + ampliar ────────────
+    // Rotación elegante de fotos en tarjetas destacadas
     (function() {
-      // Navegar entre fotos con flechas
-      window.destNav = function(e, btn, dir) {
-        e.preventDefault(); e.stopPropagation();
-        const card  = btn.closest('.dest-card');
-        const fotos = JSON.parse(card.dataset.fotos || '[]');
-        if (fotos.length < 2) return;
-        const img   = card.querySelector('.dest-main-img');
-        const dots  = card.querySelectorAll('.dest-dot');
-        let idx = parseInt(card.dataset.idx || '0') + dir;
-        idx = ((idx % fotos.length) + fotos.length) % fotos.length;
-        card.dataset.idx = idx;
-        img.style.opacity = '0';
-        img.style.transition = 'opacity 0.25s';
-        setTimeout(() => { img.src = fotos[idx]; img.style.opacity = '1'; }, 150);
-        dots.forEach((d, j) => d.classList.toggle('active', j === idx));
-      };
-
-      // Ampliar foto actual en lightbox
-      window.destExpand = function(e, btn) {
-        e.preventDefault(); e.stopPropagation();
-        const card  = btn.closest('.dest-card');
-        const fotos = JSON.parse(card.dataset.fotos || '[]');
-        const idx   = parseInt(card.dataset.idx || '0');
-        const id    = card.dataset.id;
-        if (!fotos.length) return;
-        // Abrir lightbox inline
-        let lb = document.getElementById('dest-lb');
-        if (!lb) {
-          lb = document.createElement('div');
-          lb.id = 'dest-lb';
-          lb.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.97);display:flex;align-items:center;justify-content:center;flex-direction:column;';
-          lb.innerHTML = `
-            <button onclick="this.closest('#dest-lb').remove();document.body.style.overflow=''"
-              style="position:fixed;top:14px;right:18px;background:none;border:none;color:#aaa;font-size:2.2rem;cursor:pointer;z-index:10001;">✕</button>
-            <button id="dest-lb-prev" style="position:fixed;top:50%;left:14px;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(212,175,55,0.4);color:#f9e27e;font-size:2rem;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#8249;</button>
-            <button id="dest-lb-next" style="position:fixed;top:50%;right:14px;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(212,175,55,0.4);color:#f9e27e;font-size:2rem;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#8250;</button>
-            <img id="dest-lb-img" style="max-width:92vw;max-height:85vh;object-fit:contain;border-radius:10px;opacity:0;transition:opacity 0.3s;">
-            <div id="dest-lb-ctr" style="margin-top:12px;font-size:0.72rem;color:rgba(212,175,55,0.7);letter-spacing:2px;"></div>`;
-          document.body.appendChild(lb);
-          lb.addEventListener('click', e => { if (e.target === lb) { lb.remove(); document.body.style.overflow=''; }});
-          document.addEventListener('keydown', function esc(e) {
-            if (e.key==='Escape'){ lb.remove(); document.body.style.overflow=''; document.removeEventListener('keydown',esc); }
-            if (e.key==='ArrowRight') lbNav(1);
-            if (e.key==='ArrowLeft')  lbNav(-1);
-          });
-        }
-        document.body.style.overflow = 'hidden';
-        let lbIdx = idx;
-        const lbImg = lb.querySelector('#dest-lb-img');
-        const lbCtr = lb.querySelector('#dest-lb-ctr');
-        function lbShow(i) {
-          lbIdx = ((i%fotos.length)+fotos.length)%fotos.length;
-          lbImg.style.opacity='0';
-          setTimeout(()=>{ lbImg.src=fotos[lbIdx]; lbImg.onload=()=>lbImg.style.opacity='1'; if(lbImg.complete)lbImg.style.opacity='1'; },120);
-          lbCtr.textContent=`${lbIdx+1} / ${fotos.length}`;
-        }
-        function lbNav(d){ lbShow(lbIdx+d); }
-        lb.querySelector('#dest-lb-prev').onclick = e=>{ e.stopPropagation(); lbNav(-1); };
-        lb.querySelector('#dest-lb-next').onclick = e=>{ e.stopPropagation(); lbNav(1); };
-        lbShow(idx);
-      };
+      var groups = {};
+      document.querySelectorAll('.card-slide').forEach(function(img) {
+        var gid = img.dataset.slideGroup;
+        if (!groups[gid]) groups[gid] = [];
+        groups[gid].push(img);
+      });
+      Object.keys(groups).forEach(function(gid) {
+        var imgs = groups[gid];
+        if (imgs.length < 2) return;
+        var current = 0;
+        setInterval(function() {
+          imgs[current].style.opacity = '0';
+          current = (current + 1) % imgs.length;
+          imgs[current].style.opacity = '1';
+        }, 3500 + Math.random() * 1500);
+      });
     })();
   </script>
 </body>

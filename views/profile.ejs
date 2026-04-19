@@ -21,88 +21,40 @@
   <div class="container" style="padding-top:100px;padding-bottom:60px;">
     <div class="profile-detail-grid">
 
-      <!-- ── GALERÍA DE FOTOS ──────────────────────────── -->
+      <!-- Photo Gallery -->
       <div class="photo-gallery" style="position:relative;">
         <% if (perfil.fotos.length > 0) { %>
-          <% const pixelar = perfil.pixelar_cara === true; %>
-
-          <!-- Foto principal con flechas de navegación inline -->
-          <div class="photo-main-wrap" id="gallery-wrap">
-            <!-- Imagen principal -->
-            <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>"
-              alt="<%= perfil.nombre %>" crossorigin="anonymous"
-              onclick="qlbOpen()"
-              style="margin-bottom:0;cursor:zoom-in;">
-
-            <!-- Flechas inline (solo si hay >1 foto) -->
-            <% if (perfil.fotos.length > 1) { %>
-            <button class="gal-arrow gal-prev" onclick="galNav(-1)" aria-label="Foto anterior">&#8249;</button>
-            <button class="gal-arrow gal-next" onclick="galNav(+1)" aria-label="Foto siguiente">&#8250;</button>
-            <% } %>
-
-            <!-- Contador -->
-            <% if (perfil.fotos.length > 1) { %>
-            <div class="gal-counter" id="gal-counter">1 / <%= perfil.fotos.length %></div>
-            <% } %>
-
-            <!-- Badges info -->
-            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:4;">
+          <div style="position:relative;">
+            <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>" alt="<%= perfil.nombre %>">
+            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:2;">
               <% if (perfil.nacionalidad) { %>
-              <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+              <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 <img src="https://flagcdn.com/<%= perfil.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;">
               </span>
               <% } %>
               <% if (perfil.edad) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 <%= perfil.edad %> años
               </span>
               <% } %>
               <% if (perfil.zona) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
+              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 📍 <%= perfil.zona %><span id="dist-photo" style="margin-left:4px;color:#d4af37;"></span>
               </span>
               <% } %>
             </div>
           </div>
-
-          <!-- Tira de miniaturas -->
           <% if (perfil.fotos.length > 1) { %>
-          <div class="photo-thumbs" id="thumb-strip" style="margin-top:10px;">
+          <div class="photo-thumbs">
             <% perfil.fotos.forEach((foto, i) => { %>
-            <div class="thumb-item <%= i===0?'thumb-active':'' %>" onclick="galGo(<%= i %>)">
-              <img src="<%= foto %>" alt="Foto <%= i+1 %>" crossorigin="anonymous"
-                style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">
-            </div>
+              <img class="photo-thumb <%= i===0?'active':'' %>" src="<%= foto %>" data-full="<%= foto %>" alt="Foto <%= i+1 %>">
             <% }) %>
           </div>
           <% } %>
-
         <% } else { %>
           <div class="card-image-placeholder" style="border-radius:14px;border:1px solid rgba(212,175,55,0.3);font-size:4rem;color:var(--gold-3);aspect-ratio:3/4;">
             <%= perfil.nombre.charAt(0).toUpperCase() %>
           </div>
-        <% } %>
-
-        <!-- ── LIGHTBOX FULLSCREEN ──────────────────────── -->
-        <% if (perfil.fotos.length > 0) { %>
-        <div id="qlb" class="qlb-overlay" onclick="if(event.target===this)qlbClose()">
-          <button class="qlb-close" onclick="qlbClose()">✕</button>
-          <% if (perfil.fotos.length > 1) { %>
-          <button class="qlb-arrow left"  onclick="qlbPrev()">&#8249;</button>
-          <button class="qlb-arrow right" onclick="qlbNext()">&#8250;</button>
-          <% } %>
-          <div class="qlb-img-wrap" id="qlb-img-wrap">
-            <img id="qlb-img" class="qlb-img" src="" alt="" crossorigin="anonymous">
-          </div>
-          <div class="qlb-counter" id="qlb-counter"></div>
-          <% if (perfil.fotos.length > 1) { %>
-          <div class="qlb-dots" id="qlb-dots">
-            <% perfil.fotos.forEach((_, i) => { %>
-              <div class="qlb-dot" onclick="qlbGo(<%= i %>)"></div>
-            <% }) %>
-          </div>
-          <% } %>
-        </div>
         <% } %>
 
         <!-- Vídeo de presentación (solo Destacada) -->
@@ -332,212 +284,6 @@
       });
     }
   </script>
-
-  <!-- ── GALERÍA + PIXELADO DE CARA ──────────────────── -->
-  <% if (perfil.fotos && perfil.fotos.length > 0) { %>
-  <% if (perfil.pixelar_cara) { %>
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-  <% } %>
-  <script>
-  (function() {
-    const FOTOS   = <%- JSON.stringify(perfil.fotos) %>;
-    const PIXELAR = <%= perfil.pixelar_cara ? 'true' : 'false' %>;
-    let galIdx = 0;       // índice foto activa en galería inline
-    let qlbIdx = 0;       // índice foto activa en lightbox
-    let touchX0 = 0;
-    const faceCache = {};
-    let faceApiReady = false;
-
-    // ── Galería inline ─────────────────────────────────
-    const mainImg   = document.getElementById('main-photo');
-    const galCount  = document.getElementById('gal-counter');
-    const thumbs    = document.querySelectorAll('#thumb-strip .thumb-item');
-
-    function galShow(i) {
-      galIdx = ((i % FOTOS.length) + FOTOS.length) % FOTOS.length;
-      // Fade suave
-      mainImg.style.opacity = '0';
-      mainImg.style.transition = 'opacity 0.28s ease';
-      setTimeout(() => {
-        mainImg.src = FOTOS[galIdx];
-        mainImg.onload = () => { mainImg.style.opacity = '1'; blurMain(); };
-        if (mainImg.complete) { mainImg.style.opacity = '1'; blurMain(); }
-      }, 140);
-      if (galCount) galCount.textContent = `${galIdx + 1} / ${FOTOS.length}`;
-      thumbs.forEach((t, j) => t.classList.toggle('thumb-active', j === galIdx));
-    }
-
-    window.galNav = (dir) => { galShow(galIdx + dir); };
-    window.galGo  = (i)   => { galShow(i); };
-
-    // Swipe táctil en foto principal
-    if (mainImg) {
-      mainImg.addEventListener('touchstart', e => { touchX0 = e.touches[0].clientX; }, { passive: true });
-      mainImg.addEventListener('touchend',   e => {
-        const dx = e.changedTouches[0].clientX - touchX0;
-        if (Math.abs(dx) > 40) galNav(dx < 0 ? 1 : -1);
-      });
-    }
-
-    // ── Lightbox fullscreen ────────────────────────────
-    const qlbEl = document.getElementById('qlb');
-
-    window.qlbOpen = function(i) {
-      qlbIdx = i != null ? i : galIdx;
-      qlbEl.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      qlbRender(qlbIdx);
-    };
-    window.qlbClose = function() {
-      qlbEl.classList.remove('open');
-      document.body.style.overflow = '';
-    };
-    window.qlbNext  = function() { qlbIdx = (qlbIdx + 1) % FOTOS.length; qlbRender(qlbIdx); };
-    window.qlbPrev  = function() { qlbIdx = (qlbIdx - 1 + FOTOS.length) % FOTOS.length; qlbRender(qlbIdx); };
-    window.qlbGo    = function(i) { qlbIdx = i; qlbRender(i); };
-
-    function qlbRender(i) {
-      const img  = document.getElementById('qlb-img');
-      const wrap = document.getElementById('qlb-img-wrap');
-      img.classList.remove('visible');
-      wrap.querySelectorAll('canvas.face-blur').forEach(c => c.remove());
-
-      function onReady() {
-        img.classList.add('visible');
-        if (PIXELAR) blurImg(wrap, img);
-      }
-      img.onload = onReady;
-      img.src = FOTOS[i];
-      if (img.complete && img.naturalWidth) onReady();
-
-      const ctr = document.getElementById('qlb-counter');
-      if (ctr) ctr.textContent = `${i + 1} / ${FOTOS.length}`;
-      document.querySelectorAll('.qlb-dot').forEach((d, j) => d.classList.toggle('active', j === i));
-    }
-
-    // Teclado
-    document.addEventListener('keydown', e => {
-      if (!qlbEl.classList.contains('open')) return;
-      if (e.key === 'Escape')     qlbClose();
-      if (e.key === 'ArrowRight') qlbNext();
-      if (e.key === 'ArrowLeft')  qlbPrev();
-    });
-    // Swipe en lightbox
-    qlbEl.addEventListener('touchstart', e => { touchX0 = e.touches[0].clientX; }, { passive: true });
-    qlbEl.addEventListener('touchend',   e => {
-      const dx = e.changedTouches[0].clientX - touchX0;
-      if (Math.abs(dx) > 50) dx < 0 ? qlbNext() : qlbPrev();
-    });
-
-    // ── Blur gaussiano de cara ──────────────────────────
-    <% if (perfil.pixelar_cara) { %>
-    // Fallback inmediato: CSS blur en foto principal mientras carga modelo
-    if (mainImg) mainImg.style.filter = 'blur(0px)'; // listo, se gestiona con canvas
-
-    async function detectFaces(imgEl) {
-      if (!faceApiReady) return null; // null = modelo no listo aún
-      const url = imgEl.src;
-      if (faceCache[url] !== undefined) return faceCache[url];
-      try {
-        const dets = await faceapi.detectAllFaces(
-          imgEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.4 })
-        );
-        faceCache[url] = dets.map(d => ({
-          cx: (d.box.x + d.box.width  / 2) / imgEl.naturalWidth,
-          cy: (d.box.y + d.box.height / 2) / imgEl.naturalHeight,
-          rx: (d.box.width  * 0.65) / imgEl.naturalWidth,
-          ry: (d.box.height * 0.75) / imgEl.naturalHeight
-        }));
-      } catch(_) { faceCache[url] = []; }
-      return faceCache[url];
-    }
-
-    function drawBlur(canvas, imgEl, faces) {
-      const W = imgEl.offsetWidth  || imgEl.naturalWidth;
-      const H = imgEl.offsetHeight || imgEl.naturalHeight;
-      if (!W || !H) return;
-      canvas.width  = W;
-      canvas.height = H;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, H);
-
-      const list = (faces && faces.length) ? faces : [
-        // fallback: cara típica en retrato (centro superior)
-        { cx: 0.5, cy: 0.2, rx: 0.28, ry: 0.18 }
-      ];
-
-      list.forEach(f => {
-        const cx = f.cx * W, cy = f.cy * H;
-        const rx = f.rx * W, ry = f.ry * H;
-        // fuente: región de la cara en la imagen natural
-        const sx = Math.max(0, (cx - rx) / W * imgEl.naturalWidth);
-        const sy = Math.max(0, (cy - ry) / H * imgEl.naturalHeight);
-        const sw = Math.min(imgEl.naturalWidth  - sx, (2 * rx) / W * imgEl.naturalWidth);
-        const sh = Math.min(imgEl.naturalHeight - sy, (2 * ry) / H * imgEl.naturalHeight);
-
-        // Clip a elipse suave
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, rx + 6, ry + 6, 0, 0, Math.PI * 2);
-        ctx.clip();
-
-        // Blur gaussiano por capas para efecto suave y opaco
-        for (let strength = 6; strength <= 22; strength += 8) {
-          ctx.filter = `blur(${strength}px)`;
-          ctx.drawImage(imgEl, sx, sy, sw, sh, cx - rx - 6, cy - ry - 6, (rx + 6) * 2, (ry + 6) * 2);
-        }
-        ctx.restore();
-      });
-    }
-
-    function blurImg(container, imgEl) {
-      if (!imgEl.complete || !imgEl.naturalWidth) return;
-      let canvas = container.querySelector('canvas.face-blur');
-      if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.className = 'face-blur';
-        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;border-radius:inherit;opacity:0;transition:opacity 0.5s ease;';
-        container.appendChild(canvas);
-      }
-      const faces = faceCache[imgEl.src];
-      drawBlur(canvas, imgEl, faces || null);
-      requestAnimationFrame(() => { canvas.style.opacity = '1'; });
-
-      // Refinar si el modelo ya detectó caras
-      if (faceApiReady && faces === undefined) {
-        detectFaces(imgEl).then(f => { if (f) { drawBlur(canvas, imgEl, f); } });
-      }
-    }
-
-    function blurMain() {
-      if (!PIXELAR) return;
-      const wrap = document.getElementById('gallery-wrap');
-      blurImg(wrap, mainImg);
-    }
-
-    // Cargar modelo y aplicar a todas las fotos visibles
-    faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector').then(() => {
-      faceApiReady = true;
-      // Foto principal
-      blurMain();
-      // Lightbox si está abierto
-      if (qlbEl.classList.contains('open')) {
-        const li = document.getElementById('qlb-img');
-        blurImg(document.getElementById('qlb-img-wrap'), li);
-      }
-    });
-
-    // Aplicar fallback inmediato al cargar la página
-    if (mainImg.complete && mainImg.naturalWidth) blurMain();
-    else mainImg.addEventListener('load', blurMain);
-
-    <% } else { %>
-    function blurMain() {}
-    function blurImg() {}
-    <% } %>
-  })();
-  </script>
-  <% } %>
 </body>
 </html>
 

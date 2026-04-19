@@ -273,19 +273,6 @@
                       <input type="number" name="orden_manual" class="admin-form-input"
                         value="<%= perfil?.orden_manual || 99 %>" min="1" max="999">
                     </div>
-
-                    <!-- Pixelar cara (solo Destacada) -->
-                    <div class="admin-form-group" id="pixelar-cara-group" style="<%= (perfil?.plan || 'basica') !== 'destacada' ? 'display:none;' : '' %>">
-                      <label class="admin-form-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-                        <input type="checkbox" name="pixelar_cara" id="pixelar_cara_check"
-                          <%= perfil?.pixelar_cara ? 'checked' : '' %>
-                          style="width:16px;height:16px;accent-color:#d4af37;cursor:pointer;">
-                        🫥 Pixelar cara en fotos
-                      </label>
-                      <p style="font-size:0.7rem;color:#888;margin-top:5px;line-height:1.5;">
-                        Detecta y pixela la cara automáticamente en todas las fotos del perfil. Exclusivo plan Destacada.
-                      </p>
-                    </div>
               </div>
 
               <div class="admin-form-card" style="margin-bottom:16px;">
@@ -393,45 +380,23 @@
               </strong>
             </p>
 
-            <% if (perfil.fotos.length > 0) { %>
-              <p style="font-size:0.7rem;color:#888;margin-bottom:12px;">
-                La foto con <strong style="color:#d4af37;">⭐ Portada</strong> es la que se muestra primero en la ficha. Haz clic en "Poner portada" para cambiarla.
-              </p>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:20px;">
-                <% perfil.fotos.forEach((foto, idx) => { %>
-                  <div style="position:relative;border-radius:8px;overflow:hidden;border:2px solid <%= idx===0 ? '#d4af37' : 'rgba(212,175,55,0.2)' %>;">
+            <% if (perfil.fotos.length> 0) { %>
+              <div
+                style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:20px;">
+                <% perfil.fotos.forEach(foto=> { %>
+                  <div
+                    style="position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(212,175,55,0.2);">
                     <img src="<%= foto %>" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block;">
-
-                    <!-- Badge portada -->
-                    <% if (idx === 0) { %>
-                      <div style="position:absolute;top:5px;left:5px;background:#d4af37;color:#000;font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.5px;">
-                        ⭐ PORTADA
-                      </div>
-                    <% } %>
-
-                    <!-- Botón eliminar -->
                     <form action="/admin/perfil/<%= perfil.id %>/foto-eliminar" method="POST"
                       style="position:absolute;top:4px;right:4px;">
                       <input type="hidden" name="foto" value="<%= foto %>">
                       <button type="submit" class="btn btn-danger btn-sm"
                         style="padding:3px 8px;font-size:0.65rem;">✕</button>
                     </form>
-
-                    <!-- Botón poner portada (solo si no es ya la portada) -->
-                    <% if (idx !== 0) { %>
-                      <form action="/admin/perfil/<%= perfil.id %>/foto-portada" method="POST"
-                        style="position:absolute;bottom:4px;left:4px;right:4px;">
-                        <input type="hidden" name="foto" value="<%= foto %>">
-                        <button type="submit" class="btn btn-ghost btn-sm"
-                          style="width:100%;padding:3px 4px;font-size:0.6rem;background:rgba(0,0,0,0.75);border-color:rgba(212,175,55,0.6);">
-                          ⭐ Poner portada
-                        </button>
-                      </form>
-                    <% } %>
                   </div>
-                <% }) %>
+                  <% }) %>
               </div>
-            <% } %>
+              <% } %>
 
                 <form action="/admin/perfil/<%= perfil.id %>/fotos" method="POST" enctype="multipart/form-data">
                   <div style="border:2px dashed rgba(212,175,55,0.3);border-radius:8px;padding:24px;text-align:center;">
@@ -471,18 +436,6 @@
         if (c) c.textContent = desc.value.length;
       }
       planSel.addEventListener('change', sync);
-
-      // Mostrar/ocultar toggle "Pixelar cara" según plan
-      var pixelarGroup = document.getElementById('pixelar-cara-group');
-      var pixelarCheck = document.getElementById('pixelar_cara_check');
-      planSel.addEventListener('change', function() {
-        if (planSel.value === 'destacada') {
-          pixelarGroup.style.display = '';
-        } else {
-          pixelarGroup.style.display = 'none';
-          if (pixelarCheck) pixelarCheck.checked = false;
-        }
-      });
     })();
 
     function copyRefLink(id) {
