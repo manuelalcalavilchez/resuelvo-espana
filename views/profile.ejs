@@ -21,62 +21,96 @@
   <div class="container" style="padding-top:100px;padding-bottom:60px;">
     <div class="profile-detail-grid">
 
-      <!-- Photo Gallery -->
+      <!-- Photo Gallery Premium -->
       <div class="photo-gallery" style="position:relative;">
         <% if (perfil.fotos.length > 0) { %>
-          <!-- Foto principal -->
-          <div id="pf-wrap" style="position:relative;overflow:hidden;border-radius:var(--radius-md);"
-               data-fotos="<%- JSON.stringify(perfil.fotos) %>" data-idx="0">
-            <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>"
-                 alt="<%= perfil.nombre %>" style="cursor:zoom-in;margin-bottom:0;"
-                 onclick="pfLbOpen(parseInt(document.getElementById('pf-wrap').dataset.idx||0))">
-            <% if (perfil.fotos.length > 1) { %>
-            <button class="pf-arrow pf-prev" onclick="pfNav(-1)">&#8249;</button>
-            <button class="pf-arrow pf-next" onclick="pfNav(+1)">&#8250;</button>
-            <div class="pf-counter" id="pf-counter">1 / <%= perfil.fotos.length %></div>
-            <% } %>
-            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:4;">
-              <% if (perfil.nacionalidad) { %>
-              <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
-                <img src="https://flagcdn.com/<%= perfil.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;">
-              </span>
-              <% } %>
-              <% if (perfil.edad) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
-                <%= perfil.edad %> años
-              </span>
-              <% } %>
-              <% if (perfil.zona) { %>
-              <span style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
-                📍 <%= perfil.zona %><span id="dist-photo" style="margin-left:4px;color:#d4af37;"></span>
-              </span>
-              <% } %>
-            </div>
-          </div>
 
-          <!-- Miniaturas -->
-          <% if (perfil.fotos.length > 1) { %>
-          <div class="photo-thumbs" style="margin-top:10px;">
-            <% perfil.fotos.forEach((foto, i) => { %>
-              <div class="pf-thumb <%= i===0?'pf-thumb-active':'' %>" onclick="pfGo(<%= i %>)">
-                <img src="<%= foto %>" alt="Foto <%= i+1 %>" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">
+          <!-- Contenedor galería: filmstrip izquierda + foto principal -->
+          <div class="pgallery" id="pf-wrap" data-idx="0">
+
+            <!-- Tira vertical de miniaturas (izquierda) -->
+            <% if (perfil.fotos.length > 1) { %>
+            <div class="pgallery-strip" id="pgStrip">
+              <% perfil.fotos.forEach((foto, i) => { %>
+              <div class="pgallery-strip-item <%= i===0 ? 'active' : '' %>" onclick="pfGo(<%= i %>)" title="Foto <%= i+1 %>">
+                <img src="<%= foto %>" alt="Foto <%= i+1 %>" loading="lazy">
+                <div class="pgallery-strip-num"><%= i+1 %></div>
               </div>
-            <% }) %>
-          </div>
-          <% } %>
-
-          <!-- Lightbox -->
-          <div id="pf-lb" onclick="if(event.target===this)pfLbClose()"
-               style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.97);align-items:center;justify-content:center;flex-direction:column;">
-            <button onclick="pfLbClose()" style="position:fixed;top:14px;right:18px;background:none;border:none;color:#bbb;font-size:2.2rem;cursor:pointer;z-index:10001;line-height:1;">✕</button>
-            <% if (perfil.fotos.length > 1) { %>
-            <button id="pf-lb-prev" style="position:fixed;top:50%;left:14px;transform:translateY(-50%);background:rgba(0,0,0,0.6);border:1px solid rgba(212,175,55,0.45);color:#f9e27e;font-size:2rem;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10001;">&#8249;</button>
-            <button id="pf-lb-next" style="position:fixed;top:50%;right:14px;transform:translateY(-50%);background:rgba(0,0,0,0.6);border:1px solid rgba(212,175,55,0.45);color:#f9e27e;font-size:2rem;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10001;">&#8250;</button>
-            <% } %>
-            <div style="position:relative;display:inline-block;line-height:0;">
-              <img id="pf-lb-img" style="max-width:92vw;max-height:85vh;object-fit:contain;border-radius:10px;display:block;transition:opacity 0.25s;">
+              <% }) %>
             </div>
-            <div id="pf-lb-ctr" style="margin-top:12px;font-size:0.72rem;color:rgba(212,175,55,0.7);letter-spacing:2px;"></div>
+            <% } %>
+
+            <!-- Foto principal -->
+            <div class="pgallery-main">
+              <img id="main-photo" class="pgallery-img" src="<%= perfil.fotos[0] %>"
+                   alt="<%= perfil.nombre %>" onclick="pfLbOpen(parseInt(document.getElementById('pf-wrap').dataset.idx||0))">
+
+              <!-- Flechas de navegación -->
+              <% if (perfil.fotos.length > 1) { %>
+              <button class="pgallery-arrow pgallery-prev" onclick="pfNav(-1)" aria-label="Anterior">&#8249;</button>
+              <button class="pgallery-arrow pgallery-next" onclick="pfNav(+1)" aria-label="Siguiente">&#8250;</button>
+              <% } %>
+
+              <!-- Dots indicadores -->
+              <% if (perfil.fotos.length > 1) { %>
+              <div class="pgallery-dots" id="pgDots">
+                <% perfil.fotos.forEach((_, i) => { %>
+                <span class="pgallery-dot <%= i===0?'active':'' %>" onclick="pfGo(<%= i %>)"></span>
+                <% }) %>
+              </div>
+              <% } %>
+
+              <!-- Zoom hint -->
+              <div class="pgallery-zoom-hint" id="pgZoomHint">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/></svg>
+                Ampliar
+              </div>
+
+              <!-- Badges inferiores -->
+              <div class="pgallery-badges">
+                <% if (perfil.nacionalidad) { %>
+                <span class="pgallery-badge">
+                  <img src="https://flagcdn.com/<%= perfil.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;vertical-align:middle;">
+                </span>
+                <% } %>
+                <% if (perfil.edad) { %><span class="pgallery-badge"><%= perfil.edad %> años</span><% } %>
+                <% if (perfil.zona) { %>
+                <span class="pgallery-badge">📍 <%= perfil.zona %><span id="dist-photo" style="margin-left:4px;color:#d4af37;"></span></span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lightbox premium -->
+          <div id="pf-lb" class="pglb" onclick="if(event.target===this||event.target.id==='pf-lb')pfLbClose()">
+            <!-- Barra superior -->
+            <div class="pglb-topbar">
+              <span class="pglb-name font-cinzel"><%= perfil.nombre %></span>
+              <span class="pglb-counter" id="pf-lb-ctr">1 / <%= perfil.fotos.length %></span>
+              <button class="pglb-close" onclick="pfLbClose()" aria-label="Cerrar">✕</button>
+            </div>
+
+            <!-- Imagen central -->
+            <div class="pglb-stage">
+              <% if (perfil.fotos.length > 1) { %>
+              <button class="pglb-arrow pglb-prev" id="pf-lb-prev" aria-label="Anterior">&#8249;</button>
+              <% } %>
+              <img id="pf-lb-img" class="pglb-img" alt="<%= perfil.nombre %>">
+              <% if (perfil.fotos.length > 1) { %>
+              <button class="pglb-arrow pglb-next" id="pf-lb-next" aria-label="Siguiente">&#8250;</button>
+              <% } %>
+            </div>
+
+            <!-- Film strip inferior -->
+            <% if (perfil.fotos.length > 1) { %>
+            <div class="pglb-filmstrip" id="pglbFilmstrip">
+              <% perfil.fotos.forEach((foto, i) => { %>
+              <div class="pglb-fs-item <%= i===0?'active':'' %>" id="pglb-fs-<%= i %>" onclick="pfLbShow(<%= i %>)">
+                <img src="<%= foto %>" alt="Foto <%= i+1 %>" loading="lazy">
+              </div>
+              <% }) %>
+            </div>
+            <% } %>
           </div>
 
         <% } else { %>
@@ -316,37 +350,50 @@
   <% if (perfil.fotos && perfil.fotos.length > 0) { %>
   <script>
   (function() {
-    var FOTOS  = <%- JSON.stringify(perfil.fotos) %>;
+    var FOTOS   = <%- JSON.stringify(perfil.fotos) %>;
     var PIXELAR = <%= perfil.pixelar_cara ? 'true' : 'false' %>;
-    var wrap   = document.getElementById('pf-wrap');
+    var wrap    = document.getElementById('pf-wrap');
     var mainImg = document.getElementById('main-photo');
-    var counter = document.getElementById('pf-counter');
-    var thumbs  = document.querySelectorAll('.pf-thumb');
     var lbEl    = document.getElementById('pf-lb');
     var lbImg   = document.getElementById('pf-lb-img');
     var lbCtr   = document.getElementById('pf-lb-ctr');
     var lbIdx   = 0;
     var touchX0 = 0;
 
-    // ── Galería principal ───────────────────────────────────
+    // ── Hint de zoom ─────────────────────────────────────────
+    var zoomHint = document.getElementById('pgZoomHint');
+    if (zoomHint && FOTOS.length > 0) {
+      setTimeout(function() { zoomHint.style.opacity = '0'; }, 2200);
+    }
+
+    // ── Galería principal ─────────────────────────────────────
     function pfShow(i) {
       var idx = ((i % FOTOS.length) + FOTOS.length) % FOTOS.length;
       wrap.dataset.idx = idx;
-      mainImg.style.transition = 'opacity 0.22s';
-      mainImg.style.opacity = '0';
+      mainImg.classList.add('pgallery-img--fade');
       setTimeout(function() {
         mainImg.src = FOTOS[idx];
-        mainImg.style.opacity = '1';
+        mainImg.classList.remove('pgallery-img--fade');
         if (PIXELAR) applyBlur();
-      }, 220);
-      if (counter) counter.textContent = (idx + 1) + ' / ' + FOTOS.length;
-      thumbs.forEach(function(t, j) { t.classList.toggle('pf-thumb-active', j === idx); });
+      }, 200);
+      // Dots
+      document.querySelectorAll('.pgallery-dot').forEach(function(d, j) {
+        d.classList.toggle('active', j === idx);
+      });
+      // Strip lateral
+      var stripItems = document.querySelectorAll('.pgallery-strip-item');
+      stripItems.forEach(function(t, j) {
+        t.classList.toggle('active', j === idx);
+        if (j === idx) {
+          t.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      });
     }
 
     window.pfNav = function(dir) { pfShow(parseInt(wrap.dataset.idx || 0) + dir); };
     window.pfGo  = function(i)   { pfShow(i); };
 
-    // Swipe táctil
+    // Swipe táctil galería
     if (mainImg) {
       mainImg.addEventListener('touchstart', function(e) { touchX0 = e.touches[0].clientX; }, { passive: true });
       mainImg.addEventListener('touchend',   function(e) {
@@ -355,68 +402,73 @@
       });
     }
 
-    // ── Lightbox ────────────────────────────────────────────
-    function lbShow(i) {
+    // ── Lightbox ──────────────────────────────────────────────
+    window.pfLbShow = function(i) {
       lbIdx = ((i % FOTOS.length) + FOTOS.length) % FOTOS.length;
       lbImg.style.opacity = '0';
-      setTimeout(function() { lbImg.src = FOTOS[lbIdx]; lbImg.style.opacity = '1'; }, 150);
+      setTimeout(function() { lbImg.src = FOTOS[lbIdx]; lbImg.style.opacity = '1'; }, 160);
       if (lbCtr) lbCtr.textContent = (lbIdx + 1) + ' / ' + FOTOS.length;
-    }
+      // Film strip lightbox
+      document.querySelectorAll('.pglb-fs-item').forEach(function(el, j) {
+        el.classList.toggle('active', j === lbIdx);
+        if (j === lbIdx) el.scrollIntoView({ inline: 'nearest', behavior: 'smooth' });
+      });
+    };
+
     window.pfLbOpen = function(i) {
-      lbEl.style.display = 'flex';
+      lbEl.classList.add('pglb--open');
       document.body.style.overflow = 'hidden';
-      lbShow(i != null ? i : parseInt(wrap.dataset.idx || 0));
+      pfLbShow(i != null ? i : parseInt(wrap.dataset.idx || 0));
     };
     window.pfLbClose = function() {
-      lbEl.style.display = 'none';
+      lbEl.classList.remove('pglb--open');
       document.body.style.overflow = '';
     };
+
     var lbPrev = document.getElementById('pf-lb-prev');
     var lbNext = document.getElementById('pf-lb-next');
-    if (lbPrev) lbPrev.addEventListener('click', function(e) { e.stopPropagation(); lbShow(lbIdx - 1); });
-    if (lbNext) lbNext.addEventListener('click', function(e) { e.stopPropagation(); lbShow(lbIdx + 1); });
+    if (lbPrev) lbPrev.addEventListener('click', function(e) { e.stopPropagation(); pfLbShow(lbIdx - 1); });
+    if (lbNext) lbNext.addEventListener('click', function(e) { e.stopPropagation(); pfLbShow(lbIdx + 1); });
+
     document.addEventListener('keydown', function(e) {
-      if (!lbEl || lbEl.style.display !== 'flex') return;
+      if (!lbEl || !lbEl.classList.contains('pglb--open')) return;
       if (e.key === 'Escape')     pfLbClose();
-      if (e.key === 'ArrowRight') lbShow(lbIdx + 1);
-      if (e.key === 'ArrowLeft')  lbShow(lbIdx - 1);
+      if (e.key === 'ArrowRight') pfLbShow(lbIdx + 1);
+      if (e.key === 'ArrowLeft')  pfLbShow(lbIdx - 1);
     });
-    // Swipe en lightbox
+
+    // Swipe lightbox
     if (lbEl) {
       lbEl.addEventListener('touchstart', function(e) { touchX0 = e.touches[0].clientX; }, { passive: true });
       lbEl.addEventListener('touchend',   function(e) {
         var dx = e.changedTouches[0].clientX - touchX0;
-        if (Math.abs(dx) > 50) lbShow(lbIdx + (dx < 0 ? 1 : -1));
+        if (Math.abs(dx) > 50) pfLbShow(lbIdx + (dx < 0 ? 1 : -1));
       });
     }
 
-    // ── Difuminado de cara (sin librerías externas) ──────────
+    // ── Difuminado de cara ────────────────────────────────────
     function applyBlur() {
       if (!PIXELAR || !mainImg.complete || !mainImg.naturalWidth) return;
-      var W = wrap.offsetWidth, H = wrap.offsetHeight;
+      var pgMain = mainImg.parentElement;
+      var W = pgMain.offsetWidth, H = pgMain.offsetHeight;
       if (!W || !H) return;
-      var canvas = wrap.querySelector('canvas.fb');
+      var canvas = pgMain.querySelector('canvas.fb');
       if (!canvas) {
         canvas = document.createElement('canvas');
         canvas.className = 'fb';
-        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;';
-        wrap.appendChild(canvas);
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;border-radius:inherit;';
+        pgMain.appendChild(canvas);
       }
       canvas.width = W; canvas.height = H;
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, W, H);
-
-      // Región estimada de la cara: centro superior del retrato
-      var cx = W * 0.5, cy = H * 0.28;
-      var rx = W * 0.30, ry = H * 0.22;
-
-      // Calcular la porción de la imagen visible con object-fit:cover
+      var cx = W * 0.5, cy = H * 0.25;
+      var rx = W * 0.28, ry = H * 0.20;
       var nW = mainImg.naturalWidth, nH = mainImg.naturalHeight;
       var scale = Math.max(W / nW, H / nH);
       var sx = ((nW * scale - W) / 2) / scale;
       var sy = ((nH * scale - H) / 2) / scale;
       var sw = W / scale, sh = H / scale;
-
       ctx.save();
       ctx.beginPath();
       ctx.ellipse(cx, cy, rx + 10, ry + 10, 0, 0, Math.PI * 2);
@@ -428,7 +480,6 @@
       ctx.restore();
       ctx.filter = 'none';
     }
-
     if (PIXELAR) {
       if (mainImg.complete && mainImg.naturalWidth) applyBlur();
       else mainImg.addEventListener('load', applyBlur);
