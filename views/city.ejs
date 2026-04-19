@@ -93,11 +93,11 @@
       <div class="profiles-grid highlighted">
         <% destacadas.forEach(p=> { %>
           <div class="dest-card" data-id="<%= p.id %>" data-fotos="<%- JSON.stringify(p.fotos) %>">
-            <span class="card-plan-badge destacada"></span>
-            <div class="availability-dot <%= p.disponibilidad %>"></div>
 
             <!-- Imagen con filo dorado -->
             <div class="dest-img-wrap">
+              <span class="card-plan-badge destacada"></span>
+              <div class="availability-dot <%= p.disponibilidad %>"></div>
               <% if (p.fotos.length > 0) { %>
                 <img class="card-image dest-main-img" src="<%= p.fotos[0] %>" alt="<%= p.nombre %>" loading="lazy">
               <% } else { %>

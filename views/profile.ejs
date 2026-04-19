@@ -31,7 +31,7 @@
             <!-- Imagen principal -->
             <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>"
               alt="<%= perfil.nombre %>" crossorigin="anonymous"
-              onclick="qlbOpen(galIdx)"
+              onclick="qlbOpen()"
               style="margin-bottom:0;cursor:zoom-in;">
 
             <!-- Flechas inline (solo si hay >1 foto) -->
@@ -369,7 +369,6 @@
 
     window.galNav = (dir) => { galShow(galIdx + dir); };
     window.galGo  = (i)   => { galShow(i); };
-    window.galIdx = galIdx; // exponer para qlbOpen
 
     // Swipe táctil en foto principal
     if (mainImg) {
