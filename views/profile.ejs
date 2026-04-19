@@ -21,19 +21,32 @@
   <div class="container" style="padding-top:100px;padding-bottom:60px;">
     <div class="profile-detail-grid">
 
-      <!-- Photo Gallery -->
+      <!-- ── GALERÍA DE FOTOS ──────────────────────────── -->
       <div class="photo-gallery" style="position:relative;">
         <% if (perfil.fotos.length > 0) { %>
-          <%
-            const fotosPublicas = perfil.fotos;
-            const pixelar = perfil.pixelar_cara === true;
-          %>
-          <!-- Foto portada → clic abre lightbox -->
-          <div class="photo-main-wrap" id="gallery-main-wrap" onclick="qlbOpen(0)" title="Ver fotos">
-            <img id="main-photo" class="photo-main" style="margin-bottom:0;" src="<%= fotosPublicas[0] %>" alt="<%= perfil.nombre %>" crossorigin="anonymous">
+          <% const pixelar = perfil.pixelar_cara === true; %>
+
+          <!-- Foto principal con flechas de navegación inline -->
+          <div class="photo-main-wrap" id="gallery-wrap">
+            <!-- Imagen principal -->
+            <img id="main-photo" class="photo-main" src="<%= perfil.fotos[0] %>"
+              alt="<%= perfil.nombre %>" crossorigin="anonymous"
+              onclick="qlbOpen(galIdx)"
+              style="margin-bottom:0;cursor:zoom-in;">
+
+            <!-- Flechas inline (solo si hay >1 foto) -->
+            <% if (perfil.fotos.length > 1) { %>
+            <button class="gal-arrow gal-prev" onclick="galNav(-1)" aria-label="Foto anterior">&#8249;</button>
+            <button class="gal-arrow gal-next" onclick="galNav(+1)" aria-label="Foto siguiente">&#8250;</button>
+            <% } %>
+
+            <!-- Contador -->
+            <% if (perfil.fotos.length > 1) { %>
+            <div class="gal-counter" id="gal-counter">1 / <%= perfil.fotos.length %></div>
+            <% } %>
 
             <!-- Badges info -->
-            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:3;">
+            <div style="position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:4;">
               <% if (perfil.nacionalidad) { %>
               <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.72);padding:4px 10px;border-radius:20px;font-size:0.75rem;color:#fff;backdrop-filter:blur(4px);">
                 <img src="https://flagcdn.com/<%= perfil.nacionalidad %>.svg" alt="" style="width:18px;height:13px;border-radius:2px;">
@@ -50,32 +63,16 @@
               </span>
               <% } %>
             </div>
-
-            <!-- Indicador de fotos (esquina superior derecha) -->
-            <% if (fotosPublicas.length > 1) { %>
-            <div style="position:absolute;top:10px;right:10px;z-index:3;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.72);padding:5px 11px;border-radius:20px;backdrop-filter:blur(4px);">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-              <span style="font-size:0.72rem;color:#f9e27e;font-weight:600;"><%= fotosPublicas.length %> fotos</span>
-            </div>
-            <% } %>
-
-            <!-- Hint "toca para ver" solo con >1 foto -->
-            <% if (fotosPublicas.length > 1) { %>
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;z-index:2;" class="gallery-hover-hint">
-              <div style="background:rgba(0,0,0,0.55);padding:10px 18px;border-radius:30px;border:1px solid rgba(212,175,55,0.5);color:#f9e27e;font-size:0.78rem;letter-spacing:1px;backdrop-filter:blur(6px);">
-                Ver todas las fotos
-              </div>
-            </div>
-            <% } %>
           </div>
 
-          <!-- Tira de miniaturas (todas las fotos, todos los planes) -->
-          <% if (fotosPublicas.length > 1) { %>
-          <div class="photo-thumbs" style="margin-top:10px;">
-            <% fotosPublicas.forEach((foto, i) => { %>
-              <div style="position:relative;overflow:hidden;border-radius:var(--radius-sm);cursor:pointer;border:2px solid <%= i===0 ? '#d4af37' : 'rgba(212,175,55,0.15)' %>;" onclick="qlbOpen(<%= i %>)" class="thumb-item">
-                <img class="photo-thumb" src="<%= foto %>" data-idx="<%= i %>" alt="Foto <%= i+1 %>" style="margin:0;width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:transform 0.25s;" crossorigin="anonymous">
-              </div>
+          <!-- Tira de miniaturas -->
+          <% if (perfil.fotos.length > 1) { %>
+          <div class="photo-thumbs" id="thumb-strip" style="margin-top:10px;">
+            <% perfil.fotos.forEach((foto, i) => { %>
+            <div class="thumb-item <%= i===0?'thumb-active':'' %>" onclick="galGo(<%= i %>)">
+              <img src="<%= foto %>" alt="Foto <%= i+1 %>" crossorigin="anonymous"
+                style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">
+            </div>
             <% }) %>
           </div>
           <% } %>
@@ -86,13 +83,13 @@
           </div>
         <% } %>
 
-        <!-- ── LIGHTBOX OVERLAY ─────────────────────────── -->
+        <!-- ── LIGHTBOX FULLSCREEN ──────────────────────── -->
         <% if (perfil.fotos.length > 0) { %>
-        <div id="qlb" class="qlb-overlay" role="dialog" aria-modal="true" onclick="if(event.target===this)qlbClose()">
-          <button class="qlb-close" onclick="qlbClose()" aria-label="Cerrar">✕</button>
+        <div id="qlb" class="qlb-overlay" onclick="if(event.target===this)qlbClose()">
+          <button class="qlb-close" onclick="qlbClose()">✕</button>
           <% if (perfil.fotos.length > 1) { %>
-          <button class="qlb-arrow left" onclick="qlbPrev()" aria-label="Anterior">‹</button>
-          <button class="qlb-arrow right" onclick="qlbNext()" aria-label="Siguiente">›</button>
+          <button class="qlb-arrow left"  onclick="qlbPrev()">&#8249;</button>
+          <button class="qlb-arrow right" onclick="qlbNext()">&#8250;</button>
           <% } %>
           <div class="qlb-img-wrap" id="qlb-img-wrap">
             <img id="qlb-img" class="qlb-img" src="" alt="" crossorigin="anonymous">
@@ -101,7 +98,7 @@
           <% if (perfil.fotos.length > 1) { %>
           <div class="qlb-dots" id="qlb-dots">
             <% perfil.fotos.forEach((_, i) => { %>
-              <div class="qlb-dot <%= i===0?'active':'' %>" onclick="qlbGo(<%= i %>)"></div>
+              <div class="qlb-dot" onclick="qlbGo(<%= i %>)"></div>
             <% }) %>
           </div>
           <% } %>
@@ -336,160 +333,210 @@
     }
   </script>
 
-  <!-- ── LIGHTBOX + PIXELACIÓN DE CARA ────────────────── -->
+  <!-- ── GALERÍA + PIXELADO DE CARA ──────────────────── -->
   <% if (perfil.fotos && perfil.fotos.length > 0) { %>
   <% if (perfil.pixelar_cara) { %>
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <% } %>
   <script>
-    const FOTOS_LB = <%- JSON.stringify(perfil.fotos) %>;
-    const PIXELAR  = <%= perfil.pixelar_cara ? 'true' : 'false' %>;
-    let qlbIdx = 0;
-    let touchStartX = 0;
-    const faceCache = {}; // url → [{x,y,w,h}] relativo (0-1)
+  (function() {
+    const FOTOS   = <%- JSON.stringify(perfil.fotos) %>;
+    const PIXELAR = <%= perfil.pixelar_cara ? 'true' : 'false' %>;
+    let galIdx = 0;       // índice foto activa en galería inline
+    let qlbIdx = 0;       // índice foto activa en lightbox
+    let touchX0 = 0;
+    const faceCache = {};
+    let faceApiReady = false;
 
-    // ── Lightbox ──────────────────────────────────────────
-    function qlbOpen(i) {
-      qlbIdx = i;
-      document.getElementById('qlb').classList.add('open');
+    // ── Galería inline ─────────────────────────────────
+    const mainImg   = document.getElementById('main-photo');
+    const galCount  = document.getElementById('gal-counter');
+    const thumbs    = document.querySelectorAll('#thumb-strip .thumb-item');
+
+    function galShow(i) {
+      galIdx = ((i % FOTOS.length) + FOTOS.length) % FOTOS.length;
+      // Fade suave
+      mainImg.style.opacity = '0';
+      mainImg.style.transition = 'opacity 0.28s ease';
+      setTimeout(() => {
+        mainImg.src = FOTOS[galIdx];
+        mainImg.onload = () => { mainImg.style.opacity = '1'; blurMain(); };
+        if (mainImg.complete) { mainImg.style.opacity = '1'; blurMain(); }
+      }, 140);
+      if (galCount) galCount.textContent = `${galIdx + 1} / ${FOTOS.length}`;
+      thumbs.forEach((t, j) => t.classList.toggle('thumb-active', j === galIdx));
+    }
+
+    window.galNav = (dir) => { galShow(galIdx + dir); };
+    window.galGo  = (i)   => { galShow(i); };
+    window.galIdx = galIdx; // exponer para qlbOpen
+
+    // Swipe táctil en foto principal
+    if (mainImg) {
+      mainImg.addEventListener('touchstart', e => { touchX0 = e.touches[0].clientX; }, { passive: true });
+      mainImg.addEventListener('touchend',   e => {
+        const dx = e.changedTouches[0].clientX - touchX0;
+        if (Math.abs(dx) > 40) galNav(dx < 0 ? 1 : -1);
+      });
+    }
+
+    // ── Lightbox fullscreen ────────────────────────────
+    const qlbEl = document.getElementById('qlb');
+
+    window.qlbOpen = function(i) {
+      qlbIdx = i != null ? i : galIdx;
+      qlbEl.classList.add('open');
       document.body.style.overflow = 'hidden';
-      qlbShow(i);
-    }
-    function qlbClose() {
-      document.getElementById('qlb').classList.remove('open');
+      qlbRender(qlbIdx);
+    };
+    window.qlbClose = function() {
+      qlbEl.classList.remove('open');
       document.body.style.overflow = '';
-    }
-    function qlbNext() { qlbIdx = (qlbIdx + 1) % FOTOS_LB.length; qlbShow(qlbIdx); }
-    function qlbPrev() { qlbIdx = (qlbIdx - 1 + FOTOS_LB.length) % FOTOS_LB.length; qlbShow(qlbIdx); }
-    function qlbGo(i)  { qlbIdx = i; qlbShow(i); }
+    };
+    window.qlbNext  = function() { qlbIdx = (qlbIdx + 1) % FOTOS.length; qlbRender(qlbIdx); };
+    window.qlbPrev  = function() { qlbIdx = (qlbIdx - 1 + FOTOS.length) % FOTOS.length; qlbRender(qlbIdx); };
+    window.qlbGo    = function(i) { qlbIdx = i; qlbRender(i); };
 
-    function qlbShow(i) {
-      const img = document.getElementById('qlb-img');
-      img.classList.remove('visible');
-
-      // Quitar canvas anterior de pixelado
+    function qlbRender(i) {
+      const img  = document.getElementById('qlb-img');
       const wrap = document.getElementById('qlb-img-wrap');
-      wrap.querySelectorAll('canvas').forEach(c => c.remove());
+      img.classList.remove('visible');
+      wrap.querySelectorAll('canvas.face-blur').forEach(c => c.remove());
 
-      img.onload = () => {
+      function onReady() {
         img.classList.add('visible');
-        if (PIXELAR) applyPixelCanvas(wrap, img);
-      };
-      img.src = FOTOS_LB[i];
-      if (img.complete && img.naturalWidth) { img.classList.add('visible'); if (PIXELAR) applyPixelCanvas(wrap, img); }
+        if (PIXELAR) blurImg(wrap, img);
+      }
+      img.onload = onReady;
+      img.src = FOTOS[i];
+      if (img.complete && img.naturalWidth) onReady();
 
-      // Contador
       const ctr = document.getElementById('qlb-counter');
-      if (ctr) ctr.textContent = `${i + 1} / ${FOTOS_LB.length}`;
-
-      // Dots
+      if (ctr) ctr.textContent = `${i + 1} / ${FOTOS.length}`;
       document.querySelectorAll('.qlb-dot').forEach((d, j) => d.classList.toggle('active', j === i));
     }
 
-    // ── Teclado y swipe ───────────────────────────────────
+    // Teclado
     document.addEventListener('keydown', e => {
-      if (!document.getElementById('qlb').classList.contains('open')) return;
-      if (e.key === 'Escape')      qlbClose();
-      if (e.key === 'ArrowRight')  qlbNext();
-      if (e.key === 'ArrowLeft')   qlbPrev();
+      if (!qlbEl.classList.contains('open')) return;
+      if (e.key === 'Escape')     qlbClose();
+      if (e.key === 'ArrowRight') qlbNext();
+      if (e.key === 'ArrowLeft')  qlbPrev();
     });
-    document.getElementById('qlb').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-    document.getElementById('qlb').addEventListener('touchend',   e => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
+    // Swipe en lightbox
+    qlbEl.addEventListener('touchstart', e => { touchX0 = e.touches[0].clientX; }, { passive: true });
+    qlbEl.addEventListener('touchend',   e => {
+      const dx = e.changedTouches[0].clientX - touchX0;
       if (Math.abs(dx) > 50) dx < 0 ? qlbNext() : qlbPrev();
     });
 
-    // ── Pixelación de cara con face-api.js ───────────────
+    // ── Blur gaussiano de cara ──────────────────────────
     <% if (perfil.pixelar_cara) { %>
-    async function getFaces(imgEl) {
+    // Fallback inmediato: CSS blur en foto principal mientras carga modelo
+    if (mainImg) mainImg.style.filter = 'blur(0px)'; // listo, se gestiona con canvas
+
+    async function detectFaces(imgEl) {
+      if (!faceApiReady) return null; // null = modelo no listo aún
       const url = imgEl.src;
       if (faceCache[url] !== undefined) return faceCache[url];
       try {
         const dets = await faceapi.detectAllFaces(
-          imgEl,
-          new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 })
+          imgEl, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.4 })
         );
         faceCache[url] = dets.map(d => ({
-          x: d.box.x / imgEl.naturalWidth,
-          y: d.box.y / imgEl.naturalHeight,
-          w: d.box.width  / imgEl.naturalWidth,
-          h: d.box.height / imgEl.naturalHeight
+          cx: (d.box.x + d.box.width  / 2) / imgEl.naturalWidth,
+          cy: (d.box.y + d.box.height / 2) / imgEl.naturalHeight,
+          rx: (d.box.width  * 0.65) / imgEl.naturalWidth,
+          ry: (d.box.height * 0.75) / imgEl.naturalHeight
         }));
       } catch(_) { faceCache[url] = []; }
       return faceCache[url];
     }
 
-    function drawPixel(canvas, imgEl, faces) {
-      canvas.width  = imgEl.offsetWidth  || imgEl.naturalWidth;
-      canvas.height = imgEl.offsetHeight || imgEl.naturalHeight;
-      if (!canvas.width || !canvas.height || !faces.length) return;
+    function drawBlur(canvas, imgEl, faces) {
+      const W = imgEl.offsetWidth  || imgEl.naturalWidth;
+      const H = imgEl.offsetHeight || imgEl.naturalHeight;
+      if (!W || !H) return;
+      canvas.width  = W;
+      canvas.height = H;
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, W, H);
 
-      faces.forEach(f => {
-        const pad = 0.25;
-        const x  = (f.x - f.w * pad) * canvas.width;
-        const y  = (f.y - f.h * pad) * canvas.height;
-        const w  = f.w * (1 + pad * 2) * canvas.width;
-        const h  = f.h * (1 + pad * 2) * canvas.height;
-        const px = Math.max(0, x), py = Math.max(0, y);
-        const pw = Math.min(canvas.width  - px, w);
-        const ph = Math.min(canvas.height - py, h);
+      const list = (faces && faces.length) ? faces : [
+        // fallback: cara típica en retrato (centro superior)
+        { cx: 0.5, cy: 0.2, rx: 0.28, ry: 0.18 }
+      ];
 
-        // Coordenadas en imagen natural
-        const sx = (px / canvas.width)  * imgEl.naturalWidth;
-        const sy = (py / canvas.height) * imgEl.naturalHeight;
-        const sw = (pw / canvas.width)  * imgEl.naturalWidth;
-        const sh = (ph / canvas.height) * imgEl.naturalHeight;
+      list.forEach(f => {
+        const cx = f.cx * W, cy = f.cy * H;
+        const rx = f.rx * W, ry = f.ry * H;
+        // fuente: región de la cara en la imagen natural
+        const sx = Math.max(0, (cx - rx) / W * imgEl.naturalWidth);
+        const sy = Math.max(0, (cy - ry) / H * imgEl.naturalHeight);
+        const sw = Math.min(imgEl.naturalWidth  - sx, (2 * rx) / W * imgEl.naturalWidth);
+        const sh = Math.min(imgEl.naturalHeight - sy, (2 * ry) / H * imgEl.naturalHeight);
 
-        // Pixelar: reducir a bloque pequeño y escalar sin suavizado
-        const PSIZE = 14;
-        const tmp = document.createElement('canvas');
-        tmp.width  = Math.max(1, Math.round(pw / PSIZE));
-        tmp.height = Math.max(1, Math.round(ph / PSIZE));
-        const tc = tmp.getContext('2d');
-        tc.imageSmoothingEnabled = false;
-        tc.drawImage(imgEl, sx, sy, sw, sh, 0, 0, tmp.width, tmp.height);
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(tmp, 0, 0, tmp.width, tmp.height, px, py, pw, ph);
+        // Clip a elipse suave
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx + 6, ry + 6, 0, 0, Math.PI * 2);
+        ctx.clip();
+
+        // Blur gaussiano por capas para efecto suave y opaco
+        for (let strength = 6; strength <= 22; strength += 8) {
+          ctx.filter = `blur(${strength}px)`;
+          ctx.drawImage(imgEl, sx, sy, sw, sh, cx - rx - 6, cy - ry - 6, (rx + 6) * 2, (ry + 6) * 2);
+        }
+        ctx.restore();
       });
     }
 
-    function applyPixelCanvas(container, imgEl) {
-      let canvas = container.querySelector('canvas.face-pixel');
+    function blurImg(container, imgEl) {
+      if (!imgEl.complete || !imgEl.naturalWidth) return;
+      let canvas = container.querySelector('canvas.face-blur');
       if (!canvas) {
         canvas = document.createElement('canvas');
-        canvas.className = 'face-pixel';
-        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;border-radius:inherit;';
+        canvas.className = 'face-blur';
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;border-radius:inherit;opacity:0;transition:opacity 0.5s ease;';
         container.appendChild(canvas);
       }
-      getFaces(imgEl).then(faces => drawPixel(canvas, imgEl, faces));
+      const faces = faceCache[imgEl.src];
+      drawBlur(canvas, imgEl, faces || null);
+      requestAnimationFrame(() => { canvas.style.opacity = '1'; });
+
+      // Refinar si el modelo ya detectó caras
+      if (faceApiReady && faces === undefined) {
+        detectFaces(imgEl).then(f => { if (f) { drawBlur(canvas, imgEl, f); } });
+      }
     }
 
-    // Inicializar face-api y aplicar a galería
-    faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector').then(() => {
-      // Foto principal
-      const mainWrap = document.getElementById('gallery-main-wrap');
-      const mainImg  = document.getElementById('main-photo');
-      if (mainWrap && mainImg) {
-        if (mainImg.complete && mainImg.naturalWidth) applyPixelCanvas(mainWrap, mainImg);
-        else mainImg.addEventListener('load', () => applyPixelCanvas(mainWrap, mainImg));
-        new ResizeObserver(() => getFaces(mainImg).then(f => {
-          const c = mainWrap.querySelector('canvas.face-pixel');
-          if (c) drawPixel(c, mainImg, f);
-        })).observe(mainWrap);
-      }
+    function blurMain() {
+      if (!PIXELAR) return;
+      const wrap = document.getElementById('gallery-wrap');
+      blurImg(wrap, mainImg);
+    }
 
-      // Miniaturas
-      document.querySelectorAll('.photo-thumb').forEach(img => {
-        const wrap = img.parentElement;
-        if (img.complete && img.naturalWidth) applyPixelCanvas(wrap, img);
-        else img.addEventListener('load', () => applyPixelCanvas(wrap, img));
-      });
+    // Cargar modelo y aplicar a todas las fotos visibles
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector').then(() => {
+      faceApiReady = true;
+      // Foto principal
+      blurMain();
+      // Lightbox si está abierto
+      if (qlbEl.classList.contains('open')) {
+        const li = document.getElementById('qlb-img');
+        blurImg(document.getElementById('qlb-img-wrap'), li);
+      }
     });
+
+    // Aplicar fallback inmediato al cargar la página
+    if (mainImg.complete && mainImg.naturalWidth) blurMain();
+    else mainImg.addEventListener('load', blurMain);
+
     <% } else { %>
-    function applyPixelCanvas() {}  // no-op si pixelar desactivado
+    function blurMain() {}
+    function blurImg() {}
     <% } %>
+  })();
   </script>
   <% } %>
 </body>

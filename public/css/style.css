@@ -348,7 +348,7 @@ h1, h2, h3, h4, h5 { line-height: 1.2; }
   gap: 20px;
 }
 
-.profiles-grid.highlighted { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.profiles-grid.highlighted { grid-template-columns: repeat(auto-fill, minmax(min(100%,360px), 1fr)); }
 .profiles-grid.premium-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
 .profiles-grid.basic-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 
@@ -1245,6 +1245,68 @@ tbody td { padding: 14px 16px; vertical-align: middle; }
   .profiles-grid.basic-grid { grid-template-columns: 1fr 1fr; }
 }
 
+/* ── Tarjetas DESTACADAS con filo dorado ─────────────────── */
+.dest-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #0d0d0d;
+  box-shadow:
+    0 0 0 2px rgba(212,175,55,0.55),
+    0 0 18px rgba(212,175,55,0.18),
+    0 8px 30px rgba(0,0,0,0.55);
+  transition: box-shadow 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+.dest-card:hover {
+  box-shadow:
+    0 0 0 2px #d4af37,
+    0 0 28px rgba(212,175,55,0.35),
+    0 12px 40px rgba(0,0,0,0.7);
+  transform: translateY(-4px);
+}
+.dest-img-wrap { position: relative; overflow: hidden; }
+.dest-img-wrap .card-image { margin:0; transition: opacity 0.3s, transform 0.4s; }
+.dest-card:hover .dest-img-wrap .card-image { transform: scale(1.03); }
+
+.dest-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(212,175,55,0.5);
+  color: #f9e27e; font-size: 1.6rem; width: 36px; height: 36px;
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s, background 0.2s;
+  backdrop-filter: blur(4px); user-select: none;
+}
+.dest-card:hover .dest-arrow { opacity: 1; }
+.dest-arrow:hover { background: rgba(212,175,55,0.3); }
+.dest-prev { left: 7px; } .dest-next { right: 7px; }
+
+.dest-dots { position:absolute; bottom:7px; left:50%; transform:translateX(-50%); display:flex; gap:4px; z-index:5; }
+.dest-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.35); transition:background 0.2s,transform 0.2s; }
+.dest-dot.active { background:#d4af37; transform:scale(1.4); }
+
+.dest-expand {
+  position:absolute; top:8px; right:8px; z-index:5;
+  background:rgba(0,0,0,0.55); border:1px solid rgba(212,175,55,0.45);
+  color:#f9e27e; width:30px; height:30px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:0; transition:opacity 0.2s,background 0.2s; backdrop-filter:blur(4px);
+}
+.dest-card:hover .dest-expand { opacity:1; }
+.dest-expand:hover { background:rgba(212,175,55,0.25); }
+
+.dest-info {
+  padding:10px 12px 12px; text-decoration:none; color:inherit; display:block;
+  border-top:1px solid rgba(212,175,55,0.15);
+}
+.dest-name {
+  font-family:'Cinzel',serif; font-size:0.88rem; font-weight:700; color:#f9e27e;
+  margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.dest-meta { font-size:0.7rem; color:var(--text-muted); }
+
 /* ─── LIGHTBOX ───────────────────────────────────────────── */
 .qlb-overlay {
   display: none;
@@ -1339,19 +1401,71 @@ tbody td { padding: 14px 16px; vertical-align: middle; }
 }
 .qlb-dot.active { background: #d4af37; transform: scale(1.4); }
 
-/* wrapper foto principal */
+/* ── Galería inline ──────────────────────────────────── */
 .photo-main-wrap {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-md);
-  margin-bottom: 12px;
-  cursor: pointer;
+  margin-bottom: 0;
 }
-.photo-main-wrap:hover .gallery-hover-hint { opacity: 1 !important; }
-.photo-main-wrap:hover .photo-main { transform: scale(1.02); }
-.photo-main { transition: transform 0.4s ease; }
 
-.thumb-item:hover img { transform: scale(1.08); }
+/* Flechas de navegación sobre la foto */
+.gal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(212,175,55,0.4);
+  color: #f9e27e;
+  font-size: 2rem;
+  line-height: 1;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+  opacity: 0;
+  user-select: none;
+}
+.photo-main-wrap:hover .gal-arrow { opacity: 1; }
+.gal-arrow:hover { background: rgba(212,175,55,0.25); border-color: #d4af37; }
+.gal-prev { left: 10px; }
+.gal-next { right: 10px; }
+
+/* Contador inline */
+.gal-counter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  background: rgba(0,0,0,0.6);
+  color: #f9e27e;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.5px;
+}
+
+/* Miniaturas */
+.thumb-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid rgba(212,175,55,0.18);
+  transition: border-color 0.2s;
+}
+.thumb-item img { transition: transform 0.25s; }
+.thumb-item:hover img { transform: scale(1.07); }
+.thumb-item.thumb-active { border-color: #d4af37; }
+.thumb-item.thumb-active img { transform: scale(1.04); }
 
 /* ─── UTILITIES ──────────────────────────────────────────── */
 .mt-1 { margin-top: 8px; }
