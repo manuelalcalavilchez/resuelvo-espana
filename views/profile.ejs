@@ -32,7 +32,7 @@
             <% if (perfil.fotos.length > 1) { %>
             <div class="pgallery-strip" id="pgStrip">
               <% perfil.fotos.forEach((foto, i) => { %>
-              <div class="pgallery-strip-item <%= i===0 ? 'active' : '' %>" onclick="pfGo(<%= i %>)" title="Foto <%= i+1 %>">
+              <div class="pgallery-strip-item <%= i===0 ? 'active' : '' %>" data-pgidx="<%= i %>" title="Foto <%= i+1 %>">
                 <img src="<%= foto %>" alt="Foto <%= i+1 %>" loading="lazy">
                 <div class="pgallery-strip-num"><%= i+1 %></div>
               </div>
@@ -43,19 +43,19 @@
             <!-- Foto principal -->
             <div class="pgallery-main">
               <img id="main-photo" class="pgallery-img" src="<%= perfil.fotos[0] %>"
-                   alt="<%= perfil.nombre %>" onclick="pfLbOpen(parseInt(document.getElementById('pf-wrap').dataset.idx||0))">
+                   alt="<%= perfil.nombre %>">
 
               <!-- Flechas de navegación -->
               <% if (perfil.fotos.length > 1) { %>
-              <button class="pgallery-arrow pgallery-prev" onclick="pfNav(-1)" aria-label="Anterior">&#8249;</button>
-              <button class="pgallery-arrow pgallery-next" onclick="pfNav(+1)" aria-label="Siguiente">&#8250;</button>
+              <button id="pg-prev" class="pgallery-arrow pgallery-prev" aria-label="Anterior">&#8249;</button>
+              <button id="pg-next" class="pgallery-arrow pgallery-next" aria-label="Siguiente">&#8250;</button>
               <% } %>
 
               <!-- Dots indicadores -->
               <% if (perfil.fotos.length > 1) { %>
               <div class="pgallery-dots" id="pgDots">
                 <% perfil.fotos.forEach((_, i) => { %>
-                <span class="pgallery-dot <%= i===0?'active':'' %>" onclick="pfGo(<%= i %>)"></span>
+                <span class="pgallery-dot <%= i===0?'active':'' %>" data-pgidx="<%= i %>"></span>
                 <% }) %>
               </div>
               <% } %>
@@ -82,12 +82,12 @@
           </div>
 
           <!-- Lightbox premium -->
-          <div id="pf-lb" class="pglb" onclick="if(event.target===this||event.target.id==='pf-lb')pfLbClose()">
+          <div id="pf-lb" class="pglb">
             <!-- Barra superior -->
             <div class="pglb-topbar">
               <span class="pglb-name font-cinzel"><%= perfil.nombre %></span>
               <span class="pglb-counter" id="pf-lb-ctr">1 / <%= perfil.fotos.length %></span>
-              <button class="pglb-close" onclick="pfLbClose()" aria-label="Cerrar">✕</button>
+              <button id="pglb-close-btn" class="pglb-close" aria-label="Cerrar">✕</button>
             </div>
 
             <!-- Imagen central -->
@@ -105,7 +105,7 @@
             <% if (perfil.fotos.length > 1) { %>
             <div class="pglb-filmstrip" id="pglbFilmstrip">
               <% perfil.fotos.forEach((foto, i) => { %>
-              <div class="pglb-fs-item <%= i===0?'active':'' %>" id="pglb-fs-<%= i %>" onclick="pfLbShow(<%= i %>)">
+              <div class="pglb-fs-item <%= i===0?'active':'' %>" id="pglb-fs-<%= i %>" data-lbidx="<%= i %>">
                 <img src="<%= foto %>" alt="Foto <%= i+1 %>" loading="lazy">
               </div>
               <% }) %>
@@ -351,7 +351,6 @@
   <script>
   (function() {
     var FOTOS   = <%- JSON.stringify(perfil.fotos) %>;
-    var PIXELAR = <%= perfil.pixelar_cara ? 'true' : 'false' %>;
     var wrap    = document.getElementById('pf-wrap');
     var mainImg = document.getElementById('main-photo');
     var lbEl    = document.getElementById('pf-lb');
@@ -360,11 +359,9 @@
     var lbIdx   = 0;
     var touchX0 = 0;
 
-    // ── Hint de zoom ─────────────────────────────────────────
+    // ── Hint de zoom ──────────────────────────────────────────
     var zoomHint = document.getElementById('pgZoomHint');
-    if (zoomHint && FOTOS.length > 0) {
-      setTimeout(function() { zoomHint.style.opacity = '0'; }, 2200);
-    }
+    if (zoomHint) setTimeout(function() { zoomHint.style.opacity = '0'; }, 2200);
 
     // ── Galería principal ─────────────────────────────────────
     function pfShow(i) {
@@ -374,61 +371,81 @@
       setTimeout(function() {
         mainImg.src = FOTOS[idx];
         mainImg.classList.remove('pgallery-img--fade');
-        if (PIXELAR) applyBlur();
       }, 200);
-      // Dots
       document.querySelectorAll('.pgallery-dot').forEach(function(d, j) {
         d.classList.toggle('active', j === idx);
       });
-      // Strip lateral
-      var stripItems = document.querySelectorAll('.pgallery-strip-item');
-      stripItems.forEach(function(t, j) {
+      document.querySelectorAll('.pgallery-strip-item').forEach(function(t, j) {
         t.classList.toggle('active', j === idx);
-        if (j === idx) {
-          t.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }
+        if (j === idx) t.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       });
     }
 
-    window.pfNav = function(dir) { pfShow(parseInt(wrap.dataset.idx || 0) + dir); };
-    window.pfGo  = function(i)   { pfShow(i); };
-
-    // Swipe táctil galería
+    // ── Eventos galería ───────────────────────────────────────
     if (mainImg) {
+      mainImg.addEventListener('click', function() {
+        pfLbOpen(parseInt(wrap.dataset.idx || 0));
+      });
       mainImg.addEventListener('touchstart', function(e) { touchX0 = e.touches[0].clientX; }, { passive: true });
-      mainImg.addEventListener('touchend',   function(e) {
+      mainImg.addEventListener('touchend', function(e) {
         var dx = e.changedTouches[0].clientX - touchX0;
-        if (Math.abs(dx) > 40) pfNav(dx < 0 ? 1 : -1);
+        if (Math.abs(dx) > 40) pfShow(parseInt(wrap.dataset.idx || 0) + (dx < 0 ? 1 : -1));
       });
     }
+
+    var pgPrev = document.getElementById('pg-prev');
+    var pgNext = document.getElementById('pg-next');
+    if (pgPrev) pgPrev.addEventListener('click', function() { pfShow(parseInt(wrap.dataset.idx || 0) - 1); });
+    if (pgNext) pgNext.addEventListener('click', function() { pfShow(parseInt(wrap.dataset.idx || 0) + 1); });
+
+    document.querySelectorAll('.pgallery-strip-item').forEach(function(el) {
+      el.addEventListener('click', function() { pfShow(parseInt(el.dataset.pgidx)); });
+    });
+    document.querySelectorAll('.pgallery-dot').forEach(function(el) {
+      el.addEventListener('click', function() { pfShow(parseInt(el.dataset.pgidx)); });
+    });
 
     // ── Lightbox ──────────────────────────────────────────────
-    window.pfLbShow = function(i) {
+    function pfLbShow(i) {
       lbIdx = ((i % FOTOS.length) + FOTOS.length) % FOTOS.length;
       lbImg.style.opacity = '0';
       setTimeout(function() { lbImg.src = FOTOS[lbIdx]; lbImg.style.opacity = '1'; }, 160);
       if (lbCtr) lbCtr.textContent = (lbIdx + 1) + ' / ' + FOTOS.length;
-      // Film strip lightbox
       document.querySelectorAll('.pglb-fs-item').forEach(function(el, j) {
         el.classList.toggle('active', j === lbIdx);
         if (j === lbIdx) el.scrollIntoView({ inline: 'nearest', behavior: 'smooth' });
       });
-    };
+    }
 
-    window.pfLbOpen = function(i) {
+    function pfLbOpen(i) {
       lbEl.classList.add('pglb--open');
       document.body.style.overflow = 'hidden';
       pfLbShow(i != null ? i : parseInt(wrap.dataset.idx || 0));
-    };
-    window.pfLbClose = function() {
+    }
+
+    function pfLbClose() {
       lbEl.classList.remove('pglb--open');
       document.body.style.overflow = '';
-    };
+    }
+
+    // Cerrar al hacer click en el fondo del lightbox
+    if (lbEl) {
+      lbEl.addEventListener('click', function(e) {
+        if (e.target === lbEl || e.target.classList.contains('pglb-stage')) pfLbClose();
+      });
+    }
+
+    var closeBtn = document.getElementById('pglb-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', pfLbClose);
 
     var lbPrev = document.getElementById('pf-lb-prev');
     var lbNext = document.getElementById('pf-lb-next');
     if (lbPrev) lbPrev.addEventListener('click', function(e) { e.stopPropagation(); pfLbShow(lbIdx - 1); });
     if (lbNext) lbNext.addEventListener('click', function(e) { e.stopPropagation(); pfLbShow(lbIdx + 1); });
+
+    document.querySelectorAll('.pglb-fs-item').forEach(function(el) {
+      el.addEventListener('click', function() { pfLbShow(parseInt(el.dataset.lbidx)); });
+    });
 
     document.addEventListener('keydown', function(e) {
       if (!lbEl || !lbEl.classList.contains('pglb--open')) return;
@@ -437,52 +454,12 @@
       if (e.key === 'ArrowLeft')  pfLbShow(lbIdx - 1);
     });
 
-    // Swipe lightbox
     if (lbEl) {
       lbEl.addEventListener('touchstart', function(e) { touchX0 = e.touches[0].clientX; }, { passive: true });
-      lbEl.addEventListener('touchend',   function(e) {
+      lbEl.addEventListener('touchend', function(e) {
         var dx = e.changedTouches[0].clientX - touchX0;
         if (Math.abs(dx) > 50) pfLbShow(lbIdx + (dx < 0 ? 1 : -1));
       });
-    }
-
-    // ── Difuminado de cara ────────────────────────────────────
-    function applyBlur() {
-      if (!PIXELAR || !mainImg.complete || !mainImg.naturalWidth) return;
-      var pgMain = mainImg.parentElement;
-      var W = pgMain.offsetWidth, H = pgMain.offsetHeight;
-      if (!W || !H) return;
-      var canvas = pgMain.querySelector('canvas.fb');
-      if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.className = 'fb';
-        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;border-radius:inherit;';
-        pgMain.appendChild(canvas);
-      }
-      canvas.width = W; canvas.height = H;
-      var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, H);
-      var cx = W * 0.5, cy = H * 0.25;
-      var rx = W * 0.28, ry = H * 0.20;
-      var nW = mainImg.naturalWidth, nH = mainImg.naturalHeight;
-      var scale = Math.max(W / nW, H / nH);
-      var sx = ((nW * scale - W) / 2) / scale;
-      var sy = ((nH * scale - H) / 2) / scale;
-      var sw = W / scale, sh = H / scale;
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, rx + 10, ry + 10, 0, 0, Math.PI * 2);
-      ctx.clip();
-      [10, 20, 30].forEach(function(b) {
-        ctx.filter = 'blur(' + b + 'px)';
-        ctx.drawImage(mainImg, sx, sy, sw, sh, 0, 0, W, H);
-      });
-      ctx.restore();
-      ctx.filter = 'none';
-    }
-    if (PIXELAR) {
-      if (mainImg.complete && mainImg.naturalWidth) applyBlur();
-      else mainImg.addEventListener('load', applyBlur);
     }
   })();
   </script>
