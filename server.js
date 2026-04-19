@@ -925,7 +925,7 @@ app.post('/admin/perfil/nuevo', requireAuth, (req, res) => {
     nacionalidad: nacionalidad ? nacionalidad.toLowerCase().trim() : null,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
     notas_internas: notas_internas || null, created_at: new Date().toISOString(),
-    referidos_count: 0, recompensa: false, tiers_cobrados: []
+    referidos_count: 0, recompensa: false, tiers_cobrados: [], pixelar_cara: false
   });
   savePerfiles(perfiles);
   res.redirect(`/admin/perfil/${id}/editar`); // Redirigir a editar para poder subir fotos inmediatamente
@@ -977,7 +977,8 @@ app.post('/admin/perfil/:id/editar', requireAuth, (req, res) => {
     zona: zona || null, zona_lat: zona_lat ? parseFloat(zona_lat) : null, zona_lng: zona_lng ? parseFloat(zona_lng) : null,
     nacionalidad: nacionalidad ? nacionalidad.toLowerCase().trim() : null,
     fecha_inicio: fecha_inicio || null, fecha_fin: fecha_fin || null,
-    notas_internas: notas_internas || null, orden_manual: parseInt(orden_manual) || 99
+    notas_internas: notas_internas || null, orden_manual: parseInt(orden_manual) || 99,
+    pixelar_cara: req.body.pixelar_cara === 'on'
   };
   savePerfiles(perfiles);
   res.redirect('/panel');
@@ -1068,6 +1069,17 @@ app.post('/admin/perfil/:id/foto-eliminar', requireAuth, (req, res) => {
   if (p && checkOwnership(p, req.session.user)) { p.fotos = (p.fotos || []).filter(f => f !== foto); savePerfiles(perfiles); }
   const filePath = path.join(__dirname, 'public', foto);
   if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  res.redirect(`/admin/perfil/${req.params.id}/editar`);
+});
+
+app.post('/admin/perfil/:id/foto-portada', requireAuth, (req, res) => {
+  const { foto } = req.body;
+  const perfiles = getPerfiles();
+  const p = perfiles.find(p => p.id === req.params.id);
+  if (p && checkOwnership(p, req.session.user) && foto) {
+    p.fotos = [foto, ...(p.fotos || []).filter(f => f !== foto)];
+    savePerfiles(perfiles);
+  }
   res.redirect(`/admin/perfil/${req.params.id}/editar`);
 });
 
