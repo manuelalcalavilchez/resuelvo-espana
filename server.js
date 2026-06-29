@@ -4,8 +4,7 @@ const FileStore = require('session-file-store')(session);
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const pino = require('pino');
-const pinoHttp = require('pino-http');
+const pino={info:()=>{},warn:()=>{},error:()=>{},fatal:()=>{},debug:()=>{}}; const pinoHttp=()=>()=>{};
 const multer = require('multer');
 const path = require('path');
 const cron = require('node-cron');
@@ -16,12 +15,13 @@ const translations = require('./translations');
 const crypto = require('crypto');
 
 // ─── LOGGER ───────────────────────────────────────────────
-const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  transport: process.env.NODE_ENV === 'production'
-    ? undefined
-    : { target: 'pino-pretty', options: { colorize: true, translateTime: 'HH:MM:ss' } }
-});
+const logger = {
+  info: (...a) => console.log('[INFO]', ...a),
+  warn: (...a) => console.warn('[WARN]', ...a),
+  error: (...a) => console.error('[ERROR]', ...a),
+  fatal: (...a) => { console.error('[FATAL]', ...a); },
+  debug: (...a) => {},
+};
 
 // ─── PRODUCTION SAFETY: secrets obligatorios ──────────────
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -66,7 +66,7 @@ app.use(helmet({
 }));
 
 // Middleware
-app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url.startsWith('/uploads') || req.url.startsWith('/css') || req.url.startsWith('/js') || req.url.startsWith('/img') } }));
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
