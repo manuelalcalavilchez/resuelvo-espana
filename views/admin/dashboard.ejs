@@ -29,7 +29,8 @@
       <% } %>
       <% if (!_panel) { %>
       <a href="/admin/recordatorios">🔔 Recordatorios <% if (stats.expiran7 > 0) { %><span style="background:#ffab00;color:#000;font-size:0.6rem;padding:1px 6px;border-radius:30px;font-weight:700;margin-left:4px;"><%= stats.expiran7 %></span><% } %></a>
-      <a href="/admin/agencias">🏢 Agencias</a>
+      <a href="/admin/agencias">🏢 Agencias <% if (stats.agencias_pendientes > 0) { %><span style="background:#ffab00;color:#000;font-size:0.6rem;padding:1px 6px;border-radius:30px;font-weight:700;margin-left:4px;"><%= stats.agencias_pendientes %></span><% } %></a>
+      <a href="/admin/usuarios">👤 Usuarios <% if (stats.usuarios_pendientes > 0) { %><span style="background:#ffab00;color:#000;font-size:0.6rem;padding:1px 6px;border-radius:30px;font-weight:700;margin-left:4px;"><%= stats.usuarios_pendientes %></span><% } %></a>
       <a href="/admin/config">⚙️ Configuración</a>
       <a href="/admin/clicks">🖱️ Clicks</a>
       <% } %>
@@ -102,6 +103,22 @@
         <div class="stat-value"><%= stats.expiran7 %></div>
         <div class="stat-label">Expiran en 7 días</div>
       </div>
+      <% if (!_panel && stats.usuarios_pendientes > 0) { %>
+      <a href="/admin/usuarios" style="text-decoration:none;">
+        <div class="stat-card" style="background:#ffab00;color:#000;cursor:pointer;">
+          <div class="stat-value" style="color:#000;"><%= stats.usuarios_pendientes %></div>
+          <div class="stat-label" style="color:#000;">⚠️ Usuarios pendientes</div>
+        </div>
+      </a>
+      <% } %>
+      <% if (!_panel && stats.agencias_pendientes > 0) { %>
+      <a href="/admin/agencias" style="text-decoration:none;">
+        <div class="stat-card" style="background:#ffab00;color:#000;cursor:pointer;">
+          <div class="stat-value" style="color:#000;"><%= stats.agencias_pendientes %></div>
+          <div class="stat-label" style="color:#000;">⚠️ Agencias pendientes</div>
+        </div>
+      </a>
+      <% } %>
     </div>
 
     <!-- Filters -->

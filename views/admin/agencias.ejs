@@ -70,10 +70,34 @@
             <div>
               <h3 style="font-size:0.95rem;color:#c8d0e0;margin-bottom:4px;"><%= a.nombre %></h3>
               <span class="badge badge-basica"><%= a.ciudad %></span>
+              <% if (a.estado === 'pendiente') { %>
+                <span style="background:#ffab00;color:#000;font-size:0.65rem;padding:2px 8px;border-radius:30px;font-weight:700;margin-left:6px;">PENDIENTE</span>
+              <% } else if (a.estado === 'activa') { %>
+                <span style="background:#00e676;color:#000;font-size:0.65rem;padding:2px 8px;border-radius:30px;font-weight:700;margin-left:6px;">ACTIVA</span>
+              <% } else if (a.estado === 'rechazada') { %>
+                <span style="background:#ff3b6b;color:#fff;font-size:0.65rem;padding:2px 8px;border-radius:30px;font-weight:700;margin-left:6px;">RECHAZADA</span>
+              <% } %>
             </div>
-            <form action="/admin/agencias/<%= a.id %>/eliminar" method="POST" class="confirm-delete">
-              <button type="submit" class="btn btn-danger btn-sm">🗑</button>
-            </form>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <% if (a.estado === 'pendiente') { %>
+              <form action="/admin/agencias/<%= a.id %>/estado" method="POST" style="display:inline;">
+                <input type="hidden" name="estado" value="activa">
+                <button type="submit" class="btn btn-success btn-sm">✓ Aprobar</button>
+              </form>
+              <form action="/admin/agencias/<%= a.id %>/estado" method="POST" style="display:inline;">
+                <input type="hidden" name="estado" value="rechazada">
+                <button type="submit" class="btn btn-danger btn-sm">✗ Rechazar</button>
+              </form>
+              <% } else if (a.estado === 'rechazada' || a.estado === 'activa') { %>
+              <form action="/admin/agencias/<%= a.id %>/estado" method="POST" style="display:inline;">
+                <input type="hidden" name="estado" value="<%= a.estado === 'activa' ? 'pendiente' : 'activa' %>">
+                <button type="submit" class="btn btn-ghost btn-sm"><%= a.estado === 'activa' ? '⏸ Suspender' : '▶ Activar' %></button>
+              </form>
+              <% } %>
+              <form action="/admin/agencias/<%= a.id %>/eliminar" method="POST" class="confirm-delete" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+              </form>
+            </div>
           </div>
           <% if (a.descripcion) { %><p style="font-size:0.8rem;color:#4a5568;margin-bottom:8px;"><%= a.descripcion %></p><% } %>
           <% if (a.contacto) { %>

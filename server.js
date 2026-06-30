@@ -828,11 +828,15 @@ app.get('/admin', requireAdmin, (req, res) => {
   const today = new Date().toISOString().split('T')[0];
   const in7 = new Date(); in7.setDate(in7.getDate() + 7);
   const in7str = in7.toISOString().split('T')[0];
+  const todosUsuarios = getUsuarios();
+  const todasAgencias = getAgencias();
   const stats = {
     total: all.length,
     activos: all.filter(p => p.estado === 'activo').length,
     pendientes: all.filter(p => !['activo', 'rechazado', 'expirado'].includes(p.estado)).length,
-    expiran7: all.filter(p => p.estado === 'activo' && p.fecha_fin && p.fecha_fin >= today && p.fecha_fin <= in7str).length
+    expiran7: all.filter(p => p.estado === 'activo' && p.fecha_fin && p.fecha_fin >= today && p.fecha_fin <= in7str).length,
+    usuarios_pendientes: todosUsuarios.filter(u => u.estado === 'pendiente').length,
+    agencias_pendientes: todasAgencias.filter(a => a.estado === 'pendiente').length
   };
   const ciudadesLista = [...new Set(all.map(p => p.ciudad))].sort();
   res.render('admin/dashboard', { perfiles, stats, filters: { estado, ciudad, plan }, ciudadesLista });
@@ -1100,8 +1104,17 @@ app.get('/admin/agencias', requireAdmin, (req, res) => {
 app.post('/admin/agencias/nueva', requireAdmin, (req, res) => {
   const { nombre, ciudad, descripcion, contacto } = req.body;
   const agencias = getAgencias();
-  agencias.push({ id: 'AG-' + Date.now(), nombre, ciudad, descripcion: descripcion || null, contacto: contacto || null, created_at: new Date().toISOString() });
+  agencias.push({ id: 'AG-' + Date.now(), nombre, ciudad, descripcion: descripcion || null, contacto: contacto || null, estado: 'pendiente', created_at: new Date().toISOString() });
   saveAgencias(agencias);
+  res.redirect('/admin/agencias');
+});
+app.post('/admin/agencias/:id/estado', requireAdmin, (req, res) => {
+  const agencias = getAgencias();
+  const a = agencias.find(x => x.id === req.params.id);
+  if (a) {
+    a.estado = req.body.estado || a.estado;
+    saveAgencias(agencias);
+  }
   res.redirect('/admin/agencias');
 });
 app.post('/admin/agencias/:id/eliminar', requireAdmin, (req, res) => {
