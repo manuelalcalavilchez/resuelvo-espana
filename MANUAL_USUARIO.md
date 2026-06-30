@@ -1,7 +1,7 @@
 # Manual de Usuario · Queens VIP Royal
 
-> Plataforma de directorio premium de acompañantes verificados en España.
-> Versión: 1.0 · Última actualización: 2026-04-07
+> Plataforma de directorio premium de acompañantes verificados en España.  
+> Versión: 1.1 · Última actualización: 2026-06-30
 
 ---
 
@@ -40,7 +40,7 @@
 | **Visitante** | Buscar y ver perfiles, contactar por WhatsApp | Sin registro |
 | **Modelo independiente** | Crear y gestionar su propio perfil | Registro vía WhatsApp |
 | **Agencia** | Gestionar varios perfiles asociados a su cuenta | Alta supervisada por el equipo |
-| **Administrador** | Verificar perfiles, aprobar agencias, moderar contenido | Acceso restringido |
+| **Administrador** | Verificar perfiles, aprobar agencias y usuarios, moderar contenido | Acceso restringido |
 
 ---
 
@@ -60,7 +60,7 @@ La primera vez que entras al sitio aparece una **pantalla de verificación de ed
    - **Disponibilidad**: Disponible ahora · Próximamente · No disponible
 4. Pulsa el botón **"[Categoría] más cercanas"** para que el navegador detecte tu ubicación y ordene los perfiles por proximidad.
 
-En el listado de cada provincia verás primero las fichas **👑 Destacadas** — con marco dorado animado, badge Corona brillante y un fragmento amplio de la descripción (hasta 800 caracteres, se expande al pasar el cursor). Debajo aparece el **Catálogo** con un resumen compacto de la descripción (hasta 250 caracteres).
+En el listado verás primero las fichas **👑 Destacadas** — con marco dorado animado, badge Corona brillante y un fragmento amplio de la descripción (hasta 800 caracteres, se expande al hover). Debajo aparece el **Catálogo** con un resumen compacto (hasta 250 caracteres).
 
 ### 3.3 Ver una ficha de perfil
 
@@ -74,7 +74,7 @@ En cada ficha encontrarás:
 - 📞 **Botón Llamar**: marcar el teléfono
 
 ### 3.4 Cambiar de idioma
-En la parte superior derecha (próximamente, según diseño actual) o en el footer puedes cambiar el idioma. La preferencia se guarda en tu sesión.
+En la navegación puedes cambiar el idioma. La preferencia se guarda en tu sesión.
 
 ---
 
@@ -103,8 +103,8 @@ En la parte superior derecha (próximamente, según diseño actual) o en el foot
 
 | Plan | Fotos | Vídeo | Descripción | Posición | Badge |
 |---|---|---|---|---|---|
-| **Catálogo (básico)** | 5 | ❌ | 250 caracteres (visibles en el listado) | Estándar | — |
-| **👑 Destacada** | 12 | ✅ | 800 caracteres (visibles y expandibles al hover) | Prioritaria + carrusel home + marco dorado animado | 👑 Corona |
+| **Catálogo (básico)** | 5 | ❌ | 250 caracteres | Estándar | — |
+| **👑 Destacada** | 12 | ✅ | 800 caracteres (expandible al hover) | Prioritaria + carrusel home + marco dorado | 👑 Corona |
 
 ### 4.4 Acceder a tu panel
 
@@ -131,6 +131,7 @@ El alta de agencia es **supervisada manualmente** por el equipo de Queens. Para 
 1. Pulsa **"Inscribir Agencia"** en la página principal.
 2. Se abre WhatsApp con un mensaje pre-rellenado.
 3. Tras una entrevista de validación (datos fiscales, NIF, ubicación), el equipo te crea la cuenta de agencia.
+4. La agencia entra en estado **pendiente** hasta que el administrador la apruebe.
 
 ### 5.2 Gestión de modelos
 Desde el panel de agencia puedes:
@@ -150,30 +151,66 @@ La agencia paga un plan global o por perfil, según el acuerdo establecido al al
 ### 6.1 Acceso al panel admin
 1. Entra en `/admin/login`
 2. Introduce la contraseña de administrador (definida en `ADMIN_PASSWORD`)
-3. Accedes al **dashboard** con estadísticas globales
+3. Accedes al **dashboard** con estadísticas en tiempo real
 
-### 6.2 Funciones del panel admin
+### 6.2 Dashboard — Estadísticas y alertas
 
-- **Dashboard**: estadísticas generales (perfiles activos, ingresos del mes, alertas pendientes)
-- **Gestión de perfiles** (`/admin/perfiles`):
-  - Crear nuevo perfil
-  - Editar perfil existente
-  - Subir/reordenar fotos
-  - Subir vídeo (planes Destacada)
-  - Cambiar plan, estado, disponibilidad
-  - Acreditar referidas (programa de afiliación)
-- **Gestión de agencias** (`/admin/agencias`)
-- **Gestión de usuarios** (`/admin/usuarios`)
-- **Configuración global** (`/admin/config`):
-  - Número de WhatsApp principal
-  - Idiomas activos
-  - Configuración de planes
-- **Recordatorios** (`/admin/recordatorios`): perfiles próximos a vencer
-- **Solicitudes legales**:
-  - `data/takedowns.json` → solicitudes de retirada de contenido
-  - `data/gdpr_requests.json` → ejercicio de derechos RGPD
+El dashboard muestra:
+- **Total Perfiles**: todos los perfiles registrados
+- **Activos**: perfiles publicados actualmente
+- **Pendientes**: perfiles en cualquier estado de tramitación
+- **Expiran en 7 días**: perfiles activos próximos a vencer
+- **⚠️ Usuarios pendientes**: usuarios registrados que esperan aprobación (solo aparece si hay alguno)
+- **⚠️ Agencias pendientes**: agencias nuevas sin aprobar (solo aparece si hay alguna)
 
-### 6.3 Verificación de un perfil nuevo
+Las tarjetas de alerta (amarillas) son clicables y llevan directamente a la sección correspondiente.
+
+### 6.3 Navegación del panel
+
+El sidebar incluye:
+- 📊 Dashboard
+- ➕ Nuevo Perfil
+- 🔔 Recordatorios (con badge si hay perfiles próximos a expirar)
+- 🏢 Agencias (con badge si hay agencias pendientes)
+- 👤 Usuarios (con badge si hay usuarios pendientes)
+- ⚙️ Configuración
+- 🖱️ Clicks
+- 🌐 Ver Web
+- 🚪 Salir
+
+### 6.4 Gestión de perfiles
+
+Desde el dashboard puedes:
+- Crear nuevo perfil con todos sus datos
+- Editar perfil existente (fotos, vídeo, textos, plan, estado)
+- Cambiar estado rápidamente: Activar / Pausar / Rechazar
+- Filtrar por estado, ciudad o plan
+- Contactar por WhatsApp directamente
+
+### 6.5 Gestión de agencias (`/admin/agencias`)
+
+- **Crear nueva agencia**: nombre, ciudad, descripción, contacto
+- Las agencias nuevas se crean en estado **pendiente**
+- **Aprobar** (✓): cambia a estado "activa"
+- **Rechazar** (✗): cambia a estado "rechazada"
+- **Suspender** (⏸): vuelve a estado "pendiente"
+- **Eliminar** (🗑): borrado permanente
+
+### 6.6 Gestión de usuarios (`/admin/usuarios`)
+
+- Ver todos los usuarios registrados (modelos y agencias)
+- Aprobar o rechazar usuarios pendientes
+- Vincular usuario a un perfil o agencia
+- Resetear contraseña desde el panel
+
+### 6.7 Configuración global (`/admin/config`)
+
+- Número de WhatsApp principal
+- Idiomas activos
+- Configuración de planes y precios
+
+### 6.8 Verificación de un perfil nuevo
+
 Cuando una modelo solicita alta vía WhatsApp:
 1. Recibes su DNI, fotos HD y vídeo de verificación
 2. Verificas que la persona del DNI coincide con la del vídeo
@@ -183,7 +220,7 @@ Cuando una modelo solicita alta vía WhatsApp:
 6. Activas el plan correspondiente
 7. Marcas como "activo" → el perfil se publica
 
-### 6.4 Plazos legales que debes cumplir
+### 6.9 Plazos legales
 
 | Tipo de solicitud | Plazo legal | Dónde llegan |
 |---|---|---|
@@ -191,18 +228,19 @@ Cuando una modelo solicita alta vía WhatsApp:
 | **Derecho RGPD (acceso, supresión...)** | 1 mes desde recepción | `data/gdpr_requests.json` |
 | **Sospecha de trata o menor** | **INMEDIATO** | Bloquear perfil + denunciar a 062 / 091 |
 
-### 6.5 Backups automáticos
-El sistema realiza un **backup diario a las 4:00 AM** y guarda los últimos 14 días en `data/backups/YYYY-MM-DD/`. Si necesitas restaurar:
-1. Para el contenedor.
-2. Copia los `.json` del backup deseado a `data/`.
-3. Reinicia el contenedor.
+### 6.10 Backups automáticos
+
+El sistema realiza un **backup diario a las 4:00 AM** y guarda los últimos 14 días en `data/backups/YYYY-MM-DD/`. Para restaurar:
+1. Para el contenedor
+2. Copia los `.json` del backup deseado a `data/`
+3. Reinicia el contenedor
 
 ---
 
 ## 7. Programa de afiliación / Recompensas
 
 ### 7.1 Cómo funciona
-Cada perfil tiene un enlace único de invitación que puede compartir con otras personas que quieran anunciarse. Cuando alguien se inscribe usando ese enlace, se acredita a la afiliada.
+Cada perfil activo tiene un enlace único de invitación que puede compartir. Cuando alguien se inscribe usando ese enlace y se activa, se acredita a la afiliada.
 
 ### 7.2 Niveles de recompensa
 
@@ -215,16 +253,16 @@ Cada perfil tiene un enlace único de invitación que puede compartir con otras 
 ### 7.3 Cómo acreditar una referida
 1. La nueva inscrita debe entrar usando el enlace de la afiliada (ej: `/inicio?ref=Q-1234`).
 2. Cuando el equipo da de alta el nuevo perfil, queda automáticamente acreditado.
-3. Si por alguna razón no quedó acreditado, el admin puede acreditar manualmente desde el panel del perfil de la nueva.
+3. Si no quedó acreditado, el admin puede acreditar manualmente.
 
-### 7.4 Botón "Invita a nuevos anunciantes y obtén tu recompensa"
-Desde la propia ficha de perfil, la afiliada puede pulsar este botón para copiar su enlace de referido y compartirlo en sus redes o por WhatsApp.
+### 7.4 Widget de afiliación
+Desde su panel, la afiliada ve su progreso, enlace para copiar y botón para compartir por WhatsApp.
 
 ---
 
 ## 8. Modo seguro (Ghost Mode)
 
-Pulsa el enlace **"Modo seguro"** en cualquier página y serás redirigido a una página neutra (página estilo página de noticias / clima) que **no deja rastro** en el historial. Útil si necesitas cerrar la pestaña rápidamente.
+Pulsa el enlace **"Modo seguro"** en cualquier página y serás redirigido a una página neutra (estilo noticias/clima) que **no deja rastro** en el historial. Útil si necesitas cerrar la pestaña rápidamente.
 
 ---
 
@@ -234,7 +272,7 @@ Pulsa el enlace **"Modo seguro"** en cualquier página y serás redirigido a una
 Consultable en `/legal/privacidad`. Cumple con el RGPD (UE 2016/679) y la LOPDGDD 3/2018.
 
 ### 9.2 Tus derechos como usuario
-Puedes ejercer cualquiera de tus derechos RGPD desde `/legal/mis-datos`:
+Desde `/legal/mis-datos` puedes ejercer:
 - **Acceso**: saber qué datos tenemos sobre ti
 - **Rectificación**: corregir datos inexactos
 - **Supresión** (derecho al olvido)
@@ -246,18 +284,14 @@ Puedes ejercer cualquiera de tus derechos RGPD desde `/legal/mis-datos`:
 Plazo de respuesta: **1 mes desde la recepción**.
 
 ### 9.3 Solicitar retirada de contenido
-Si consideras que algún contenido vulnera tus derechos (imagen, intimidad, propiedad intelectual) o sospechas un delito, usa `/legal/takedown`. Plazo de respuesta: **48 horas laborables**.
+Usa `/legal/takedown`. Plazo de respuesta: **48 horas laborables**.
 
 ### 9.4 Política anti-trata
-Queens tiene **tolerancia cero** ante la trata de seres humanos. Consulta `/legal/anti-trata` para conocer:
-- Marco legal (art. 177 bis CP, Directiva 2011/36/UE, Protocolo de Palermo)
-- Indicadores de alerta
-- Procedimiento de notificación
-- Teléfonos oficiales:
-  - **062** Guardia Civil
-  - **091** Policía Nacional
-  - **016** Atención a víctimas de violencia de género
-  - **900 10 50 90** Línea anti-trata
+Queens tiene **tolerancia cero**. Consulta `/legal/anti-trata`. Teléfonos oficiales:
+- **062** Guardia Civil
+- **091** Policía Nacional
+- **016** Atención a víctimas de violencia de género
+- **900 10 50 90** Línea anti-trata
 
 ### 9.5 Cookies utilizadas
 
@@ -273,61 +307,27 @@ Queens tiene **tolerancia cero** ante la trata de seres humanos. Consulta `/lega
 
 ## 10. Solución de problemas
 
-### "CSRF: origen ausente" al enviar un formulario
-- Causa: cookies o JavaScript desactivados, o estás enviando el formulario desde otro dominio.
-- Solución: activa cookies, recarga la página y vuelve a enviar.
-
-### "No puedo entrar al sitio porque me redirige siempre al age-gate"
-- Causa: tu navegador está bloqueando cookies de primera parte (cookie técnica `queens_age_18`).
-- Solución: en la configuración del navegador, permite cookies para `queensviproyal.com`.
-
-### "No veo perfiles en mi provincia"
-- Es posible que aún no haya perfiles activos en esa zona. Prueba con provincias cercanas o vuelve más tarde.
-
-### "He subido fotos pero no aparecen"
-- Pueden estar en cola de moderación. Las fotos subidas por modelos pasan por validación del equipo antes de hacerse públicas. Tarda hasta 24 h.
-
-### "Olvidé mi contraseña"
-- Pulsa "¿Olvidaste tu contraseña?" en `/acceso/login`. Se abre WhatsApp con un mensaje pre-rellenado. El equipo restablecerá tu acceso manualmente.
-
-### "He cambiado mi descripción pero no aparece en mi ficha"
-- Asegúrate de que tu plan permite descripción (Catálogo: 250 caracteres, Destacada: 800).
-- Tras guardar, recarga la página de tu ficha pública con Ctrl+F5.
-
-### "Mi vídeo no se ve"
-- Solo los perfiles **plan Destacada** pueden tener vídeo público. Verifica tu plan en el panel.
-
-### Quiero borrar mi cuenta y mis datos
-- Usa el formulario `/legal/mis-datos` con tipo "Supresión / Derecho al olvido". Tu cuenta y tus datos serán eliminados en un plazo máximo de 1 mes.
+| Problema | Solución |
+|---|---|
+| "CSRF: origen ausente" al enviar formulario | Activa cookies, recarga la página y reenvía |
+| Siempre redirige al age-gate | Permite cookies de primera parte para el dominio |
+| No veo perfiles en mi provincia | Puede que no haya activos aún; prueba provincias cercanas |
+| Fotos subidas no aparecen | Están en cola de moderación (hasta 24 h) |
+| Olvidé mi contraseña | Usa "¿Olvidaste tu contraseña?" en `/acceso/login` |
+| Mi vídeo no se ve | Solo disponible en plan Destacada |
+| Quiero borrar mi cuenta | Usa `/legal/mis-datos` → "Supresión" (plazo: 1 mes) |
 
 ---
 
 ## 11. Contacto y soporte
 
-- **WhatsApp principal**: configurable desde el panel admin (variable `WHATSAPP_NUMBER`)
-- **Soporte legal**: `/legal/takedown` (retirada de contenido) · `/legal/mis-datos` (RGPD)
-- **Emergencia anti-trata o menor**: 062 / 091 / 900 10 50 90 (no esperes a contactar con el sitio: llama directamente)
+- **WhatsApp principal**: configurable desde el panel admin
+- **Soporte legal**: `/legal/takedown` · `/legal/mis-datos`
+- **Emergencia anti-trata o menor**: 062 / 091 / 900 10 50 90
 
 ---
 
-## Apéndice A · Glosario rápido
-
-- **Anunciante**: persona que publica su perfil para ofrecer servicios.
-- **Plan Destacada**: plan premium con 12 fotos, vídeo, descripción ampliada y posición prioritaria.
-- **Plan Catálogo**: plan básico estándar.
-- **Independiente**: anunciante que gestiona su propio perfil sin agencia.
-- **Agencia**: entidad que gestiona varios perfiles bajo su cuenta.
-- **Verificación**: proceso de comprobación de identidad y autenticidad de fotos.
-- **Age-gate**: pantalla de verificación de mayoría de edad.
-- **Modo seguro / Ghost mode**: redirección de emergencia a una página neutra.
-- **Referida**: nueva anunciante traída por una afiliada existente.
-- **Acreditación**: proceso por el cual se vincula formalmente una referida a una afiliada para activar la recompensa.
-- **Takedown**: solicitud formal de retirada de contenido.
-- **SAR (Subject Access Request)**: solicitud RGPD de ejercicio de derechos.
-
----
-
-## Apéndice B · URLs útiles
+## Apéndice — URLs útiles
 
 | URL | Para qué sirve |
 |---|---|
@@ -339,19 +339,18 @@ Queens tiene **tolerancia cero** ante la trata de seres humanos. Consulta `/lega
 | `/planes` | Comparativa de planes y precios |
 | `/acceso/login` | Acceso al panel privado (modelos / agencias) |
 | `/admin/login` | Acceso al panel de administración |
+| `/admin` | Dashboard admin |
+| `/admin/usuarios` | Gestión de usuarios |
+| `/admin/agencias` | Gestión de agencias |
+| `/admin/config` | Configuración global |
+| `/admin/recordatorios` | Alertas de expiración |
+| `/admin/clicks` | Estadísticas de clicks |
 | `/legal/privacidad` | Política de privacidad RGPD |
-| `/legal/terminos` | Términos y condiciones |
-| `/legal/cookies` | Política de cookies |
-| `/legal/aviso` | Aviso legal LSSI |
-| `/legal/anti-trata` | Política anti-trata |
-| `/legal/consentimiento` | Política de consentimiento |
-| `/legal/dmca` | Política de propiedad intelectual / DMCA |
 | `/legal/takedown` | Formulario de retirada de contenido |
 | `/legal/mis-datos` | Ejercicio de derechos RGPD |
-| `/age-gate` | Verificación de mayoría de edad |
 | `/ghost` | Modo seguro (página neutra de salida) |
-| `/health` | Endpoint de healthcheck (devuelve JSON) |
+| `/health` | Endpoint de healthcheck (JSON) |
 
 ---
 
-© Queens VIP Royal · Todos los derechos reservados.
+© Queens VIP Royal · Todos los derechos reservados · 2026
