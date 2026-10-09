@@ -147,6 +147,9 @@ app.use((req, res, next) => {
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Queens2024!';
 const APP_VERSION = Date.now().toString(); // Genera un ID único cada vez que reinicias el servidor
 
+// Marketplace nacional añadido en la copia, sin alterar las rutas originales.
+app.use('/servicios', require('./marketplace').router);
+
 // ─── CONFIG (editable desde admin) ────────────────────────
 const CONFIG_FILE = path.join(__dirname, 'data', 'config.json');
 const DEFAULT_CONFIG = {
