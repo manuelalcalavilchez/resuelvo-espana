@@ -1,119 +1,58 @@
 # Despliegue en EasyPanel — Resuelvo España
 
-Guía para la copia independiente `manuelalcalavilchez/resuelvo-espana`, rama `main`. La aplicación se sirve en `/servicios` dentro del servidor Express existente. No se ha desplegado ni publicado este commit desde Desktop Commander; antes de admitir clientes reales hay que completar las tareas legales, de persistencia y privacidad descritas en `README_RESUELVO.md`. No hay cobros reales activos.
+Repositorio independiente: `manuelalcalavilchez/resuelvo-espana`, rama `main`.
+El marketplace está montado en `/servicios`. **No desplegar el repositorio original `queen2` ni la rama `master`.** Este MVP todavía requiere una revisión legal y de privacidad y no tiene pagos reales.
 
----
+## 1. Servicio
 
-## 1. Crear el servicio
+- Tipo: **App**, fuente GitHub.
+- Repositorio: `manuelalcalavilchez/resuelvo-espana`.
+- Rama: `main`.
+- Build: Dockerfile en la raíz.
+- Puerto interno: `3000`.
 
-1. En tu proyecto de Easypanel → **+ Service** → **App**.
-2. **Source:** GitHub → repositorio `dnogares/queenviproyal`, branch `master`.
-3. **Build method:** `Dockerfile` (auto-detectado).
-4. **Build path:** `/` (raíz del repo).
-5. **Port:** `3000`.
+## 2. Variables de entorno obligatorias
 
----
+Configurar en EasyPanel → Environment; no subir secretos al repositorio:
 
-## 2. Variables de entorno
+| Variable | Valor |
+|---|---|
+| `NODE_ENV` | `production` |
+| `PORT` | `3000` |
+| `ADMIN_PASSWORD` | Contraseña única, larga y no reutilizada |
+| `SESSION_SECRET` | Secreto aleatorio de al menos 32 bytes |
 
-En la pestaña **Environment** del servicio añade:
+Genera los secretos fuera del repositorio. Por ejemplo, en un terminal Linux seguro: `openssl rand -hex 32`. No reutilices contraseñas de otros servicios. El servidor debe detenerse si falta cualquiera de las dos variables críticas.
 
-| Variable | Valor recomendado | Notas |
-|---|---|---|
-| `NODE_ENV` | `production` | |
-| `PORT` | `3000` | Easypanel inyecta su propio puerto si lo dejas así |
-| `ADMIN_PASSWORD` | *(elige una fuerte)* | Acceso a `/admin/login` |
-| `SESSION_SECRET` | *(string aleatorio largo)* | Usa `openssl rand -hex 32` |
-| `WHATSAPP_NUMBER` | `34610216548` | Fallback inicial — luego se edita desde `/admin/config` |
+## 3. Volumen persistente
 
-> ⚠️ **No** guardes el `.env` en el repo. Easypanel inyecta estas variables en tiempo de ejecución.
+Crear un volumen persistente montado en **`/app/data`**. El proyecto guarda ahí configuración, perfiles, solicitudes, profesionales, libro de créditos, auditoría y sesiones. Sin persistencia pueden perderse datos y sesiones al redeplegar.
 
----
-
-## 3. Volúmenes persistentes (CRÍTICO)
-
-Sin volúmenes, **cada redeploy borra la base de datos y las fotos subidas**.
-
-En la pestaña **Mounts** del servicio crea estos dos volúmenes:
-
-| Tipo | Mount path | Descripción |
-|---|---|---|
-| Volume | `/app/data` | Almacena `config.json`, `perfiles.json`, `usuarios.json`, `agencias.json` |
-| Volume | `/app/public/uploads` | Fotos y vídeos subidos por las anunciantes |
-
-Easypanel los crea automáticamente en `/etc/easypanel/projects/<proj>/<service>/volumes/`.
-
----
+Las subidas usan `/app/public/uploads`; si se habilitan en el despliegue, monta también esa ruta en un volumen persistente. Configura copias de seguridad cifradas y prueba una restauración antes de admitir datos reales.
 
 ## 4. Dominio y HTTPS
 
-1. Pestaña **Domains** → **+ Add Domain**.
-2. Escribe tu dominio (ej. `queenviproyal.com`).
-3. Activa **HTTPS** (Let's Encrypt automático).
-4. Apunta tu DNS (`A` record) a la IP de tu servidor Easypanel.
+1. Asignar el dominio de Resuelvo España en EasyPanel.
+2. Configurar el DNS hacia el servidor.
+3. Activar HTTPS.
+4. Comprobar que las cookies seguras funcionan detrás del proxy.
 
----
+## 5. Verificación tras desplegar
 
-## 5. Primer arranque
+- `GET /servicios` debe devolver HTTP 200.
+- `GET /servicios/api/health` debe devolver JSON con `ok: true`.
+- `GET /servicios/api/catalogo` debe mostrar categorías y provincias.
+- `GET /servicios/admin/leads` sin sesión de administrador debe devolver HTTP 403.
+- Verificar que los datos sobreviven a un redeploy.
+- Revisar los logs y confirmar que no se imprimen contraseñas ni secretos.
 
-1. **Deploy** → Easypanel construye la imagen y arranca el contenedor.
-2. Comprueba los logs: deberías ver `Servidor en puerto 3000` (o similar).
-3. Visita `https://tu-dominio/` → debería cargar la portada.
-4. Entra a `https://tu-dominio/admin/login` con la `ADMIN_PASSWORD` que pusiste.
-5. Verifica `/admin/config` → deberías ver el número de WhatsApp configurado.
+## 6. Antes de producción comercial
 
----
+- Migrar la persistencia JSON a PostgreSQL y usar transacciones/concurrencia segura.
+- Implementar eliminación automática y verificable de datos vencidos y gestión real de solicitudes RGPD.
+- Añadir pruebas automatizadas, alertas, backups y restauración.
+- Revisar todos los endpoints y controles de acceso, incluido el código heredado.
+- Integrar pagos, facturación, email y WhatsApp solo con proveedores configurados y pruebas de webhooks.
+- Completar términos, política de privacidad, consentimientos y revisión legal.
 
-## 6. Healthcheck
-
-El `Dockerfile` incluye:
-
-```dockerfile
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||3000), r => process.exit(r.statusCode < 500 ? 0 : 1))"
-```
-
-Easypanel lo respeta — si el contenedor deja de responder, lo reinicia automáticamente.
-
----
-
-## 7. Backups recomendados
-
-Configura un backup automático (Easypanel → **Backups**) sobre los volúmenes:
-
-- `/app/data` (BD de perfiles + config)
-- `/app/public/uploads` (fotos y vídeos)
-
-Frecuencia recomendada: **diaria**, retención **7-14 días**.
-
----
-
-## 8. Actualizar el código
-
-Cada `git push origin master` desde tu equipo:
-
-1. Easypanel detecta el commit (si tienes el webhook activado) o haz **Deploy** manual.
-2. Reconstruye la imagen → arranca el contenedor nuevo → los volúmenes se reutilizan.
-3. **Cero pérdida de datos** porque `data/` y `uploads/` están fuera del contenedor.
-
----
-
-## 9. Troubleshooting
-
-| Problema | Causa probable | Solución |
-|---|---|---|
-| `bcrypt` no compila | Falta `python3` / `make` / `g++` | El Dockerfile ya los instala en la stage `deps` |
-| Las fotos desaparecen tras un redeploy | Falta el volumen `/app/public/uploads` | Añadir el mount |
-| `/admin/config` muestra el número antiguo | El `.env` no se actualiza | El número editable está en `data/config.json`, no en `.env` |
-| 502 Bad Gateway | Healthcheck fallando, app crasheada | Mira los logs de Easypanel |
-| Pérdida de sesiones tras redeploy | `SESSION_SECRET` no fijado | Configurarlo como env var |
-
----
-
-## 10. Dominios múltiples / staging
-
-Puedes crear un segundo servicio (ej. `queenviproyal-staging`) que apunte a una branch distinta (`develop`) con su propio volumen, dominio y `ADMIN_PASSWORD`.
-
----
-
-¡Listo! 👑
+**Estado:** MVP técnico; no hay cobros reales ni despliegue de producción confirmado por este documento.

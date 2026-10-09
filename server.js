@@ -144,7 +144,10 @@ app.use((req, res, next) => {
   return res.status(403).send('CSRF: origen no autorizado');
 });
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Queens2024!';
+// No usar credenciales por defecto: en producción son obligatorias y en desarrollo
+// el panel queda cerrado si no se configura ADMIN_PASSWORD explícitamente.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 const APP_VERSION = Date.now().toString(); // Genera un ID único cada vez que reinicias el servidor
 
 // ─── CONFIG (editable desde admin) ────────────────────────
@@ -278,7 +281,7 @@ const SESSIONS_DIR = path.join(__dirname, 'data', 'sessions');
 if (!fs.existsSync(SESSIONS_DIR)) fs.mkdirSync(SESSIONS_DIR, { recursive: true });
 app.use(session({
   store: new FileStore({ path: SESSIONS_DIR, ttl: 86400, retries: 1, logFn: () => {} }),
-  secret: process.env.SESSION_SECRET || 'queens-secret-2024',
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   name: 'queens.sid',
@@ -739,16 +742,36 @@ app.get('/admin/login', (req, res) => {
   res.render('admin/login', { error: null });
 });
 app.post('/admin/login', loginLimiter, (req, res) => {
-  if (req.body.password === ADMIN_PASSWORD) {
-    req.session.isAdmin = true;
-    req.session.user = { id: 'root', rol: 'admin' };
-    logger.info({ ip: req.ip }, 'Admin login exitoso');
-    return res.redirect('/admin');
+  if (ADMIN_PASSWORD && typeof req.body.password === 'string' && req.body.password.length > 0 && req.body.password === ADMIN_PASSWORD) {
+    // Regenerar el ID de sesión tras autenticación para mitigar session fixation.
+    return req.session.regenerate((err) => {
+      if (err) {
+        logger.error({ err }, 'No se pudo regenerar la sesión de administrador');
+        return res.status(500).render('admin/login', { error: 'No se pudo iniciar sesión. Inténtalo de nuevo.' });
+      }
+      req.session.isAdmin = true;
+      req.session.user = { id: 'root', rol: 'admin' };
+      logger.info({ ip: req.ip }, 'Admin login exitoso');
+      return req.session.save((saveErr) => {
+        if (saveErr) {
+          logger.error({ err: saveErr }, 'No se pudo guardar la sesión de administrador');
+          return res.status(500).render('admin/login', { error: 'No se pudo iniciar sesión. Inténtalo de nuevo.' });
+        }
+        return res.redirect('/admin');
+      });
+    });
   }
   logger.warn({ ip: req.ip }, 'Admin login fallido');
-  res.render('admin/login', { error: 'Contraseña incorrecta.' });
+  res.status(401).render('admin/login', { error: ADMIN_PASSWORD ? 'Contraseña incorrecta.' : 'El acceso de administrador no está configurado. Define ADMIN_PASSWORD en el entorno.' });
 });
-app.get('/admin/logout', (req, res) => { req.session.destroy(); res.redirect('/admin/login'); });
+app.get('/admin/logout', (req, res) => {
+  if (!req.session) return res.redirect('/admin/login');
+  req.session.destroy((err) => {
+    if (err) logger.warn({ err }, 'No se pudo destruir la sesión');
+    res.clearCookie('queens.sid', { httpOnly: true, sameSite: 'strict', secure: IS_PROD });
+    res.redirect('/admin/login');
+  });
+});
 
 // Admin: Config (WhatsApp, etc.)
 app.get('/admin/config', requireAdmin, (req, res) => {
@@ -1203,9 +1226,9 @@ app.get('/admin/clicks', requireAdmin, (req, res) => {
 app.listen(PORT, () => {
   logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'Queens server iniciado');
   if (!IS_PROD) {
-    console.log(`\n🏆 Queens → http://localhost:${PORT}`);
-    console.log(`🔑 Admin Panel   → http://localhost:${PORT}/admin`);
-    console.log(`🔑 Password      → ${ADMIN_PASSWORD}\n`);
+    console.log(`\nResuelvo España / app local → http://localhost:${PORT}`);
+    console.log(`Panel de administración → http://localhost:${PORT}/admin/login`);
+    if (!ADMIN_PASSWORD) console.log('ADMIN_PASSWORD no configurada: el acceso de administrador permanece deshabilitado.');
   }
 });
 
