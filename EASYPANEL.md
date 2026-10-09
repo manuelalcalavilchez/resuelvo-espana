@@ -1,6 +1,6 @@
-# Despliegue en Easypanel — Queens
+# Despliegue en EasyPanel — Resuelvo España
 
-Guía rápida para desplegar este proyecto en [Easypanel](https://easypanel.io/) usando el `Dockerfile` incluido.
+Guía para la copia independiente `manuelalcalavilchez/resuelvo-espana`, rama `main`. La aplicación se sirve en `/servicios` dentro del servidor Express existente. No se ha desplegado ni publicado este commit desde Desktop Commander; antes de admitir clientes reales hay que completar las tareas legales, de persistencia y privacidad descritas en `README_RESUELVO.md`. No hay cobros reales activos.
 
 ---
 

@@ -7,6 +7,11 @@ node_modules/
 .env.*.local
 
 # Runtime data (perfiles, usuarios, agencias, sessions, backups, config)
+data/solicitudes.json
+data/profesionales.json
+data/creditos-ledger.json
+data/marketplace-audit.json
+audit-resuelvo.json
 data/perfiles.json
 data/usuarios.json
 data/agencias.json

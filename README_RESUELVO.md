@@ -2,16 +2,26 @@
 
 Esta es una evolución independiente del repositorio Queen2. El repositorio original no se modifica. La aplicación existente se conserva y el nuevo vertical se incorpora en `/servicios`.
 
-## MVP incluido
+## Funcionalidad implementada
 
-- Formulario público de solicitudes para servicios profesionales.
-- Cobertura de las 50 provincias y Ceuta y Melilla.
-- Catálogo inicial de categorías de hogar, mantenimiento, informática y servicios personales.
-- Validación de datos en servidor y consentimiento expreso antes de guardar datos de contacto.
-- Persistencia atómica en `data/solicitudes.json`.
-- Identificador único de solicitud, estado, urgencia, categoría y precio orientativo interno de lead.
-- API de catálogo en `GET /servicios/api/catalogo` y healthcheck en `GET /servicios/api/health`.
-- Diseño responsive para móvil y escritorio.
+- Formulario público de solicitudes, 17 categorías y cobertura nacional (50 provincias, Ceuta y Melilla).
+- Validación en servidor, límites de longitud, consentimiento obligatorio y teléfono no expuesto en páginas públicas.
+- Persistencia JSON con escritura atómica, identificadores únicos, fecha de retención prevista y registro de auditoría.
+- Registro de profesionales con contraseñas hash bcrypt, selección de especialidades/provincias, aprobación manual e inicio de sesión con sesión.
+- Panel profesional con matching por categoría/provincia, máximo de tres asignaciones por solicitud y desbloqueo de contacto mediante libro de créditos.
+- Panel administrativo de solicitudes y aprobación/rechazo de profesionales; requiere sesión de administrador existente (`/admin/login`).
+- Límites de frecuencia para operaciones de escritura y autenticación; API de catálogo y healthcheck.
+
+## Rutas principales
+
+- `GET /servicios` — página pública y formulario.
+- `POST /servicios/solicitud` — crea una solicitud con consentimiento.
+- `GET/POST /servicios/profesionales/registro` — alta pendiente de aprobación.
+- `GET/POST /servicios/profesionales/entrar` — acceso profesional.
+- `GET /servicios/profesionales/panel` — oportunidades y contactos desbloqueados.
+- `POST /servicios/profesionales/leads/:id/desbloquear` — asignación mediante créditos.
+- `GET /servicios/admin/leads` — administración de leads y profesionales.
+- `GET /servicios/api/catalogo` y `GET /servicios/api/health` — API de catálogo y healthcheck.
 
 ## Ejecutar
 
