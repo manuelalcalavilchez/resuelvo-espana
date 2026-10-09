@@ -6,7 +6,8 @@ Esta es una evolución independiente del repositorio Queen2. El repositorio orig
 
 - Formulario público de solicitudes, 17 categorías y cobertura nacional (50 provincias, Ceuta y Melilla).
 - Validación en servidor, límites de longitud, consentimiento obligatorio y teléfono no expuesto en páginas públicas.
-- Persistencia JSON con escritura atómica, identificadores únicos, fecha de retención prevista y registro de auditoría.
+- Persistencia JSON con escritura atómica, identificadores únicos, fecha de retención y auditoría; purga diaria de solicitudes caducadas con registro del número eliminado.
+- Prueba automatizada aislada de la política de retención ejecutable con `npm test`.
 - Registro de profesionales con contraseñas hash bcrypt, selección de especialidades/provincias, aprobación manual e inicio de sesión con sesión.
 - Panel profesional con matching por categoría/provincia, máximo de tres asignaciones por solicitud y desbloqueo de contacto mediante libro de créditos.
 - Panel administrativo de solicitudes y aprobación/rechazo de profesionales; requiere sesión de administrador existente (`/admin/login`).

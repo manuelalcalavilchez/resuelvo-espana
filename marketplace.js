@@ -5,12 +5,14 @@ const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const rateLimit = require('express-rate-limit');
+const cron = require('node-cron');
 
 const router = express.Router();
 const mutationLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 60, standardHeaders: true, legacyHeaders: false });
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 8, standardHeaders: true, legacyHeaders: false });
 router.use((req, res, next) => req.method === 'GET' || req.method === 'HEAD' ? next() : mutationLimiter(req, res, next));
-const DATA = path.join(__dirname, 'data');
+// Override útil para tests aislados; producción usa el directorio data del proyecto.
+const DATA = process.env.RESUELVO_DATA_DIR || path.join(__dirname, 'data');
 const FILES = {
   leads: path.join(DATA, 'solicitudes.json'),
   pros: path.join(DATA, 'profesionales.json'),
@@ -125,4 +127,30 @@ router.post('/privacidad/solicitud',(req,res)=>{
  const requests=read('audit');requests.push({id:crypto.randomUUID(),action:'privacy.request',actor:'customer',details:{email,type},at:new Date().toISOString()});write('audit',requests.slice(-10000));return redirectMessage(res,'Solicitud registrada','Se ha registrado la petición para revisión manual. La identidad y el alcance deberán verificarse antes de actuar.');
 });
 
-module.exports={router,provincias,categorias};
+// Purga diaria de solicitudes cuyo plazo de conservación ha vencido.
+// Solo se elimina cuando retention_until contiene una fecha válida y vencida;
+// registros antiguos o con fecha inválida se conservan para revisión manual.
+function purgeExpiredLeads(now = Date.now()) {
+ try {
+  const leads = read('leads');
+  const kept = [];
+  let purged = 0;
+  for (const lead of leads) {
+   const expiresAt = Date.parse(lead.retention_until || '');
+   if (Number.isFinite(expiresAt) && expiresAt <= now) purged += 1;
+   else kept.push(lead);
+  }
+  if (purged > 0) {
+   write('leads', kept);
+   audit('leads.retention_purged', 'system', { count: purged });
+  }
+  return { purged, remaining: kept.length };
+ } catch (err) {
+  console.error('[RESUELVO] Error al purgar solicitudes caducadas:', err.message);
+  return { purged: 0, error: true };
+ }
+}
+purgeExpiredLeads();
+cron.schedule('30 5 * * *', () => purgeExpiredLeads());
+
+module.exports={router,provincias,categorias,purgeExpiredLeads};
