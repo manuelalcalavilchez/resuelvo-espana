@@ -24,6 +24,12 @@ Esta es una evolución independiente del repositorio Queen2. El repositorio orig
 - `GET /servicios/admin/leads` — administración de leads y profesionales.
 - `GET /servicios/api/catalogo` y `GET /servicios/api/health` — API de catálogo y healthcheck.
 
+## Calidad y despliegue
+
+El workflow de GitHub Actions `.github/workflows/ci.yml` ejecuta comprobaciones de sintaxis, `npm test`, auditoría de dependencias de producción y construcción de la imagen Docker en cada push a `main` y en pull requests. La publicación en GitHub no equivale por sí sola a un despliegue confirmado: hay que verificar el servicio y su healthcheck en EasyPanel.
+
+La imagen Docker excluye los ficheros de runtime del marketplace. En EasyPanel deben vivir en el volumen persistente montado en `/app/data`; no se deben copiar datos personales a la imagen.
+
 ## Ejecutar
 
 Requiere la versión de Node.js compatible con el `package.json` original.

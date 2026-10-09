@@ -41,3 +41,10 @@ build
 # Imágenes temporales de debug
 public/img/models/debug-*
 public/img/models/hero-banner-nomast.png
+
+# Marketplace runtime data: never bake personal data into an image
+data/solicitudes.json
+data/profesionales.json
+data/creditos-ledger.json
+data/marketplace-audit.json
+data/*.tmp

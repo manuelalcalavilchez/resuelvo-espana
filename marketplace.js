@@ -62,8 +62,11 @@ router.post('/profesionales/registro',authLimiter,async(req,res)=>{
  const b=req.body||{}, email=String(b.email||'').trim().toLowerCase(), empresa=String(b.empresa||'').trim(), nombre=String(b.nombre_contacto||'').trim(), telefono=String(b.telefono||'').trim(), password=String(b.password||''), cats=[].concat(b.categorias||[]).filter(x=>categorias.some(c=>c[0]===x)), provs=[].concat(b.provincias||[]).filter(x=>provincias.includes(x));
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!empresa||!nombre||telefono.replace(/\D/g,'').length<9||password.length<12||cats.length===0||provs.length===0||b.acepta!=='si') return redirectMessage(res,'Datos incompletos','Revisa email, teléfono, contraseña (mínimo 12 caracteres), servicios, provincias y consentimiento.',400);
  const pros=read('pros'); if(pros.some(p=>p.email===email)) return redirectMessage(res,'Cuenta existente','Ya hay una cuenta registrada con ese email. Prueba a iniciar sesión.',409);
- const pro={id:'PRO-'+crypto.randomBytes(6).toString('hex').toUpperCase(),empresa:empresa.slice(0,100),nombre_contacto:nombre.slice(0,80),email,telefono:telefono.slice(0,24),password_hash:await bcrypt.hash(password,12),categorias:cats,provincias:provs,status:'pending',credits:0,verified:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),consentimiento_at:new Date().toISOString()};
- pros.push(pro);write('pros',pros);audit('professional.registered',pro.id,{email,categories:cats.length,provinces:provs.length});
+ const password_hash=await bcrypt.hash(password,12);
+ // Releer después del hash: evita que dos registros concurrentes sobrescriban la misma lista.
+ const latestPros=read('pros'); if(latestPros.some(p=>p.email===email)) return redirectMessage(res,'Cuenta existente','Ya hay una cuenta registrada con ese email. Prueba a iniciar sesión.',409);
+ const pro={id:'PRO-'+crypto.randomBytes(6).toString('hex').toUpperCase(),empresa:empresa.slice(0,100),nombre_contacto:nombre.slice(0,80),email,telefono:telefono.slice(0,24),password_hash,categorias:cats,provincias:provs,status:'pending',credits:0,verified:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),consentimiento_at:new Date().toISOString()};
+ latestPros.push(pro);write('pros',latestPros);audit('professional.registered',pro.id,{categories:cats.length,provinces:provs.length});
  return redirectMessage(res,'Solicitud enviada','Tu cuenta está pendiente de revisión. Podrás iniciar sesión cuando el equipo la apruebe.');
 });
 router.get('/profesionales/entrar',(req,res)=>{
@@ -72,7 +75,7 @@ router.get('/profesionales/entrar',(req,res)=>{
 });
 router.post('/profesionales/entrar',authLimiter,async(req,res)=>{
  const email=String(req.body.email||'').trim().toLowerCase(), password=String(req.body.password||''), pro=read('pros').find(p=>p.email===email);
- if(!pro||!(await bcrypt.compare(password,pro.password_hash||''))) { audit('professional.login_failed','anonymous',{email}); return redirectMessage(res,'No se pudo iniciar sesión','Email o contraseña incorrectos.',401); }
+ if(!pro||!(await bcrypt.compare(password,pro.password_hash||''))) { audit('professional.login_failed','anonymous'); return redirectMessage(res,'No se pudo iniciar sesión','Email o contraseña incorrectos.',401); }
  if(pro.status!=='approved') return redirectMessage(res,'Cuenta pendiente',pro.status==='rejected'?'La solicitud no ha sido aprobada. Contacta con soporte.':'La cuenta está pendiente de aprobación. No se ha habilitado el acceso a leads.',403);
  req.session.marketplaceProId=pro.id; audit('professional.login',pro.id); res.redirect('/servicios/profesionales/panel');
 });
@@ -92,8 +95,12 @@ router.post('/profesionales/leads/:id/desbloquear',requirePro,(req,res)=>{
  if(lead.asignaciones.length>=3) return redirectMessage(res,'Cupo completo','Esta solicitud ya ha alcanzado el límite de profesionales.',409);
  const cost=creditCost(lead), bal=balance(pro.id);
  if(bal<cost) return redirectMessage(res,'Saldo insuficiente','No tienes créditos suficientes. La recarga se habilitará cuando se integre un proveedor de pagos.',402);
- const ledger=read('ledger'); ledger.push({id:crypto.randomUUID(),proId:pro.id,leadId:lead.id,amount:-cost,type:'lead_unlock',at:new Date().toISOString()}); write('ledger',ledger);
- lead.asignaciones.push({proId:pro.id,at:new Date().toISOString(),cost}); lead.estado='asignado';lead.updated_at=new Date().toISOString();write('leads',leads);audit('lead.unlocked',pro.id,{leadId:lead.id,cost});
+ const ledger=read('ledger'); const previousLedger=ledger.slice(); ledger.push({id:crypto.randomUUID(),proId:pro.id,leadId:lead.id,amount:-cost,type:'lead_unlock',at:new Date().toISOString()});
+ lead.asignaciones.push({proId:pro.id,at:new Date().toISOString(),cost}); lead.estado='asignado';lead.updated_at=new Date().toISOString();
+ // Si falla la segunda escritura, revertimos el débito para no cobrar sin asignar el contacto.
+ try { write('ledger',ledger); write('leads',leads); }
+ catch (err) { try { write('ledger',previousLedger); } catch (rollbackErr) { console.error('[RESUELVO] Falló la reversión de crédito:',rollbackErr.message); } throw err; }
+ audit('lead.unlocked',pro.id,{leadId:lead.id,cost});
  res.redirect('/servicios/profesionales/panel');
 });
 
