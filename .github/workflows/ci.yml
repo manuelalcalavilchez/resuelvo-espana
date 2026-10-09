@@ -27,6 +27,7 @@ jobs:
           node --check server.js
           node --check marketplace.js
           node --check scripts/test-retention.js
+          node --check scripts/test-marketplace-flows.js
       - name: Marketplace tests
         run: npm test
       - name: Production dependency audit
