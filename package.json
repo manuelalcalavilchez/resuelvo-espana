@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
     "dev": "nodemon --exec \"node --env-file-if-exists=.env server.js\"",
-    "test": "node scripts/test-retention.js"
+    "test": "node scripts/test-retention.js && node scripts/test-marketplace-flows.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
