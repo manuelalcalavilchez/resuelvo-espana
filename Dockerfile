@@ -34,7 +34,7 @@ COPY . .
 
 # Aseguramos las carpetas que se montarán como volúmenes en Easypanel
 RUN mkdir -p /app/data /app/public/uploads \
-    && chown -R node:node /app
+    && chown -R node:node /app/data /app/public/uploads
 
 # Ejecutamos como usuario no-root por seguridad
 USER node
