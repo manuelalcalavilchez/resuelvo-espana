@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────────
 # Stage 1: build dependencies (incl. bcrypt nativo)
 # ─────────────────────────────────────────────
-FROM node:20-slim AS deps
+FROM node:22-slim AS deps
 
 # bcrypt necesita compilar binarios nativos
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -18,7 +18,7 @@ RUN npm ci --omit=dev --no-audit --no-fund
 # ─────────────────────────────────────────────
 # Stage 2: runtime ligero
 # ─────────────────────────────────────────────
-FROM node:20-slim AS runtime
+FROM node:22-slim AS runtime
 
 ENV NODE_ENV=production \
     PORT=3000 \
