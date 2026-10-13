@@ -32,7 +32,7 @@ function page(title,body,user=null) { return '<!doctype html><html lang="es"><he
 function redirectMessage(res, title, message, status=200) { return res.status(status).type('html').send(page(title,'<section class="card"><h1>'+esc(title)+'</h1><p>'+esc(message)+'</p><p><a class="btn alt" href="/servicios">Volver a Resuelvo</a></p></section>')); }
 function currentPro(req) { if(!req.session || !req.session.marketplaceProId) return null; return read('pros').find(p=>p.id===req.session.marketplaceProId && p.status==='approved')||null; }
 function requirePro(req,res,next) { const p=currentPro(req); if(!p) return res.redirect('/servicios/profesionales/entrar'); req.marketplacePro=p; next(); }
-function requireAdmin(req,res,next) { if(req.session && req.session.isAdmin===true) return next(); return res.status(403).type('html').send(page('Acceso restringido','<section class="card"><h1>Acceso restringido</h1><p>Inicia sesión como administrador en el panel principal para gestionar solicitudes.</p><a class="btn" href="/admin/login">Entrar como administrador</a></section>')); }
+function requireAdmin(req,res,next) { if(req.session && req.session.resuelvoAdmin===true) return next(); return res.redirect('/servicios/admin/login'); }
 function creditCost(lead) { return money(lead.precio_referencia_lead_eur); }
 function balance(proId) { return read('ledger').filter(x=>x.proId===proId).reduce((s,x)=>s+x.amount,0); }
 function htmlFormField(name,label,type='text',required=true,extra='') { return '<div class="field"><label for="'+name+'">'+label+(required?' *':'')+'</label><input id="'+name+'" name="'+name+'" type="'+type+'" '+(required?'required':'')+' '+extra+'></div>'; }
@@ -104,6 +104,31 @@ router.post('/profesionales/leads/:id/desbloquear',requirePro,(req,res)=>{
  res.redirect('/servicios/profesionales/panel');
 });
 
+router.get('/admin/login',(req,res)=>{
+ if(req.session && req.session.resuelvoAdmin===true) return res.redirect('/servicios/admin/leads');
+ const body='<section class="card" style="max-width:460px;margin:8vh auto"><p class="pill">Resuelvo España · Administración</p><h1>Acceso de administración</h1><p class="muted">Introduce la contraseña administrativa para gestionar solicitudes y profesionales.</p>'+(req.query.error==='1'?'<p class="danger" role="alert">Contraseña incorrecta o acceso no configurado.</p>':'')+'<form method="post" action="/servicios/admin/login"><div class="field"><label for="password">Contraseña</label><input id="password" name="password" type="password" autocomplete="current-password" required></div><button type="submit">Entrar al panel</button></form></section>';
+ res.type('html').send(page('Acceso de administración',body));
+});
+router.post('/admin/login',authLimiter,(req,res)=>{
+ const expected=process.env.ADMIN_PASSWORD;
+ if(!expected || typeof req.body.password!=='string' || !req.body.password || req.body.password!==expected){ audit('admin.login_failed','anonymous'); return res.redirect('/servicios/admin/login?error=1'); }
+ req.session.regenerate(err=>{
+  if(err) return res.status(500).type('text').send('No se pudo iniciar sesión. Inténtalo de nuevo.');
+  req.session.resuelvoAdmin=true;
+  req.session.user={id:'resuelvo-admin',rol:'admin'};
+  req.session.save(saveErr=>{
+   if(saveErr) return res.status(500).type('text').send('No se pudo guardar la sesión.');
+   audit('admin.login','resuelvo-admin');
+   res.redirect('/servicios/admin/leads');
+  });
+ });
+});
+router.get('/admin/logout',(req,res)=>{
+ if(!req.session) return res.redirect('/servicios/admin/login');
+ delete req.session.resuelvoAdmin;
+ delete req.session.user;
+ req.session.save(()=>res.redirect('/servicios/admin/login'));
+});
 router.get('/admin/leads',requireAdmin,(req,res)=>{
  const leads=read('leads'), pros=read('pros');
  const body='<h1>Administración de Resuelvo</h1><p class="muted">Solicitudes: '+leads.length+' · Profesionales: '+pros.length+' · Pendientes: '+pros.filter(p=>p.status==='pending').length+'</p><section class="card"><h2>Profesionales pendientes</h2>'+(pros.filter(p=>p.status==='pending').map(p=>'<article class="item"><b>'+esc(p.empresa)+'</b> · '+esc(p.email)+' · '+esc(p.telefono)+'<p>'+esc(p.categorias.join(', '))+' — '+esc(p.provincias.join(', '))+'</p><div class="row"><form method="post" action="/servicios/admin/profesionales/'+encodeURIComponent(p.id)+'/estado"><input type="hidden" name="estado" value="approved"><button>Aprobar</button></form><form method="post" action="/servicios/admin/profesionales/'+encodeURIComponent(p.id)+'/estado"><input type="hidden" name="estado" value="rejected"><button class="alt">Rechazar</button></form></div></article>').join('')||'<p>No hay cuentas pendientes.</p>')+'</section><section class="card"><h2>Solicitudes de clientes</h2>'+(leads.slice().reverse().map(l=>'<article class="item"><b>'+esc(l.id)+' · '+esc(l.nombre_categoria)+'</b> · <span class="pill">'+esc(l.estado)+'</span><p>'+esc(l.provincia)+' / '+esc(l.municipio)+' · '+esc(l.urgencia)+'</p><p>'+esc(l.descripcion)+'</p><p>Contacto: '+esc(l.cliente.nombre)+' · '+esc(l.cliente.telefono)+' · '+esc(l.cliente.email||'Sin email')+'</p><p>Asignados: '+(l.asignaciones||[]).length+'/3</p><div class="row"><form method="post" action="/servicios/admin/leads/'+encodeURIComponent(l.id)+'/estado"><select name="estado"><option value="nuevo">Nuevo</option><option value="asignado">Asignado</option><option value="cerrado">Cerrado</option><option value="eliminado">Eliminar / suprimir</option></select><button class="alt">Actualizar estado</button></form></div></article>').join('')||'<p>No hay solicitudes.</p>')+'</section><section class="card"><h2>Créditos manuales</h2><p class="muted">Solo para pruebas y ajustes administrativos; esto no es un cobro real.</p><form method="post" action="/servicios/admin/creditos"><div class="grid">'+htmlFormField('proId','ID profesional','text')+htmlFormField('amount','Importe de crédito (€)','number',true,'min="0.01" step="0.01"')+'</div><button>Conceder crédito de prueba</button></form></section>';

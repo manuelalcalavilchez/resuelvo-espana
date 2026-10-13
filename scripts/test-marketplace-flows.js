@@ -36,6 +36,7 @@ cron.schedule = () => ({ stop() {} });
     ]));
     fs.writeFileSync(path.join(dataDir, 'marketplace-audit.json'), '[]');
 
+    process.env.ADMIN_PASSWORD = 'test-admin-password-only';
     const { router } = require('../marketplace');
     const app = express();
     app.use(express.urlencoded({ extended: false }));
@@ -86,9 +87,26 @@ cron.schedule = () => ({ stop() {} });
     leads = JSON.parse(fs.readFileSync(path.join(dataDir, 'solicitudes.json'), 'utf8'));
     assert.equal(leads[0].asignaciones.length, 1, 'repeated unlock must not duplicate assignment');
 
-    response = await fetch(base + '/servicios/admin/leads');
-    assert.equal(response.status, 403, 'admin leads must reject anonymous access');
-    console.log('PASS: health, login audit privacy, credit deduction, duplicate unlock, and admin access checks.');
+    response = await fetch(base + '/servicios/admin/leads', { redirect: 'manual' });
+    assert.equal(response.status, 302, 'admin leads must redirect anonymous users to the Resuelvo admin login');
+    assert.equal(response.headers.get('location'), '/servicios/admin/login');
+
+    response = await fetch(base + '/servicios/admin/login');
+    assert.equal(response.status, 200);
+    assert.match(await response.text(), /Resuelvo España.*Administración/);
+
+    response = await fetch(base + '/servicios/admin/login', {
+      method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ password: 'test-admin-password-only' }), redirect: 'manual'
+    });
+    assert.equal(response.status, 302, 'admin login should accept the configured test password');
+    assert.equal(response.headers.get('location'), '/servicios/admin/leads');
+    const adminCookie = (response.headers.get('set-cookie') || '').split(';')[0];
+    assert.ok(adminCookie, 'admin login should create a session cookie');
+    response = await fetch(base + '/servicios/admin/leads', { headers: { cookie: adminCookie } });
+    assert.equal(response.status, 200, 'authenticated admin should access Resuelvo leads');
+    assert.match(await response.text(), /Administración de Resuelvo/);
+    console.log('PASS: health, login audit privacy, credit deduction, duplicate unlock, and Resuelvo admin login/access checks.');
   } catch (err) {
     console.error(err);
     process.exitCode = 1;

@@ -293,6 +293,19 @@ app.use(session({
   }
 }));
 
+// En el subdominio de Resuelvo, las rutas /admin no deben abrir el panel heredado de QUEENS.
+// El dominio principal conserva intactas sus rutas administrativas originales.
+app.use((req, res, next) => {
+  const host = String(req.headers.host || '').split(':')[0].toLowerCase();
+  if (host === 'salvar.mamanoquiere.store') {
+    if (req.path === '/admin' || req.path === '/admin/') return res.redirect(302, '/servicios/admin/leads');
+    if (req.path === '/admin/login') return res.redirect(302, '/servicios/admin/login');
+    if (req.path === '/admin/logout') return res.redirect(302, '/servicios/admin/logout');
+    if (req.path.startsWith('/admin/')) return res.redirect(302, '/servicios/admin/leads');
+  }
+  next();
+});
+
 // Marketplace nacional: montarlo después de express-session para disponer de sesiones seguras.
 app.use('/servicios', require('./marketplace').router);
 
