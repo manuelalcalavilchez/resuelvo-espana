@@ -1,58 +1,38 @@
-# Despliegue en EasyPanel — Resuelvo España
+﻿# Despliegue en EasyPanel â€” Ayuda en el Barrio
 
-Repositorio independiente: `manuelalcalavilchez/resuelvo-espana`, rama `main`.
-El marketplace está montado en `/servicios`. **No desplegar el repositorio original `queen2` ni la rama `master`.** Este MVP todavía requiere una revisión legal y de privacidad y no tiene pagos reales.
+## Servicio
 
-## 1. Servicio
-
-- Tipo: **App**, fuente GitHub.
-- Repositorio: `manuelalcalavilchez/resuelvo-espana`.
+- Repositorio: `manuelalcalavilchez/ayuda-en-el-barrio` (una vez completado el cambio de nombre en GitHub).
 - Rama: `main`.
-- Build: Dockerfile en la raíz.
 - Puerto interno: `3000`.
+- Ruta pÃºblica principal de la aplicaciÃ³n: `/servicios`.
+- AdministraciÃ³n: `/servicios/admin/login`.
+- Salud: `/health` o `/servicios/api/health`.
 
-## 2. Variables de entorno obligatorias
+## Variables de entorno
 
-Configurar en EasyPanel → Environment; no subir secretos al repositorio:
+Configurar como secretos persistentes del servicio:
 
-| Variable | Valor |
-|---|---|
-| `NODE_ENV` | `production` |
-| `PORT` | `3000` |
-| `ADMIN_PASSWORD` | Contraseña única, larga y no reutilizada |
-| `SESSION_SECRET` | Secreto aleatorio de al menos 32 bytes |
+- `NODE_ENV=production`
+- `PORT=3000`
+- `SESSION_SECRET`: valor aleatorio de al menos 32 caracteres.
+- `ADMIN_PASSWORD`: contraseÃ±a administrativa robusta.
+- `RESUELVO_DATA_DIR=/app/data`
 
-Genera los secretos fuera del repositorio. Por ejemplo, en un terminal Linux seguro: `openssl rand -hex 32`. No reutilices contraseñas de otros servicios. El servidor debe detenerse si falta cualquiera de las dos variables críticas.
+No guardar los valores secretos en Git, logs o documentaciÃ³n.
 
-## 3. Volumen persistente
+## Datos persistentes
 
-Crear un volumen persistente montado en **`/app/data`**. El proyecto guarda ahí configuración, perfiles, solicitudes, profesionales, libro de créditos, auditoría y sesiones. Sin persistencia pueden perderse datos y sesiones al redeplegar.
+Montar el volumen de producciÃ³n en `/app/data`. Contiene solicitudes, profesionales, libro de crÃ©ditos, auditorÃ­a y sesiones. No borrar ni sustituir este volumen al publicar una imagen nueva. Antes de cualquier migraciÃ³n, realizar copia de seguridad.
 
-Las subidas usan `/app/public/uploads`; si se habilitan en el despliegue, monta también esa ruta en un volumen persistente. Configura copias de seguridad cifradas y prueba una restauración antes de admitir datos reales.
+## PublicaciÃ³n segura
 
-## 4. Dominio y HTTPS
+1. Ejecutar `npm test`, comprobaciones de sintaxis y `npm audit --omit=dev`.
+2. Construir una imagen etiquetada con el SHA del commit.
+3. Conservar la imagen anterior como rollback.
+4. Actualizar solo el servicio de Ayuda en el Barrio, sin modificar los demás servicios del servidor.
+5. Verificar `/health`, `/servicios/api/health`, portada, inicio de sesiÃ³n administrativo y panel profesional.
+6. Confirmar que el volumen persistente sigue conectado y que el servicio estÃ¡ estable.
 
-1. Asignar el dominio de Resuelvo España en EasyPanel.
-2. Configurar el DNS hacia el servidor.
-3. Activar HTTPS.
-4. Comprobar que las cookies seguras funcionan detrás del proxy.
+El MVP no integra pagos reales. Antes de comercializarlo deben revisarse los textos legales, privacidad y obligaciones de facturaciÃ³n.
 
-## 5. Verificación tras desplegar
-
-- `GET /servicios` debe devolver HTTP 200.
-- `GET /servicios/api/health` debe devolver JSON con `ok: true`.
-- `GET /servicios/api/catalogo` debe mostrar categorías y provincias.
-- `GET /servicios/admin/leads` sin sesión de administrador debe devolver HTTP 403.
-- Verificar que los datos sobreviven a un redeploy.
-- Revisar los logs y confirmar que no se imprimen contraseñas ni secretos.
-
-## 6. Antes de producción comercial
-
-- Migrar la persistencia JSON a PostgreSQL y usar transacciones/concurrencia segura.
-- Implementar eliminación automática y verificable de datos vencidos y gestión real de solicitudes RGPD.
-- Añadir pruebas automatizadas, alertas, backups y restauración.
-- Revisar todos los endpoints y controles de acceso, incluido el código heredado.
-- Integrar pagos, facturación, email y WhatsApp solo con proveedores configurados y pruebas de webhooks.
-- Completar términos, política de privacidad, consentimientos y revisión legal.
-
-**Estado:** MVP técnico; no hay cobros reales ni despliegue de producción confirmado por este documento.

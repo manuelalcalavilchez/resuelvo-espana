@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -22,11 +22,11 @@ cron.schedule = () => ({ stop() {} });
     fs.writeFileSync(path.join(dataDir, 'profesionales.json'), JSON.stringify([{
       id: proId, empresa: 'Profesional de prueba', nombre_contacto: 'Prueba', email: 'flow-test@example.invalid',
       telefono: '600123456', password_hash: await bcrypt.hash(password, 4), categorias: ['fontaneria'],
-      provincias: ['Almería'], status: 'approved', verified: true
+      provincias: ['AlmerÃ­a'], status: 'approved', verified: true
     }]));
     fs.writeFileSync(path.join(dataDir, 'solicitudes.json'), JSON.stringify([{
-      id: leadId, servicio: 'fontaneria', nombre_categoria: 'Fontanería', precio_referencia_lead_eur: 7,
-      provincia: 'Almería', municipio: 'Almería', urgencia: 'esta_semana', descripcion: 'Reparación de prueba',
+      id: leadId, servicio: 'fontaneria', nombre_categoria: 'FontanerÃ­a', precio_referencia_lead_eur: 7,
+      provincia: 'AlmerÃ­a', municipio: 'AlmerÃ­a', urgencia: 'esta_semana', descripcion: 'ReparaciÃ³n de prueba',
       cliente: { nombre: 'Cliente de prueba', telefono: '600111222', email: 'customer@example.invalid' },
       consentimiento_contacto: true, estado: 'nuevo', asignaciones: [], created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(), retention_until: future
@@ -93,7 +93,7 @@ cron.schedule = () => ({ stop() {} });
 
     response = await fetch(base + '/servicios/admin/login');
     assert.equal(response.status, 200);
-    assert.match(await response.text(), /Resuelvo España.*Administración/);
+    assert.match(await response.text(), /Ayuda en el Barrio.*Administraci/);
 
     response = await fetch(base + '/servicios/admin/login', {
       method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -105,8 +105,8 @@ cron.schedule = () => ({ stop() {} });
     assert.ok(adminCookie, 'admin login should create a session cookie');
     response = await fetch(base + '/servicios/admin/leads', { headers: { cookie: adminCookie } });
     assert.equal(response.status, 200, 'authenticated admin should access Resuelvo leads');
-    assert.match(await response.text(), /Administración de Resuelvo/);
-    console.log('PASS: health, login audit privacy, credit deduction, duplicate unlock, and Resuelvo admin login/access checks.');
+    assert.match(await response.text(), /Ayuda en el Barrio.*Administraci/);
+    console.log('PASS: health, login audit privacy, credit deduction, duplicate unlock, and Ayuda en el Barrio admin login/access checks.');
   } catch (err) {
     console.error(err);
     process.exitCode = 1;
@@ -115,3 +115,7 @@ cron.schedule = () => ({ stop() {} });
     fs.rmSync(dataDir, { recursive: true, force: true });
   }
 })();
+
+
+
+
