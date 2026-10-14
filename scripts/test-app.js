@@ -135,6 +135,14 @@ const MOJIBAKE = /Ã|Â|â€|âœ/;
     assert.match(adminLeads, /<option value="cerrado" selected>/, 'estado actual preseleccionado');
 
     const refund = J('reembolsos.json')[0];
+    const renameSync = fs.renameSync; let failRefundWrite = true;
+    fs.renameSync = (from, to) => {
+      if (failRefundWrite && String(to).endsWith('reembolsos.json')) { failRefundWrite = false; throw new Error('fallo simulado al guardar reembolso'); }
+      return renameSync(from, to);
+    };
+    r = await post('/servicios/admin/reembolsos/' + refund.id, { decision: 'aprobar' }, ac);
+    assert.equal(r.status, 500, 'un fallo al guardar el reembolso deja el crédito recuperable');
+    fs.renameSync = renameSync;
     r = await post('/servicios/admin/reembolsos/' + refund.id, { decision: 'aprobar' }, ac);
     assert.equal(r.status, 302);
     assert.equal(bal(), 30, 'reembolso devuelve créditos');
@@ -154,6 +162,9 @@ const MOJIBAKE = /Ã|Â|â€|âœ/;
     r = await post('/servicios/admin/leads/' + newLead.id + '/estado', { estado: 'eliminado' }, ac);
     const sup = J('solicitudes.json').find(l => l.id === newLead.id);
     assert.equal(sup.cliente.telefono, '', 'suprimir anonimiza datos personales');
+    r = await post('/servicios/admin/leads/' + newLead.id + '/estado', { estado: 'nuevo' }, ac);
+    assert.equal(r.status, 400, 'una solicitud suprimida no se puede reabrir');
+    assert.equal(J('solicitudes.json').find(l => l.id === newLead.id).estado, 'eliminado');
 
     step = 'suspensión';
     await post('/servicios/admin/profesionales/PRO-LEGACY/estado', { estado: 'suspended' }, ac);
@@ -173,12 +184,19 @@ const MOJIBAKE = /Ã|Â|â€|âœ/;
     const sign = (body, secret = 'whsec_test') => { const t = Math.floor(Date.now() / 1000); return 't=' + t + ',v1=' + crypto.createHmac('sha256', secret).update(t + '.' + body).digest('hex'); };
     r = await req('/servicios/pagos/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': sign(event, 'otro') }, body: event });
     assert.equal(r.status, 400, 'firma inválida rechazada');
-    for (let i = 0; i < 2; i++) {
-      r = await req('/servicios/pagos/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': sign(event) }, body: event });
-      assert.equal(r.status, 200);
-    }
+    const renamePayment = fs.renameSync; let failPaymentWrite = true;
+    fs.renameSync = (from, to) => {
+      if (failPaymentWrite && String(to).endsWith('pagos.json')) { failPaymentWrite = false; throw new Error('fallo simulado al guardar pago'); }
+      return renamePayment(from, to);
+    };
+    r = await req('/servicios/pagos/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': sign(event) }, body: event });
+    assert.equal(r.status, 500, 'el primer intento falla después de acreditar');
+    fs.renameSync = renamePayment;
+    r = await req('/servicios/pagos/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': sign(event) }, body: event });
+    assert.equal(r.status, 200, 'el reintento reconcilia el pago parcialmente guardado');
     const pendBal = J('creditos-ledger.json').filter(x => x.proId === 'PRO-PEND').reduce((s, x) => s + x.amount, 0);
     assert.equal(pendBal, 55, 'paquete de 50 € acredita 55 una sola vez');
+    assert.equal(J('pagos.json').find(x => x.id === 'cs_test_1').estado, 'pagado', 'el pago conciliado aparece en administración');
     const tampered = JSON.stringify({ type: 'checkout.session.completed', data: { object: { id: 'cs_test_2', payment_status: 'paid', amount_total: 100, currency: 'eur', metadata: { proId: 'PRO-PEND', pack: 'p100' } } } });
     r = await req('/servicios/pagos/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'stripe-signature': sign(tampered) }, body: tampered });
     assert.equal(r.status, 400, 'importe que no cuadra con el paquete rechazado');

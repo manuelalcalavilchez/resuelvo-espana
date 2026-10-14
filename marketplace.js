@@ -327,7 +327,14 @@ function stripeWebhook(req, res) {
   const pays = read('payments'); let pay = pays.find(x => x.id === s.id);
   if (pay && pay.estado === 'pagado') return res.json({ received: true, duplicate: true });
   const ledger = read('ledger');
-  if (ledger.some(x => x.paymentId === s.id)) return res.json({ received: true, duplicate: true });
+  // Si el crédito llegó a escribirse pero falló el pago, el reintento de Stripe
+  // termina el segundo paso en vez de reconocer un pago que no aparece en el panel.
+  if (ledger.some(x => x.paymentId === s.id)) {
+    if (!pay) { pay = { id: s.id, proId, pack: p.id, amount: p.price, credits: p.credits, created_at: now() }; pays.push(pay); }
+    pay.estado = 'pagado'; pay.paid_at = pay.paid_at || now(); write('payments', pays);
+    audit('payment.reconciled', 'stripe', { proId, pack: p.id, amount: p.price });
+    return res.json({ received: true, duplicate: true });
+  }
   ledger.push({ id: crypto.randomUUID(), proId, amount: p.credits, type: 'purchase', paymentId: s.id, note: 'Paquete ' + p.label + ' (' + eur(p.price) + ')', at: now() });
   write('ledger', ledger);
   if (!pay) { pay = { id: s.id, proId, pack: p.id, amount: p.price, credits: p.credits, created_at: now() }; pays.push(pay); }
@@ -437,7 +444,7 @@ router.get('/admin/leads', requireAdmin, (req, res) => {
 
 router.post('/admin/leads/:id/estado', requireAdmin, (req, res) => {
   const leads = read('leads'), lead = leads.find(l => l.id === req.params.id), estado = String(req.body.estado || '');
-  if (!lead || !['nuevo', 'asignado', 'cerrado', 'eliminado'].includes(estado)) return message(res, 'No se pudo actualizar', 'Solicitud o estado no válido.', 400, { ctx: 'admin', back: ['/servicios/admin/leads', 'Volver'] });
+  if (!lead || lead.estado === 'eliminado' || !['nuevo', 'asignado', 'cerrado', 'eliminado'].includes(estado)) return message(res, 'No se pudo actualizar', 'Solicitud no válida o ya suprimida.', 400, { ctx: 'admin', back: ['/servicios/admin/leads', 'Volver'] });
   lead.estado = estado; lead.updated_at = now();
   if (estado === 'eliminado') { lead.cliente = { nombre: '[suprimido]', telefono: '', email: '' }; lead.descripcion = '[suprimido a petición]'; lead.municipio = '[suprimido]'; lead.suprimido_at = now(); }
   write('leads', leads); audit('lead.status_changed', 'admin', { leadId: lead.id, status: estado });
@@ -500,7 +507,14 @@ router.get('/admin/reembolsos', requireAdmin, (req, res) => {
 router.post('/admin/reembolsos/:id', requireAdmin, (req, res) => {
   const refunds = read('refunds'), r = refunds.find(x => x.id === req.params.id), decision = req.body.decision;
   if (!r || r.estado !== 'pendiente' || !['aprobar', 'rechazar'].includes(decision)) return message(res, 'No se pudo procesar', 'Aviso no válido o ya resuelto.', 400, { ctx: 'admin', back: ['/servicios/admin/reembolsos', 'Volver'] });
-  if (decision === 'aprobar') { const ledger = read('ledger'); ledger.push({ id: crypto.randomUUID(), proId: r.proId, leadId: r.leadId, amount: r.amount, type: 'refund', note: 'Contacto no válido: ' + (MOTIVOS[r.motivo] || r.motivo), at: now() }); write('ledger', ledger); }
+  if (decision === 'aprobar') {
+    const ledger = read('ledger');
+    // Si el fichero de reembolsos falló tras escribir el libro, no volvemos a acreditar.
+    if (!ledger.some(x => x.refundId === r.id)) {
+      ledger.push({ id: crypto.randomUUID(), refundId: r.id, proId: r.proId, leadId: r.leadId, amount: r.amount, type: 'refund', note: 'Contacto no válido: ' + (MOTIVOS[r.motivo] || r.motivo), at: now() });
+      write('ledger', ledger);
+    }
+  }
   r.estado = decision === 'aprobar' ? 'aprobado' : 'rechazado'; r.resolved_at = now(); write('refunds', refunds); audit('refund.' + r.estado, 'admin', { refundId: r.id, proId: r.proId });
   res.redirect('/servicios/admin/reembolsos?m=ok');
 });

@@ -11,6 +11,9 @@ data/solicitudes.json
 data/profesionales.json
 data/creditos-ledger.json
 data/marketplace-audit.json
+data/privacidad-solicitudes.json
+data/reembolsos.json
+data/pagos.json
 audit-resuelvo.json
 data/perfiles.json
 data/usuarios.json
