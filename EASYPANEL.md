@@ -1,38 +1,63 @@
-﻿# Despliegue en EasyPanel â€” Ayuda en el Barrio
+# Despliegue en Easypanel — Ayuda en el Barrio
 
 ## Servicio
 
-- Repositorio: `manuelalcalavilchez/ayuda-en-el-barrio` (una vez completado el cambio de nombre en GitHub).
-- Rama: `main`.
-- Puerto interno: `3000`.
-- Ruta pÃºblica principal de la aplicaciÃ³n: `/servicios`.
-- AdministraciÃ³n: `/servicios/admin/login`.
-- Salud: `/health` o `/servicios/api/health`.
+- Repositorio: `manuelalcalavilchez/resuelvo-espana` · rama `main`.
+- Puerto interno: `3000`. Una sola réplica (los datos son ficheros JSON).
+- Portada: `/servicios` · Administración: `/servicios/admin/login`.
+- Salud: `/health` o `/servicios/api/health` (devuelven la versión de `package.json`).
 
 ## Variables de entorno
 
-Configurar como secretos persistentes del servicio:
+Obligatorias:
 
 - `NODE_ENV=production`
 - `PORT=3000`
-- `SESSION_SECRET`: valor aleatorio de al menos 32 caracteres.
-- `ADMIN_PASSWORD`: contraseÃ±a administrativa robusta.
 - `RESUELVO_DATA_DIR=/app/data`
+- `SESSION_SECRET`: valor aleatorio de al menos 32 caracteres.
+- `ADMIN_PASSWORD`: contraseña administrativa robusta.
 
-No guardar los valores secretos en Git, logs o documentaciÃ³n.
+Recomendadas:
 
-## Datos persistentes
+- `PUBLIC_BASE_URL=https://tu-dominio` (sin barra final): canonical, sitemap y retorno de Stripe.
+- `LEGAL_TITULAR`, `LEGAL_NIF`, `LEGAL_DOMICILIO`, `LEGAL_EMAIL`: datos del responsable que aparecen en aviso legal, privacidad y condiciones. Si faltan, las páginas muestran «pendiente de completar» y el panel de administración lo avisa.
 
-Montar el volumen de producciÃ³n en `/app/data`. Contiene solicitudes, profesionales, libro de crÃ©ditos, auditorÃ­a y sesiones. No borrar ni sustituir este volumen al publicar una imagen nueva. Antes de cualquier migraciÃ³n, realizar copia de seguridad.
+Pagos (opcionales; la recarga de créditos solo se activa si existen las dos):
 
-## PublicaciÃ³n segura
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
 
-1. Ejecutar `npm test`, comprobaciones de sintaxis y `npm audit --omit=dev`.
-2. Construir una imagen etiquetada con el SHA del commit.
-3. Conservar la imagen anterior como rollback.
-4. Actualizar solo el servicio de Ayuda en el Barrio, sin modificar los demás servicios del servidor.
-5. Verificar `/health`, `/servicios/api/health`, portada, inicio de sesiÃ³n administrativo y panel profesional.
-6. Confirmar que el volumen persistente sigue conectado y que el servicio estÃ¡ estable.
+No guardar secretos en Git, logs ni documentación.
 
-El MVP no integra pagos reales. Antes de comercializarlo deben revisarse los textos legales, privacidad y obligaciones de facturaciÃ³n.
+## Activar Stripe
 
+1. En Stripe → Desarrolladores → Webhooks, crear un endpoint `https://tu-dominio/servicios/pagos/webhook` con el evento `checkout.session.completed` (y `checkout.session.async_payment_succeeded` si se activan métodos diferidos).
+2. Copiar el secreto de firma (`whsec_…`) a `STRIPE_WEBHOOK_SECRET` y la clave secreta (`sk_live_…` o `sk_test_…`) a `STRIPE_SECRET_KEY`.
+3. Reiniciar el servicio. Probar primero con claves de test: comprar un paquete desde el panel profesional y comprobar que aparece en Administración → Pagos y en el saldo.
+
+Paquetes (definidos en `lib/payments.js`): 20 € → 20 créditos · 50 € → 55 · 100 € → 115. Precios con IVA incluido; la facturación queda fuera de la aplicación.
+
+## Datos persistentes y migración
+
+Montar el volumen de producción en `/app/data`. Contiene solicitudes, profesionales, libro de créditos, auditoría, reembolsos, pagos, peticiones de privacidad, sesiones y copias de seguridad.
+
+Al arrancar, la versión 1.2.0 ejecuta una **migración idempotente**:
+
+- Corrige provincias guardadas con doble codificación (`AlmerÃ­a` → `Almería`) en profesionales y solicitudes, y los nombres de categoría.
+- Copia las peticiones RGPD que estaban en el log de auditoría a `privacidad-solicitudes.json`.
+- Antes de escribir guarda una copia en `data/backups/pre-migracion-<fecha>/`. Si no hay nada que corregir, no escribe nada.
+
+Aun así, **haz una copia del volumen antes de publicar**.
+
+## Publicación segura
+
+1. Copia de seguridad del volumen `/app/data`.
+2. `npm ci && npm run check && npm test && npm audit` (lo hace la CI en cada push).
+3. Construir la imagen etiquetada con el SHA del commit y conservar la anterior para rollback.
+4. Actualizar solo el servicio de Ayuda en el Barrio.
+5. Verificar: `/health`, portada, envío de una solicitud de prueba, login de administración, listado de profesionales, login profesional y panel.
+6. Revisar en los logs que no aparezcan errores de migración y que exista `data/backups/pre-migracion-*` si había datos heredados.
+
+## Rollback
+
+Volver a la imagen anterior. Si hace falta, restaurar los JSON desde `data/backups/pre-migracion-*/` (la versión anterior funciona con los datos migrados salvo en las provincias con tilde, que volverían a no coincidir).

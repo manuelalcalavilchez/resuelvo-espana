@@ -1,35 +1,32 @@
 # HANDOFF — Ayuda en el Barrio
 
-## Objetivo activo
-Rediseño opción B: experiencia moderna y tecnológica, mobile-first, buscador visual protagonista, categorías en tarjetas y marca cercana de barrio.
+## Estado (14 oct 2026)
 
-## Estado conocido
-- Repositorio local: `I:\REPOS\resuelvo-espana`
-- Rama de trabajo prevista: `redesign/opcion-b`
-- Commit base de marca: `a812738` (`Rebrand marketplace as Ayuda en el Barrio`)
-- GitHub remoto aún usa el nombre `resuelvo-espana`.
-- El despliegue de `a812738` en producción no estaba confirmado; la última imagen confirmada era `resuelvo-espana:eff9a95`.
-- Mantener intactos datos persistentes, endpoints, formularios, sesiones, acceso de profesionales y administración.
-- No tocar servicios QUEEN, CRM ni dominios no relacionados.
+- Rama `feat/fase0-arreglos-monetizacion`, creada desde `redesign/opcion-b` (414cbeb). PR abierta contra `main`.
+- Versión 1.2.0. `npm run check`, `npm test` (3 suites) y `npm audit` en verde.
+- Revisión visual hecha en escritorio (1360 px) y móvil (390 px): portada, alta, legal, panel, créditos, perfil y administración, sin desbordes ni errores de consola.
+- El despliegue en producción NO se ha hecho: requiere copia del volumen y publicación desde Easypanel (ver EASYPANEL.md).
 
-## Hallazgos antes del rediseño
-- `marketplace.js` genera el HTML y CSS en línea; la portada es `router.get('/')`.
-- Hay cadenas con mojibake (por ejemplo `FontanerÃ­a`, `soluciÃ³n`, `Â¿`) y símbolos/emoji rotos. Corregir con cuidado, comprobando UTF-8 y sin reemplazos globales ciegos.
-- El terminal de Desktop Commander empezó a bloquear algunas órdenes con la ruta del repositorio; `list_directory` y `read_file` sí respondían.
+## Qué cambia respecto a la auditoría
 
-## Progreso opción B (13 oct 2026)
-- Rama `redesign/opcion-b` creada desde `a812738`.
-- Actualizada la plantilla `page()` con identidad visual verde bosque/verde lima, tipografía fuerte, navegación fija translúcida, formularios accesibles y estilos responsive.
-- Rediseñada la portada: hero oscuro, formulario destacado, categorías rápidas y bloque de confianza. Se conservan `name` de los campos, `POST /solicitud`, categorías, provincia, urgencia y consentimiento.
-- Se han corregido algunas cadenas de provincias/categorías con mojibake; aún quedan textos rotos en páginas secundarias y mensajes. No considerar completa la limpieza de codificación.
-- `node --check marketplace.js` pasó después de corregir un salto de línea que rompía el literal JS.
-- `npm test` inició y el test de retención pasó; el proceso no había mostrado aún resultado del segundo test al último sondeo. No declarar suite completa hasta obtener el resultado final.
+- Crítico: migración idempotente de provincias con mojibake (con copia en `data/backups/`).
+- Handlers async con captura de errores y manejador global: un fallo de E/S ya no tumba el proceso.
+- Solo se pueden desbloquear solicitudes `nuevo`/`asignado`; el desbloqueo no reabre solicitudes.
+- Administración de profesionales: IDs, saldo, aprobar/suspender, verificar y ajustar créditos (±, sin saldo negativo).
+- Páginas legales, formulario RGPD con almacenamiento propio y supresión real de datos personales.
+- Sesión regenerada en el login profesional, logout por POST, CSRF por origen, honeypot, comparación en tiempo constante de la contraseña de administración.
+- Monetización: recarga de créditos con Stripe (apagada sin claves), devoluciones por contacto no válido y página de movimientos.
+- Rediseño completo y coherente de todas las páginas, SEO técnico y accesibilidad básica.
+- Dependencias sin uso eliminadas (incluido nodemon → `node --watch`); CI en ramas `feat/**` con Node 22.
 
-## Siguiente trabajo pendiente
-1. Obtener resultado final de `npm test` y `npm audit --omit=dev`.
-2. Corregir con seguridad el resto de textos de interfaz con mojibake sin alterar datos o lógica.
-3. Verificar que las tarjetas de categoría enfocan el formulario correctamente; el ancla `#solicitud` está al final de la portada y requiere revisión de UX.
-4. Añadir o ajustar pruebas de renderizado de la portada y de las rutas públicas.
-5. Probar la app aislada y verificar HTTP health y página antes de despliegue.
-6. Revisar diff, `git diff --check`, hacer commit en rama de rediseño y actualizar este HANDOFF.
-7. No publicar en producción hasta validar el contenedor y preservar el volumen persistente.
+## Hallazgo durante la verificación
+
+- Helmet pone `Referrer-Policy: no-referrer` por defecto y con esa política Chrome envía `Origin: null` en los formularios: la protección CSRF por origen los habría bloqueado todos. Se usa `strict-origin-when-cross-origin` y hay un test que lo vigila.
+
+## Siguiente trabajo
+
+1. Copia del volumen de producción y despliegue de la PR.
+2. Configurar `PUBLIC_BASE_URL` y `LEGAL_*` en Easypanel; revisar textos legales.
+3. Activar Stripe en modo test y probar una compra completa.
+4. Notificaciones (email/WhatsApp) de nuevas solicitudes a profesionales compatibles.
+5. Recuperación de contraseña por email.
