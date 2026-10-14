@@ -10,6 +10,7 @@ const { read, write, audit, balance, balances } = store;
 const { esc, icon, page, notice, badge, eur, fecha, hace } = require('./lib/ui');
 const payments = require('./lib/payments');
 const legal = require('./lib/legal');
+const notify = require('./lib/notify');
 const { version } = require('./package.json');
 
 const router = express.Router();
@@ -141,6 +142,7 @@ router.post('/solicitud', publicFormLimiter, (req, res) => {
     consentimiento_contacto: true, estado: 'nuevo', asignaciones: [], created_at: t, updated_at: t, retention_until: new Date(Date.now() + 180 * 86400000).toISOString()
   };
   leads.push(lead); write('leads', leads); audit('lead.created', 'customer', { leadId: lead.id, category: servicio, province: provincia });
+  notify.leadCreated(lead, read('pros').filter(p => p.status === 'approved' && (p.provincias || []).includes(provincia) && (p.categorias || []).includes(servicio)));
   res.status(201).type('html').send(page('Solicitud recibida', '<section class="success"><div class="badge">' + icon('check', 36) + '</div><h1>Solicitud recibida</h1>'
     + '<p class="lead" style="margin:0 auto 18px">Hemos guardado tu solicitud de ' + esc(cat[1].toLowerCase()) + ' en ' + esc(municipio) + ' (' + esc(provincia) + ').</p>'
     + '<p>Tu referencia: <span class="ref">' + esc(lead.id) + '</span></p>'
@@ -182,6 +184,7 @@ router.post('/profesionales/registro', authLimiter, wrap(async (req, res) => {
   const t = now();
   const pro = { id: 'PRO-' + crypto.randomBytes(6).toString('hex').toUpperCase(), empresa, nombre_contacto: nombre, email, telefono, password_hash, categorias: cats, provincias: provs, status: 'pending', verified: false, created_at: t, updated_at: t, consentimiento_at: t };
   pros.push(pro); write('pros', pros); audit('professional.registered', pro.id, { categories: cats.length, provinces: provs.length });
+  notify.professionalRegistered(pro);
   return message(res, 'Solicitud enviada', 'Tu cuenta está pendiente de revisión. Podrás iniciar sesión cuando el equipo la apruebe.');
 }));
 
@@ -189,7 +192,7 @@ router.get('/profesionales/entrar', (req, res) => {
   if (currentPro(req)) return res.redirect('/servicios/profesionales/panel');
   const body = '<section class="card narrow"><span class="pill">Acceso profesional</span><h1 style="font-size:2.2rem;margin-top:14px">Entra en tu panel</h1>'
     + '<form method="post" action="/servicios/profesionales/entrar">' + field('email', 'Email', { type: 'email', attrs: 'autocomplete="email"' }) + field('password', 'Contraseña', { type: 'password', attrs: 'autocomplete="current-password"' })
-    + '<button class="block" type="submit">Entrar</button></form><p class="small" style="margin:16px 0 0">¿Aún no tienes cuenta? <a href="/servicios/profesionales/registro">Date de alta gratis</a>. ¿Has olvidado la contraseña? Escríbenos' + (legal.titular().email ? ' a <a href="mailto:' + esc(legal.titular().email) + '">' + esc(legal.titular().email) + '</a>' : '') + '.</p></section>';
+    + '<button class="block" type="submit">Entrar</button></form><p class="small" style="margin:16px 0 0">¿Aún no tienes cuenta? <a href="/servicios/profesionales/registro">Date de alta gratis</a>. <a href="/servicios/profesionales/recuperar">¿Has olvidado la contraseña?</a></p></section>';
   res.type('html').send(page('Acceso profesional', body, { noindex: true }));
 });
 
@@ -210,6 +213,61 @@ router.post('/profesionales/entrar', authLimiter, wrap(async (req, res) => {
 function logoutPro(req, res) { if (req.session) delete req.session.marketplaceProId; res.redirect('/servicios'); }
 router.post('/profesionales/salir', logoutPro);
 router.get('/profesionales/salir', (req, res) => res.type('html').send(page('Salir', '<section class="card narrow"><h1 style="font-size:2rem">¿Cerrar sesión?</h1><form method="post" action="/servicios/profesionales/salir"><button type="submit">Cerrar sesión</button></form></section>', { noindex: true })));
+
+/* ───────────────────────── Recuperación de contraseña ───────────────────────── */
+
+const RESET_TTL_MS = 60 * 60 * 1000;
+const sha256 = s => crypto.createHash('sha256').update(String(s)).digest('hex');
+
+router.get('/profesionales/recuperar', (req, res) => {
+  const contacto = legal.titular().email;
+  const body = '<section class="card narrow"><span class="pill">Acceso profesional</span><h1 style="font-size:2.1rem;margin-top:14px">Recuperar contraseña</h1>'
+    + (notify.mailEnabled()
+      ? '<p class="muted">Escribe el email de tu cuenta y te enviaremos un enlace para elegir una contraseña nueva.</p><form method="post" action="/servicios/profesionales/recuperar">' + field('email', 'Email', { type: 'email', attrs: 'autocomplete="email"' }) + honeypot + '<button class="block" type="submit">Enviar enlace</button></form>'
+      : '<p class="muted">Escríbenos' + (contacto ? ' a <a href="mailto:' + esc(contacto) + '">' + esc(contacto) + '</a>' : '') + ' desde el email de tu cuenta y te ayudaremos a recuperar el acceso.</p>')
+    + '<p class="small" style="margin:16px 0 0"><a href="/servicios/profesionales/entrar">Volver a entrar</a></p></section>';
+  res.type('html').send(page('Recuperar contraseña', body, { noindex: true }));
+});
+
+router.post('/profesionales/recuperar', authLimiter, wrap(async (req, res) => {
+  const generic = () => message(res, 'Revisa tu correo', 'Si existe una cuenta activa con ese email, recibirás un enlace para cambiar la contraseña en unos minutos. Caduca en 1 hora.', 200, { back: ['/servicios/profesionales/entrar', 'Volver a entrar'] });
+  const email = str(req.body.email, 160).toLowerCase();
+  if (req.body.web || !notify.mailEnabled() || !EMAIL_RE.test(email)) return generic();
+  const pros = read('pros'), pro = pros.find(p => p.email === email && p.status === 'approved');
+  if (!pro) { audit('professional.reset_unknown', 'anonymous'); return generic(); }
+  const token = crypto.randomBytes(32).toString('base64url');
+  pro.reset = { hash: sha256(token), expires_at: new Date(Date.now() + RESET_TTL_MS).toISOString() };
+  write('pros', pros); audit('professional.reset_requested', pro.id);
+  const baseUrl = (process.env.PUBLIC_BASE_URL || (req.protocol + '://' + req.get('host'))).replace(/\/$/, '');
+  await notify.passwordReset(pro, baseUrl + '/servicios/profesionales/restablecer?token=' + encodeURIComponent(token));
+  return generic();
+}));
+
+function proByResetToken(token) {
+  if (!token || typeof token !== 'string') return { pros: [], pro: null };
+  const pros = read('pros'), h = sha256(token);
+  const pro = pros.find(p => p.reset && p.reset.hash && p.reset.hash.length === h.length && crypto.timingSafeEqual(Buffer.from(p.reset.hash), Buffer.from(h)) && Date.parse(p.reset.expires_at) > Date.now());
+  return { pros, pro: pro || null };
+}
+
+router.get('/profesionales/restablecer', (req, res) => {
+  const token = String(req.query.token || '');
+  if (!proByResetToken(token).pro) return message(res, 'Enlace no válido', 'El enlace ha caducado o ya se ha usado. Pide uno nuevo.', 400, { back: ['/servicios/profesionales/recuperar', 'Pedir otro enlace'] });
+  const body = '<section class="card narrow"><h1 style="font-size:2.1rem">Elige una contraseña nueva</h1><form method="post" action="/servicios/profesionales/restablecer"><input type="hidden" name="token" value="' + esc(token) + '">'
+    + field('nueva', 'Nueva contraseña', { type: 'password', hint: '(12–72 caracteres)', attrs: 'minlength="12" maxlength="72" autocomplete="new-password"' }) + '<button class="block" type="submit">Guardar contraseña</button></form></section>';
+  res.set('referrer-policy', 'no-referrer').type('html').send(page('Nueva contraseña', body, { noindex: true }));
+});
+
+router.post('/profesionales/restablecer', authLimiter, wrap(async (req, res) => {
+  const nueva = String(req.body.nueva || '');
+  if (nueva.length < 12 || nueva.length > 72) return message(res, 'Contraseña no válida', 'La contraseña debe tener entre 12 y 72 caracteres.', 400, { back: ['/servicios/profesionales/recuperar', 'Volver'] });
+  const hash = await bcrypt.hash(nueva, 12);
+  const { pros, pro } = proByResetToken(String(req.body.token || ''));
+  if (!pro) return message(res, 'Enlace no válido', 'El enlace ha caducado o ya se ha usado. Pide uno nuevo.', 400, { back: ['/servicios/profesionales/recuperar', 'Pedir otro enlace'] });
+  pro.password_hash = hash; delete pro.reset; pro.updated_at = now();
+  write('pros', pros); audit('professional.password_reset', pro.id);
+  return message(res, 'Contraseña cambiada', 'Ya puedes entrar con tu nueva contraseña.', 200, { back: ['/servicios/profesionales/entrar', 'Entrar'] });
+}));
 
 /* ───────────────────────── Panel profesional ───────────────────────── */
 
@@ -340,6 +398,7 @@ function stripeWebhook(req, res) {
   if (!pay) { pay = { id: s.id, proId, pack: p.id, amount: p.price, credits: p.credits, created_at: now() }; pays.push(pay); }
   pay.estado = 'pagado'; pay.paid_at = now(); write('payments', pays);
   audit('payment.paid', 'stripe', { proId, pack: p.id, amount: p.price });
+  notify.paymentPaid(proId, p);
   res.json({ received: true });
 }
 
@@ -431,11 +490,12 @@ router.get('/admin/leads', requireAdmin, (req, res) => {
     + '<p class="small" style="margin:8px 0">' + esc(l.municipio) + ', ' + esc(l.provincia) + ' · ' + esc(urgencias[l.urgencia] || l.urgencia) + ' · ' + eur(creditCost(l)) + ' por contacto</p>'
     + '<p style="line-height:1.6">' + esc(l.descripcion) + '</p>' + (l.estado === 'eliminado' ? '' : contactBlock(l.cliente || {}))
     + '<p class="small" style="margin:10px 0">Profesionales: ' + ((l.asignaciones || []).length ? (l.asignaciones || []).map(a => esc(proName.get(a.proId) || a.proId)).join(', ') : 'ninguno') + ' (' + (l.asignaciones || []).length + '/' + MAX_PROS_PER_LEAD + ')</p>'
-    + '<form class="row" method="post" action="/servicios/admin/leads/' + encodeURIComponent(l.id) + '/estado"><label class="hp" for="e-' + esc(l.id) + '">Estado</label><select id="e-' + esc(l.id) + '" name="estado" style="width:auto">' + [['nuevo', 'Nueva'], ['asignado', 'Asignada'], ['cerrado', 'Cerrada'], ['eliminado', 'Suprimir datos personales (irreversible)']].map(([v, t]) => '<option value="' + v + '"' + (v === l.estado ? ' selected' : '') + '>' + t + '</option>').join('') + '</select><button class="sm alt" type="submit">Actualizar</button></form></article>';
+    + (l.estado === 'eliminado' ? '<p class="small">Datos suprimidos el ' + esc(fecha(l.suprimido_at || l.updated_at)) + '. Estado definitivo.</p>' : '<form class="row" method="post" action="/servicios/admin/leads/' + encodeURIComponent(l.id) + '/estado"><label class="hp" for="e-' + esc(l.id) + '">Estado</label><select id="e-' + esc(l.id) + '" name="estado" style="width:auto">' + [['nuevo', 'Nueva'], ['asignado', 'Asignada'], ['cerrado', 'Cerrada'], ['eliminado', 'Suprimir datos personales (irreversible)']].map(([v, t]) => '<option value="' + v + '"' + (v === l.estado ? ' selected' : '') + '>' + t + '</option>').join('') + '</select><button class="sm alt" type="submit">Actualizar</button></form>') + '</article>';
   const body = '<h1>Administración</h1>' + flash(req)
     + '<section class="grid4" style="margin-bottom:16px"><div class="stat dark"><small>Solicitudes nuevas</small><strong>' + leads.filter(l => l.estado === 'nuevo').length + '</strong></div><a class="stat" style="text-decoration:none;color:inherit" href="/servicios/admin/profesionales?estado=pending"><small>Profesionales pendientes</small><strong>' + pend + '</strong></a><a class="stat" style="text-decoration:none;color:inherit" href="/servicios/admin/reembolsos"><small>Reembolsos pendientes</small><strong>' + refPend + '</strong></a><a class="stat" style="text-decoration:none;color:inherit" href="/servicios/admin/pagos"><small>Ingresos (Stripe)</small><strong>' + eur(ingresos) + '</strong></a></section>'
     + (privPend ? notice('warn', '<span>Hay ' + privPend + ' petición(es) de privacidad pendientes. <a href="/servicios/admin/privacidad">Revisar</a> (plazo legal: 1 mes).</span>') : '')
     + (!legal.completo() ? notice('warn', 'Faltan datos del titular en las páginas legales. Configura LEGAL_TITULAR, LEGAL_NIF, LEGAL_DOMICILIO y LEGAL_EMAIL.') : '')
+    + (!notify.mailEnabled() ? notice('', 'Los emails están desactivados (avisos de solicitudes, altas y recuperación de contraseña). Configura SMTP_HOST, MAIL_FROM y ADMIN_EMAIL.') : '')
     + '<section class="card"><div class="row between"><h2 style="margin:0">Solicitudes de clientes</h2><form class="row" method="get" action="/servicios/admin/leads"><label class="hp" for="q">Buscar</label><input id="q" name="q" value="' + esc(q) + '" placeholder="ID, municipio, nombre, teléfono" style="width:260px"><button class="sm alt" type="submit">Buscar</button></form></div><div style="margin-top:14px">'
     + tabs(base, estado, [['', 'Todas (' + leads.length + ')'], ['nuevo', 'Nuevas'], ['asignado', 'Asignadas'], ['cerrado', 'Cerradas'], ['eliminado', 'Suprimidas']]) + '</div>'
     + (slice.length ? slice.map(leadItem).join('') : '<div class="empty"><p>No hay solicitudes con este filtro.</p></div>') + pager(base + (estado ? (base.includes('?') ? '&' : '?') + 'estado=' + estado : ''), pageNo, rows.length) + '</section>';
@@ -476,7 +536,9 @@ const backToPros = req => '/servicios/admin/profesionales?estado=' + encodeURICo
 router.post('/admin/profesionales/:id/estado', requireAdmin, (req, res) => {
   const pros = read('pros'), pro = pros.find(p => p.id === req.params.id), estado = String(req.body.estado || '');
   if (!pro || !['approved', 'rejected', 'pending', 'suspended'].includes(estado)) return message(res, 'No se pudo actualizar', 'Profesional o estado no válido.', 400, { ctx: 'admin', back: ['/servicios/admin/profesionales', 'Volver'] });
+  const previous = pro.status;
   pro.status = estado; pro.updated_at = now(); write('pros', pros); audit('professional.status_changed', 'admin', { proId: pro.id, status: estado });
+  if (previous !== estado) notify.professionalStatus(pro, estado);
   res.redirect(backToPros(req) + '&m=ok');
 });
 router.post('/admin/profesionales/:id/verificado', requireAdmin, (req, res) => {
@@ -516,6 +578,7 @@ router.post('/admin/reembolsos/:id', requireAdmin, (req, res) => {
     }
   }
   r.estado = decision === 'aprobar' ? 'aprobado' : 'rechazado'; r.resolved_at = now(); write('refunds', refunds); audit('refund.' + r.estado, 'admin', { refundId: r.id, proId: r.proId });
+  notify.refundResolved(read('pros').find(p => p.id === r.proId), r);
   res.redirect('/servicios/admin/reembolsos?m=ok');
 });
 
@@ -556,8 +619,9 @@ router.post('/privacidad/solicitud', publicFormLimiter, (req, res) => {
   const email = str(req.body.email, 160).toLowerCase(), tipo = String(req.body.tipo || '');
   if (!EMAIL_RE.test(email) || !Object.hasOwn(TIPOS_DERECHO, tipo)) return message(res, 'Solicitud no válida', 'Indica un email válido y el tipo de petición.', 400, { back: ['/servicios/privacidad/derechos', 'Volver al formulario'] });
   const rows = read('privacy');
-  rows.push({ id: crypto.randomUUID(), email, tipo, referencia: str(req.body.referencia, 20).toUpperCase(), mensaje: str(req.body.mensaje, 1000), estado: 'pendiente', created_at: now() });
-  write('privacy', rows); audit('privacy.request', 'customer', { type: tipo });
+  const row = { id: crypto.randomUUID(), email, tipo, referencia: str(req.body.referencia, 20).toUpperCase(), mensaje: str(req.body.mensaje, 1000), estado: 'pendiente', created_at: now() };
+  rows.push(row); write('privacy', rows); audit('privacy.request', 'customer', { type: tipo });
+  notify.privacyRequest(row);
   return message(res, 'Solicitud registrada', 'Hemos registrado tu petición. Comprobaremos tu identidad y te responderemos en un plazo máximo de un mes.');
 });
 

@@ -26,6 +26,16 @@ Pagos (opcionales; la recarga de créditos solo se activa si existen las dos):
 
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_INVOICES=1` para que Stripe emita factura de cada recarga y pida NIF opcional (Stripe cobra por factura).
+
+Email (opcional; sin él no hay avisos ni recuperación de contraseña por email):
+
+- `SMTP_HOST`, `SMTP_PORT` (587 STARTTLS o 465 SSL), `SMTP_USER`, `SMTP_PASSWORD`
+- `MAIL_FROM` (remitente) y `ADMIN_EMAIL` (recibe altas pendientes y peticiones de privacidad)
+
+Webhook de eventos (opcional, para n8n o WhatsApp vía Evolution API):
+
+- `NOTIFY_WEBHOOK_URL` y `NOTIFY_WEBHOOK_SECRET`. Se envía un POST JSON `{event, at, data}` con cabecera `x-ayuda-signature: sha256=<HMAC del cuerpo>`. Eventos: `lead.created`, `professional.registered`, `professional.status_changed`, `privacy.request`, `payment.paid`. Nunca incluyen teléfono, nombre ni email del cliente.
 
 No guardar secretos en Git, logs ni documentación.
 

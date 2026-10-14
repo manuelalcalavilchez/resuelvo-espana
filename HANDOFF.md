@@ -17,16 +17,21 @@
 - Sesión regenerada en el login profesional, logout por POST, CSRF por origen, honeypot, comparación en tiempo constante de la contraseña de administración.
 - Monetización: recarga de créditos con Stripe (apagada sin claves), devoluciones por contacto no válido y página de movimientos.
 - Rediseño completo y coherente de todas las páginas, SEO técnico y accesibilidad básica.
-- Dependencias sin uso eliminadas (incluido nodemon → `node --watch`); CI en ramas `feat/**` con Node 22.
+- Dependencias sin uso eliminadas (incluido nodemon → `node --watch`). El cambio de CI (Node 22, ramas `feat/**`) está pendiente de subir a mano: requiere el permiso `workflow` (copia en `tmp-redesign-data/ci.yml`).
 
 ## Hallazgo durante la verificación
 
 - Helmet pone `Referrer-Policy: no-referrer` por defecto y con esa política Chrome envía `Origin: null` en los formularios: la protección CSRF por origen los habría bloqueado todos. Se usa `strict-origin-when-cross-origin` y hay un test que lo vigila.
+
+## v1.3.0 (14 oct 2026, mañana)
+
+- Revisión de Codex en la PR: 4 hallazgos, corregidos por Manuel en `cac3a2b` (ignorar nuevos JSON en Docker/Git, conciliación de pagos, reembolsos idempotentes, supresión definitiva).
+- Añadido: `lib/notify.js` (SMTP + webhook firmado), avisos de nuevas solicitudes/altas/aprobaciones/reembolsos/privacidad, recuperación de contraseña con token de un solo uso (hash SHA-256, 1 h), facturas opcionales de Stripe, la UI oculta el selector de estado en solicitudes suprimidas.
+- Test nuevo `scripts/test-notify.js`.
 
 ## Siguiente trabajo
 
 1. Copia del volumen de producción y despliegue de la PR.
 2. Configurar `PUBLIC_BASE_URL` y `LEGAL_*` en Easypanel; revisar textos legales.
 3. Activar Stripe en modo test y probar una compra completa.
-4. Notificaciones (email/WhatsApp) de nuevas solicitudes a profesionales compatibles.
-5. Recuperación de contraseña por email.
+4. Configurar SMTP y, si se quiere WhatsApp, un flujo n8n que reciba `lead.created` y avise vía Evolution API.

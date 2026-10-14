@@ -14,7 +14,7 @@ Marketplace que conecta a personas que necesitan resolver trabajos cotidianos co
 - Panel de oportunidades (solo solicitudes abiertas de sus servicios y provincias), contactos desbloqueados con enlaces de llamada, WhatsApp y email.
 - Créditos: saldo, movimientos y recarga con Stripe (se activa con variables de entorno).
 - Aviso de contacto no válido con devolución de créditos tras revisión (7 días).
-- Edición de perfil, servicios, zonas y contraseña.
+- Edición de perfil, servicios, zonas y contraseña; recuperación de contraseña por email.
 
 **Administración**
 - Solicitudes con filtros, búsqueda, paginación y supresión de datos personales.
@@ -37,6 +37,7 @@ lib/store.js       Persistencia JSON, auditoría, saldos y migración
 lib/ui.js          Plantilla HTML, estilos, iconos y formato
 lib/payments.js    Stripe Checkout y verificación de firma del webhook
 lib/legal.js       Datos del titular desde variables de entorno
+lib/notify.js      Emails (SMTP) y webhook de eventos firmado
 scripts/           Tests
 ```
 
@@ -66,9 +67,11 @@ npm test
 npm audit
 ```
 
+## Notificaciones
+
+Con SMTP configurado se envían avisos de nuevas solicitudes a los profesionales compatibles (sin datos del cliente), de altas pendientes y peticiones de privacidad al administrador, de cuenta aprobada, de reembolsos y la recuperación de contraseña. Con `NOTIFY_WEBHOOK_URL` los mismos eventos se envían firmados a n8n u otro sistema (por ejemplo, para avisar por WhatsApp).
+
 ## Pendiente antes de comercializar
 
 - Revisión jurídica de los textos legales y alta de los datos del titular.
-- Facturación de las recargas (Stripe Invoicing o herramienta externa).
-- Notificaciones por email o WhatsApp de nuevas solicitudes y de aprobación de cuentas.
-- Recuperación de contraseña automática (ahora se gestiona por soporte).
+- Decidir facturación: `STRIPE_INVOICES=1` o herramienta externa.
